@@ -10,7 +10,7 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
     <h1>Project Hummingbird, hands&nbsp;on.</h1>
     <p class="hero__lead">
       A follow-along guide to Red Hat's rebuild-don't-patch container base —
-      twelve sections, four worked example projects, ten Excalidraw diagrams.
+      sixteen sections, five worked example projects, ten Excalidraw diagrams.
       Cut, paste, run.
     </p>
 
@@ -138,13 +138,11 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card"
-         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/examples"
-         rel="noopener">
+      <a class="doc-card" href="{{ '/examples/' | relative_url }}">
         <span class="doc-card__icon" aria-hidden="true">📦</span>
         <span>
-          <span class="doc-card__title">Example projects ↗</span>
-          <span class="doc-card__desc">Four runnable companion projects: Node, Python, Go, multi-container compose stack, plus an ML variant.</span>
+          <span class="doc-card__title">Example projects</span>
+          <span class="doc-card__desc">Five runnable companion projects: Quarkus, Python, Go, multi-container compose stack, plus an ML variant.</span>
         </span>
       </a>
 
@@ -158,13 +156,11 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card"
-         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/assets/diagrams"
-         rel="noopener">
+      <a class="doc-card" href="{{ '/diagrams/' | relative_url }}">
         <span class="doc-card__icon" aria-hidden="true">📐</span>
         <span>
-          <span class="doc-card__title">Excalidraw diagrams ↗</span>
-          <span class="doc-card__desc">Ten editable architecture and flow diagrams — both .excalidraw source and pre-rendered SVG.</span>
+          <span class="doc-card__title">Excalidraw diagrams</span>
+          <span class="doc-card__desc">Ten architecture and flow diagrams in an embedded gallery — click for fullscreen, download .excalidraw to edit.</span>
         </span>
       </a>
     </div>
