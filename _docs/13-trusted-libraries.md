@@ -120,7 +120,7 @@ USER 1001
 RUN pip install --no-index --find-links=/tmp/wheels /tmp/wheels/*.whl
 ENV PYTHONPATH=/app/src
 EXPOSE 8000
-CMD ["python", "-m", "src.main"]
+CMD ["python3", "-m", "src.main"]
 ```
 
 The runtime stage doesn't reach the network — `--no-index

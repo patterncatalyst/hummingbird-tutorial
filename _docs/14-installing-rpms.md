@@ -74,7 +74,7 @@ COPY --from=builder /staged/usr/  /usr/
 
 USER 1001
 COPY --chown=1001:1001 src/ ./src/
-CMD ["python", "-m", "src.main"]
+CMD ["python3", "-m", "src.main"]
 ```
 
 Three flags worth understanding:
@@ -124,7 +124,7 @@ COPY --from=extractor /extracted/usr/bin/curl /usr/bin/curl
 COPY --from=extractor /extracted/usr/lib64/libcurl.so.4* /usr/lib64/
 
 USER 1001
-CMD ["python", "-m", "src.main"]
+CMD ["python3", "-m", "src.main"]
 ```
 
 Caveats:
@@ -207,7 +207,7 @@ USER 1001
 ENV PYTHONPATH=/app/src
 ENV TZ=UTC
 EXPOSE 8000
-CMD ["python", "-m", "src.main"]
+CMD ["python3", "-m", "src.main"]
 ```
 
 What this image now has that a stock `python:3.13` doesn't:
