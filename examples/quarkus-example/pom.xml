@@ -19,10 +19,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
 
-        <!-- Pin a recent Quarkus LTS. Update by running:
+        <!-- Pin to Quarkus 3.33 LTS — the current LTS as of March 2026,
+             supported for 12 months. Bugfixes on top of 3.32. Update via:
                mvn io.quarkus.platform:quarkus-maven-plugin:VERSION:update
              once you bootstrap a real project. -->
-        <quarkus.platform.version>3.15.1</quarkus.platform.version>
+        <quarkus.platform.version>3.33.1</quarkus.platform.version>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     </properties>

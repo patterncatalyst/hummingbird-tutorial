@@ -83,7 +83,7 @@ podman build \
 
 | File                                                | Why                                                     |
 | --------------------------------------------------- | ------------------------------------------------------- |
-| `pom.xml`                                           | Quarkus 3.15 LTS, REST + JSON-B; minimal dependency set |
+| `pom.xml`                                           | Quarkus 3.33 LTS, REST + JSON-B; minimal dependency set |
 | `src/main/java/com/example/HelloResource.java`      | Single-endpoint REST resource                           |
 | `src/main/resources/application.properties`         | HTTP host/port + log format                             |
 | `Containerfile`                                     | Two-stage: `openjdk:21-builder` → `openjdk:21-runtime`  |
