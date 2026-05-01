@@ -46,6 +46,32 @@ predictable, fast to build, well-understood. Move to native when you
 have a measurable reason. This example deliberately shows the JVM
 path so the build is fast enough to fit in a tutorial.
 
+## Why UBI for the builder, Hummingbird for the runtime
+
+The build stage uses `registry.access.redhat.com/ubi9/openjdk-21`,
+not Hummingbird. That's a deliberate choice and worth understanding.
+
+The Hummingbird `openjdk:21-builder` image ships the JDK and `javac`,
+but **does not ship Maven**. Hummingbird's design philosophy is
+"minimal: only what's actually used, only what's been audited" —
+which means the builder images don't pre-install build tools that
+not every user needs. For a `javac`-driven Java project, the
+Hummingbird builder is the right choice. For a Maven- or
+Gradle-driven project (most real-world Java apps, including this
+Quarkus example), it isn't — there's no `mvn` on PATH.
+
+UBI's `openjdk-21` image is the dual: purpose-built for Java
+builds, with Maven and Gradle pre-installed and ready to use.
+We use it for the build stage only. The compiled fast-jar moves
+across the multi-stage boundary into Hummingbird's
+`openjdk:21-runtime` (JRE-only, distroless) for deployment.
+
+**The CVE surface that ships in the deployed artifact is the
+runtime image, not the builder.** A larger UBI builder doesn't
+hurt the deployed app — it never reaches production. The
+near-zero-CVE properties Hummingbird is known for are properties
+of the runtime image, and we keep that.
+
 ## Why `openjdk:21-runtime` instead of `openjdk:21`
 
 Hummingbird publishes both a full JDK runtime (`openjdk:21`) and a
@@ -86,7 +112,7 @@ podman build \
 | `pom.xml`                                           | Quarkus 3.33 LTS, REST + JSON-B; minimal dependency set |
 | `src/main/java/com/example/HelloResource.java`      | Single-endpoint REST resource                           |
 | `src/main/resources/application.properties`         | HTTP host/port + log format                             |
-| `Containerfile`                                     | Two-stage: `openjdk:21-builder` → `openjdk:21-runtime`  |
+| `Containerfile`                                     | UBI `openjdk-21` (Maven) → Hummingbird `openjdk:21-runtime` (JRE) |
 
 ## Why not native here
 

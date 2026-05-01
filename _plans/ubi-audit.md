@@ -56,6 +56,7 @@ for each.
 | Line | Reference | Verdict | Notes |
 |---|---|---|---|
 | 35 | "Fall back to a UBI builder only when no Hummingbird builder is available" | Keep — fall-back | Explicit instruction at the section level |
+| Quarkus example builder | `${RH_REGISTRY}/ubi9/openjdk-21:latest` | Keep — Hummingbird wrong choice | Hummingbird `openjdk:21-builder` ships the JDK but not Maven; UBI is the right tool for Maven-driven Java builds. Verified 2026-05-01. Runtime stays on `${HB_REGISTRY}/openjdk:21-runtime` |
 | 588, 599 | Node appendix UBI fall-back: `${RH_REGISTRY}/ubi9/nodejs-20` | Keep — fall-back | Honest fall-back if the Hummingbird Node-20 image doesn't exist yet |
 
 ### docs/08-debugging.md

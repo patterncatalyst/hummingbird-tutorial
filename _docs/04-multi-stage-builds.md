@@ -109,27 +109,32 @@ cat > Containerfile.jvm <<'EOF'
 ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
-# ── Stage 1: Build with the Hummingbird OpenJDK builder ─────────────────────
-# This image has Maven, the JDK, and the headers needed for Quarkus
-# build-time processing.
-FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
-USER 1001
+# ── Stage 1: Build with UBI OpenJDK 21 (Maven pre-installed) ────────────────
+# Note that this builder image is UBI, not Hummingbird. The
+# Hummingbird openjdk:21-builder ships the JDK and javac but does
+# not pre-install Maven — Hummingbird keeps builder images minimal,
+# only including tools every user actually wants. UBI's openjdk-21
+# image is purpose-built for Java builds with Maven and Gradle
+# pre-installed and on PATH.
+#
+# The CVE surface that ships in production is the runtime image,
+# not the builder; the larger UBI builder never reaches the
+# deployed artefact. The runtime stage below is back on
+# Hummingbird's distroless OpenJDK JRE.
+FROM ${RH_REGISTRY}/ubi9/openjdk-21:latest AS builder
+USER root
 WORKDIR /build
 
-# Maven uses ~/.m2 for the dependency cache. Set HOME so it
-# resolves to a directory UID 1001 can write to.
-ENV HOME=/build
-
-COPY --chown=1001:1001 pom.xml ./
+COPY pom.xml ./
 
 # Cache dependencies as a separate layer. If pom.xml does not change,
 # this layer is reused.
 RUN mvn -B -ntp dependency:go-offline
 
-COPY --chown=1001:1001 src ./src
+COPY src ./src
 RUN mvn -B -ntp package -DskipTests
 
-# ── Stage 2: Runtime on the Hummingbird OpenJDK runtime ─────────────────────
+# ── Stage 2: Runtime on the Hummingbird OpenJDK JRE ─────────────────────────
 FROM ${HB_REGISTRY}/openjdk:21-runtime
 WORKDIR /app
 

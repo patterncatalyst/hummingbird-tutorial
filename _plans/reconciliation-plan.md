@@ -53,6 +53,7 @@ catalog. Status is `verified` unless otherwise noted.
 | **verified** | `nginx` is published as `quay.io/hummingbird/nginx`, current major-tag `:1` (1.28 is the latest minor) | §3, §5, §6 | Tutorial uses `nginx:1` after the catalog rewrite |
 | **verified** | `postgresql` is published, current major-tag `:18` (18.3 is the latest minor) | §7 compose stack | Tutorial originally referenced `postgresql-16`, which doesn't exist; corrected to `postgresql:18` |
 | **verified** | A Hummingbird Go runtime image exists at `${HB_REGISTRY}/go:1.26` separate from the `-builder` variant | §4 Go example | Confirmed via tag-list. The runtime is a minimal base for Go static binaries |
+| **verified** 2026-05-01 | Hummingbird `openjdk:21-builder` ships the JDK and `javac` but **not Maven**. Build attempts that invoke `mvn` fail with `mvn: command not found` | §4 Quarkus example | Discovered during build testing. Hummingbird's design philosophy keeps builder images minimal — build tools that not every user needs (like Maven) aren't pre-installed. For a Maven-driven project, switch the build stage to `${RH_REGISTRY}/ubi9/openjdk-21:latest` (Maven pre-installed) and keep the Hummingbird runtime. The Quarkus example does this; logged as a "Keep — Hummingbird wrong choice" entry in the UBI audit |
 
 ## B. Tool versions
 
@@ -258,8 +259,8 @@ a working image.
 
 | Status | What | Command |
 |---|---|---|
-| not yet run | `examples/quarkus-example` builds | `cd examples/quarkus-example && podman build -t test .` |
-| not yet run | Quarkus app responds on :8080 | `podman run -d --name t -p 8080:8080 test && sleep 5 && curl -fsSL localhost:8080 \| jq` |
+| **FAIL → fixed** 2026-05-01 | `examples/quarkus-example` builds | First test failed: `mvn: command not found` — Hummingbird `openjdk:21-builder` ships the JDK but not Maven. Fixed by switching the build stage to UBI's `openjdk-21` (which pre-installs Maven) while keeping `${HB_REGISTRY}/openjdk:21-runtime` for the deploy stage. Re-run needed |
+| not yet run | Quarkus app responds on :8080 | After the fix above lands |
 | **FAIL → fixed** 2026-05-01 | `examples/python-example` builds | First test failed: runtime stage `RUN pip install` errored with `/bin/sh not found` — Hummingbird runtime images are distroless, no shell. Fixed by moving install to the builder with `--prefix=/install` and copying the prefix across in the runtime stage. Re-run needed |
 | not yet run | Python app responds | After the fix above lands |
 | **FAIL → fixed** 2026-05-01 | `examples/go-example` builds | First test failed: `mkdir /.cache: permission denied` — UID 1001 can't write to `/`. Fixed by setting `ENV HOME=/build GOCACHE=/build/.cache/go-build` in the builder stage. Re-run needed |

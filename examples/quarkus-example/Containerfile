@@ -1,38 +1,31 @@
-# Companion Containerfile for §4 Example A of the tutorial. JVM mode
-# (not native). Uses the verified Hummingbird image catalog naming:
-# tag-based versions, with -builder suffix for the build image and
-# -runtime suffix for the JRE-only deploy image.
-#
-# Note from FINDINGS.md: when chasing JVM AOT-cache or build-ID
-# matching across multi-stage builds, the JVM major version in the
-# runtime stage must match the one in the builder stage. We use
-# OpenJDK 21 in both; do not mix.
-
 ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
 
-# ── Stage 1: build the application with the Hummingbird OpenJDK builder ─────
-FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
-USER 1001
+# ── Stage 1: Build with UBI OpenJDK 21 (Maven pre-installed) ────────────────
+# The Hummingbird openjdk:21-builder ships the JDK but not Maven —
+# Hummingbird keeps builder images minimal so users only pay for the
+# tools they actually want. UBI's openjdk-21 image is purpose-built
+# for Java builds, with Maven and Gradle pre-installed and on PATH.
+#
+# We use UBI here for the build stage only. The runtime stage below
+# stays on Hummingbird's distroless OpenJDK JRE — the UBI image
+# never ships in the deployed artifact, so its larger CVE surface
+# doesn't reach production.
+FROM ${RH_REGISTRY}/ubi9/openjdk-21:latest AS builder
+USER root
 WORKDIR /build
 
-# Maven uses ~/.m2 for the dependency cache. Set HOME so it
-# resolves to a directory UID 1001 can write to.
-ENV HOME=/build
-
-# Copy pom first so the dependency-resolution layer is cached
-# independently of source changes.
-COPY --chown=1001:1001 pom.xml ./
+COPY pom.xml ./
 RUN mvn -B -ntp dependency:go-offline
 
-# Now bring source and build the JVM-mode artefact.
-COPY --chown=1001:1001 src ./src
+COPY src ./src
 RUN mvn -B -ntp package -DskipTests
 
 # Quarkus 3.x produces target/quarkus-app/ — a directory with the
 # launcher jar plus a flat lib/ tree. Smaller and faster to copy than
 # a fat-jar, and the layers cache better across rebuilds.
 
-# ── Stage 2: runtime on Hummingbird OpenJDK JRE ─────────────────────────────
+# ── Stage 2: Runtime on Hummingbird OpenJDK JRE ─────────────────────────────
 # openjdk:21-runtime is JRE-only — no javac, no Maven, no extra
 # tooling. Smaller than the full JDK runtime; correct choice for an
 # app that only needs to RUN bytecode, not compile it.
@@ -47,8 +40,6 @@ COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/quarkus/  ./quar
 USER 1001
 EXPOSE 8080
 
-# JVM tuning. Keep these conservative; the runtime image is small and
-# real production workloads will tune separately.
 ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
 CMD ["java", "-jar", "quarkus-run.jar"]
