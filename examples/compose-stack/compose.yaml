@@ -49,9 +49,12 @@ services:
       # itself, not the otel container.
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel:4318
     healthcheck:
-      test: ["CMD", "/bin/test", "-f", "/proc/1/cmdline"]
-      interval: 2s
-      timeout: 2s
+      # Distroless runtime — no /bin/test, no /bin/sh. We use node -e
+      # for the check because node is the one tool guaranteed to be
+      # in the image. The check just confirms the listener is up.
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
       retries: 30
       start_period: 30s
     ports:

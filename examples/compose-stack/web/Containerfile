@@ -1,14 +1,30 @@
 ARG HB_REGISTRY=quay.io/hummingbird
 
+# ── Stage 1: Install npm dependencies ───────────────────────────────────────
 FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
+USER 1001
 WORKDIR /build
+
+# npm uses ~/.npm for the cache; HOME isn't set for UID 1001 in the
+# Hummingbird builder so npm tries to write to /.npm and fails. Same
+# pattern as Go's GOCACHE and pip's PIP_NO_CACHE_DIR.
+ENV HOME=/build NPM_CONFIG_CACHE=/build/.npm
+
 COPY --chown=1001:1001 package*.json ./
+
+# Use --omit=dev to skip dev deps. The "|| true" tolerates the case
+# where there's no package-lock.json and nothing to install — the
+# example has no third-party deps.
 RUN npm install --omit=dev --no-audit --no-fund || true
+
 COPY --chown=1001:1001 server.js ./
 
+# ── Stage 2: Distroless Node runtime ────────────────────────────────────────
 FROM ${HB_REGISTRY}/nodejs:20
 WORKDIR /app
+
 COPY --from=builder --chown=1001:1001 /build /app
+
 USER 1001
 EXPOSE 3000
 CMD ["node", "server.js"]
