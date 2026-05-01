@@ -18,7 +18,7 @@ COPY --chown=1001:1001 requirements.txt .
 # them) compile native code here, which is exactly why we want a
 # builder stage rather than installing in the runtime image.
 RUN pip wheel --wheel-dir /build/wheels -r requirements.txt && \
-    pip install --no-index --find-links=/build/wheels --prefix=/install \
+    pip install --no-index --find-links=/build/wheels --prefix=/build/install \
         /build/wheels/*.whl
 
 COPY --chown=1001:1001 app/ /build/app/
@@ -27,7 +27,7 @@ COPY --chown=1001:1001 app/ /build/app/
 FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
-COPY --from=builder /install /usr/local
+COPY --from=builder /build/install /usr/local
 COPY --from=builder --chown=1001:1001 /build/app /app/app
 
 USER 1001

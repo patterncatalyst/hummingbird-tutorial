@@ -211,7 +211,7 @@ COPY --chown=1001:1001 requirements.txt .
 # /install. This pulls in any C-extension build dependencies present
 # in the builder image.
 RUN pip wheel --wheel-dir /build/wheels -r requirements.txt && \
-    pip install --no-index --find-links=/build/wheels --prefix=/install \
+    pip install --no-index --find-links=/build/wheels --prefix=/build/install \
         /build/wheels/*.whl
 
 COPY --chown=1001:1001 app/ /build/app/
@@ -221,9 +221,9 @@ COPY --chown=1001:1001 app/ /build/app/
 FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
-# /install/lib/python3.13/site-packages lands at
+# /build/install/lib/python3.13/site-packages lands at
 # /usr/local/lib/python3.13/site-packages, which Python finds by default.
-COPY --from=builder /install /usr/local
+COPY --from=builder /build/install /usr/local
 COPY --from=builder --chown=1001:1001 /build/app /app/app
 
 USER 1001

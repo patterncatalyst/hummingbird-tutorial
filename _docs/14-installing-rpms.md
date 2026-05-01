@@ -189,7 +189,7 @@ WORKDIR /build
 ENV HOME=/build PIP_NO_CACHE_DIR=1
 COPY --chown=1001:1001 requirements.txt ./
 RUN pip wheel --wheel-dir=/build/wheels -r requirements.txt && \
-    pip install --no-index --find-links=/build/wheels --prefix=/install \
+    pip install --no-index --find-links=/build/wheels --prefix=/build/install \
         /build/wheels/*.whl
 
 FROM ${HB_REGISTRY}/python:3.13
@@ -200,7 +200,7 @@ COPY --from=deps /staged/etc/ /etc/
 COPY --from=deps /staged/usr/ /usr/
 
 # Then app deps and source — no RUN, only COPY.
-COPY --from=pybuild /install /usr/local
+COPY --from=pybuild /build/install /usr/local
 COPY --chown=1001:1001 src/ /app/src/
 
 USER 1001
