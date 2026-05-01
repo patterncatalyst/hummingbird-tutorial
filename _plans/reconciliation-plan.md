@@ -259,17 +259,18 @@ a working image.
 
 | Status | What | Command |
 |---|---|---|
-| **FAIL → fixed** 2026-05-01 | `examples/quarkus-example` builds | First test failed: `mvn: command not found` — Hummingbird `openjdk:21-builder` ships the JDK but not Maven. Fixed by switching the build stage to UBI's `openjdk-21` (which pre-installs Maven) while keeping `${HB_REGISTRY}/openjdk:21-runtime` for the deploy stage. Re-run needed |
-| not yet run | Quarkus app responds on :8080 | After the fix above lands |
-| **FAIL → fixed** 2026-05-01 | `examples/python-example` builds | First test failed: runtime stage `RUN pip install` errored with `/bin/sh not found` — Hummingbird runtime images are distroless, no shell. Fixed by moving install to the builder with `--prefix=/install` and copying the prefix across in the runtime stage. Re-run needed |
-| not yet run | Python app responds | After the fix above lands |
-| **FAIL → fixed** 2026-05-01 | `examples/go-example` builds | First test failed: `mkdir /.cache: permission denied` — UID 1001 can't write to `/`. Fixed by setting `ENV HOME=/build GOCACHE=/build/.cache/go-build` in the builder stage. Re-run needed |
-| not yet run | Go app responds | After the fix above lands |
-| not yet run | `examples/ml-example` builds | Same fix as python-example applied; re-run needed |
-| not yet run | `examples/node-example` builds | `cd examples/node-example && podman build -t test .` |
-| **FAIL → fixed** 2026-05-01 | `examples/compose-stack` brings up | First test failed: db exited with `Error: Database is uninitialized and superuser password is not specified` — Hummingbird's `postgresql:18` uses upstream Postgres env var names (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`), not sclorg names (`POSTGRESQL_USER`, etc.). Fixed by switching env var names in `compose.yaml`. Re-run needed |
-| not yet run | Compose stack web tier reachable | After the fix above lands |
-| not yet run | Compose stack DB queryable | After the fix above lands |
+| **verified** 2026-05-01 | `examples/quarkus-example` builds | First test failed: `mvn: command not found` — Hummingbird `openjdk:21-builder` ships the JDK but not Maven. Fixed by switching the build stage to UBI's `openjdk-21` (which pre-installs Maven) while keeping `${HB_REGISTRY}/openjdk:21-runtime` for the deploy stage. Now passes |
+| not yet run | Quarkus app responds on :8080 | Test was for build only; runtime test pending |
+| **verified** 2026-05-01 | `examples/python-example` builds | First test failed: runtime stage `RUN pip install` errored with `/bin/sh not found` — Hummingbird runtime images are distroless, no shell. Fixed by moving install to the builder with `--prefix=/build/install` and copying the prefix across; required `python3` (not `python`) in CMD; required `PYTHONPATH` covering both `lib/` and `lib64/`. Now passes |
+| **verified** 2026-05-01 | Python app responds | Build + run + curl confirmed end-to-end |
+| **verified** 2026-05-01 | `examples/go-example` builds | First test failed: `mkdir /.cache: permission denied` — UID 1001 can't write to `/`. Fixed by setting `ENV HOME=/build GOCACHE=/build/.cache/go-build` in the builder stage. Now passes |
+| **verified** 2026-05-01 | Go app responds | Build + run + curl confirmed end-to-end |
+| **verified** 2026-05-01 | `examples/ml-example` builds | Required additional fixes beyond python-example: `COPY libstdc++.so.6*` and `libgcc_s.so.1*` for NumPy's compiled extensions; `libgomp.so.1*` for the OpenMP backend that's delay-loaded at compute time. Symptom of missing libgomp was a silent SIGSEGV in the worker manifesting as "Connection reset by peer" with no traceback |
+| **verified** 2026-05-01 | ML app responds | Build + run + curl confirmed end-to-end. NumPy `np.eye(3).sum() = 3.0` returns over the wire |
+| not yet run | `examples/node-example` builds | Standalone Node.js example not yet exercised; the compose-stack web tier exercises Node.js end-to-end though |
+| **verified** 2026-05-01 | `examples/compose-stack` brings up | First test failed: db exited with `Error: Database is uninitialized and superuser password is not specified` — Hummingbird's `postgresql:18` uses upstream Postgres env var names (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`), not sclorg names (`POSTGRESQL_USER`, etc.). Fixed by switching env var names in `compose.yaml`. Now passes |
+| **verified** 2026-05-01 | Compose stack web tier reachable | `curl localhost:3000` returns expected JSON. End-to-end three-service stack: db (Hummingbird postgresql:18) → web (Hummingbird nodejs:20, depends_on db healthy) → otel (third-party docker.io/otel/opentelemetry-collector-contrib) |
+| **verified** 2026-05-01 | Compose stack DB queryable | `psql -U app -d appdb -c 'select 42'` returns 42 from inside the db container |
 
 ### G.3 — Tutorial walkthroughs (expensive, ~5 hours)
 
