@@ -36,13 +36,22 @@ COPY --from=builder --chown=1001:1001 /build/app /app/app
 # interpreter and its direct dependencies, so we have to bring the
 # C++ runtime across explicitly. Adds ~2 MB to the deploy image.
 #
+# libgomp is OpenMP runtime — NumPy 2.x's bundled OpenBLAS uses it
+# for parallel matrix operations. This one is delay-loaded: the
+# import succeeds without it, but the first actual computation
+# (e.g. np.eye(3).sum()) triggers a load that fails. The failure
+# manifests as a silent SIGSEGV killing the worker; the request
+# returns "Connection reset by peer" with no traceback.
+#
 # This pattern — selectively copying shared libraries across the
 # multi-stage boundary — is also useful for other native-extension
 # packages (scipy, pandas with arrow, lxml). When a package fails
-# at import with `libfoo.so.X: cannot open shared object file`,
-# the cure is to add another COPY line here.
+# at import with `libfoo.so.X: cannot open shared object file`, OR
+# when a request crashes the worker with no traceback, the cure is
+# to add another COPY line here.
 COPY --from=builder /usr/lib64/libstdc++.so.6* /usr/lib64/
 COPY --from=builder /usr/lib64/libgcc_s.so.1*  /usr/lib64/
+COPY --from=builder /usr/lib64/libgomp.so.1*   /usr/lib64/
 
 # Both lib and lib64 — pip splits pure-Python and C-extension packages
 # across them on RHEL-based systems. The runtime's default sys.path
