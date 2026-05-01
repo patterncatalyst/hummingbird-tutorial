@@ -290,10 +290,23 @@ COPY --chown=1001:1001 go.mod ./
 COPY --chown=1001:1001 main.go ./
 
 # Static binary: no cgo, no dynamic linker needed.
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o app .
+# -trimpath strips local build paths from the binary for reproducible
+# builds; -ldflags "-s -w" strips the symbol table and DWARF debug
+# info to keep the binary small.
+RUN CGO_ENABLED=0 GOOS=linux \
+    go build -trimpath -ldflags="-s -w" -o app .
 
-# ── Stage 2: ubi-micro runtime — just glibc + a non-root user ───────────────
-FROM ${HB_REGISTRY}/ubi-micro:latest
+# ── Stage 2: Hummingbird Go runtime ─────────────────────────────────────────
+# The Hummingbird Go runtime is the smallest base for a Go binary
+# in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
+# certificates, and not much else. It does not contain the Go
+# toolchain — that's what the builder is for.
+#
+# Alternative: ${HB_REGISTRY}/ubi-micro:latest is a few MB smaller
+# but doesn't ship CA certificates, so HTTPS calls from your Go
+# code will fail until you copy /etc/ssl/certs/ from the builder.
+# Stick with go-1.22 unless image size is the binding constraint.
+FROM ${HB_REGISTRY}/go-1.22:latest
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/app ./app
@@ -323,9 +336,12 @@ podman stop hb-go && podman rm hb-go
 ```
 
 The Go example is the one where the size win is most dramatic.
-A static binary plus `ubi-micro` is typically under 30 MB
-total — orders of magnitude smaller than the equivalent
-general-purpose image.
+A static Go binary on the Hummingbird Go runtime typically lands
+around 30 MB — orders of magnitude smaller than the equivalent
+general-purpose image. If you swap the runtime to
+`${HB_REGISTRY}/ubi-micro` (no CA certs, no /etc/passwd entries),
+you can shave another 5–10 MB at the cost of having to bring
+those in yourself.
 
 ## Cross-cutting: build args for environment switching
 
@@ -356,6 +372,138 @@ podman build \
   --build-arg RH_REGISTRY="$RH_REGISTRY" \
   -t myapp:latest .
 ```
+
+## Language-specific considerations
+
+The three primary examples follow the same two-stage pattern, but
+each language has its own gotchas. These are the things that bit
+people in the source material that this tutorial is built from.
+
+### Java (Quarkus)
+
+**Match the JDK exactly between builder and runtime.** Hummingbird
+publishes `openjdk-21-builder` and `openjdk-21-runtime` as a
+matched pair. Don't mix `openjdk-21-builder` with
+`openjdk-17-runtime` — the JVM AOT cache and the bytecode-version
+floor both depend on identical major versions. Mixing produces
+either runtime errors at first method invocation or — worse —
+silent slowdowns when the runtime falls back to interpreted mode.
+
+**JVM mode by default; native-image only when you have a reason.**
+GraalVM/Mandrel native compilation cuts cold-start time and
+memory, but it adds 2–4× to build time and not every dependency
+plays well with reflection-heavy native compilation. For most
+production workloads, JVM mode is the right starting point. Move
+to native when there's a measurable need — typically scale-to-zero
+serverless or memory-constrained edge deployment.
+
+**Use the `target/quarkus-app/` fast-jar layout, not a fat-jar.**
+Quarkus 3.x produces a directory structure with the launcher jar
+plus a flat `lib/` tree. Smaller and faster to copy than a fat-jar,
+and the layers are more cacheable across builds.
+
+**Tune the JVM for the container, not the host.** `-Xmx` should
+reference the cgroup memory limit, not physical RAM. OpenJDK 21
+does this automatically with `-XX:+UseContainerSupport` (default
+on), but verify with `podman inspect` that the cgroup limit is
+what you expect. Without the limit set, the JVM sees host memory
+and over-allocates.
+
+**Debugging needs JDWP exposed at runtime.** The Hummingbird
+runtime image lacks `jdb` — that lives in the builder. The §8
+in-image-builder pattern is the right approach: build with debug
+info, mount the resulting `target/` into a builder container, run
+`jdb -attach` against the JDWP port your production container
+exposes. Don't bake `jdb` into the runtime.
+
+### Python
+
+**Wheel-build pattern, not pip-in-runtime.** Pre-build wheels in
+the builder stage with `pip wheel --wheel-dir=/build/wheels -r
+requirements.txt`. Then in the runtime, install offline:
+`pip install --no-index --find-links=/tmp/wheels /tmp/wheels/*.whl`.
+The runtime never reaches the network, never runs a compiler.
+
+**Native dependencies need build tools in the builder.** Packages
+like `numpy`, `cryptography`, `psycopg2`, and `pillow` ship native
+code that pip compiles unless a pre-built wheel is available for
+your platform. The Hummingbird `python-311-builder` image carries
+the C toolchain. The runtime doesn't need to.
+
+**Match Python versions exactly.** A wheel built against Python
+3.11 won't load in a 3.12 runtime. Keep
+`python-311-builder` paired with `python-311`. If you need a
+different version, switch *both* together.
+
+**TLS and time zones are not in the runtime by default.**
+Hummingbird's Python runtime ships a minimal filesystem. If your
+app makes outbound HTTPS calls or uses `zoneinfo.ZoneInfo`, you
+need to add `ca-certificates` and `tzdata`. The §14 RPM-install
+pattern covers exactly this case.
+
+**Debugging — install `python3-debug` in the builder, not the
+runtime.** The §8 in-image-builder pattern: mount your source into
+a `python-311-builder` container, `dnf install python3-debug`, run
+`python3-debug -m pdb your-app.py`. Set breakpoints, fix on the
+host, restart. The runtime stays clean.
+
+### Go
+
+**Static binary by default; that's the win.** With
+`CGO_ENABLED=0`, the resulting binary has no dynamic-linker
+dependency. You can confirm with `ldd app` — output should be
+"not a dynamic executable". This is what makes the runtime image
+trivially small.
+
+**The runtime image isn't really a runtime.** Unlike Python or
+Java, a static Go binary doesn't need a language runtime.
+Hummingbird's `go-1.22` runtime image is essentially a minimal
+base — glibc, a non-root user, CA certificates. You're picking it
+for the user/glibc/certs, not for any "Go runtime". If you don't
+need any of those, `${HB_REGISTRY}/ubi-micro` (or even `scratch`)
+is technically valid; the §11 examples discuss when each makes
+sense.
+
+**`-trimpath` and `-ldflags="-s -w"` aren't optional.** `-trimpath`
+strips local build paths from the binary for reproducible builds —
+the same source committed at the same commit produces a
+byte-identical binary regardless of who built it where.
+`-ldflags="-s -w"` strips the symbol table and DWARF debug info.
+Together they shave ~30% off the binary size and remove
+build-host fingerprints.
+
+**Non-root UID 1001 — copy the user entry, or live without one.**
+If your code calls anything that looks up the running user
+(`os/user.Current()`, certain logging libraries), the runtime
+image needs `/etc/passwd` to have UID 1001. The Hummingbird
+`go-1.22` runtime ships this by default; `ubi-micro` does not.
+If you switch to `ubi-micro`, copy the entry from the builder:
+
+```dockerfile
+COPY --from=builder /etc/passwd /etc/passwd
+```
+
+**Debugging with delve — install in the builder, attach over
+network.** `dlv` doesn't exist in the runtime image. The §8
+in-image-builder pattern with `${HB_REGISTRY}/go-1.22-builder`,
+mount your source, `go install
+github.com/go-delve/delve/cmd/dlv@latest`, then `dlv exec ./app`
+or `dlv attach <pid>` against a deployed binary. Expose the
+delve port from the prod container only when actively debugging.
+
+### What's the same across all three
+
+- **Always run as UID 1001.** Hummingbird images default to it;
+  use `--chown=1001:1001` on every `COPY` so the runtime user can
+  read what you copied.
+- **Always pin tags, ideally digests.** A `FROM
+  ${HB_REGISTRY}/python-311:latest` is fine for a tutorial; in
+  production, pin to a specific tag or a SHA digest. §15 covers
+  the tag strategies.
+- **Always two stages.** Mixing build-time tools into the runtime
+  is the most common Hummingbird mistake. If you find yourself
+  reaching for `RUN apt-get` or `RUN dnf` in the runtime stage,
+  stop and refactor — that work belongs in the builder.
 
 ## Appendix — Node.js
 
