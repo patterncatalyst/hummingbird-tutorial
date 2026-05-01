@@ -10,10 +10,23 @@ COPY --chown=1001:1001 go.mod ./
 COPY --chown=1001:1001 main.go ./
 
 # Static binary: no cgo, no dynamic linker needed.
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o app .
+# -trimpath strips local build paths from the binary for reproducible
+# builds; -ldflags="-s -w" strips the symbol table and DWARF debug
+# info to keep the binary small.
+RUN CGO_ENABLED=0 GOOS=linux \
+    go build -trimpath -ldflags="-s -w" -o app .
 
-# ── Stage 2: ubi-micro runtime — just glibc + a non-root user ───────────────
-FROM ${HB_REGISTRY}/ubi-micro:latest
+# ── Stage 2: Hummingbird Go runtime ─────────────────────────────────────────
+# The Hummingbird Go runtime is the smallest base for a Go binary
+# in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
+# certificates, and not much else. It does not contain the Go
+# toolchain — that's what the builder is for.
+#
+# Alternative: ${HB_REGISTRY}/ubi-micro:latest is a few MB smaller
+# but doesn't ship CA certificates, so HTTPS calls from your Go
+# code will fail until you copy /etc/ssl/certs/ from the builder.
+# Stick with go-1.22 unless image size is the binding constraint.
+FROM ${HB_REGISTRY}/go-1.22:latest
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/app ./app

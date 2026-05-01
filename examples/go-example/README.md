@@ -1,11 +1,11 @@
 # go-example
 
 Static Go HTTP server compiled with the Hummingbird Go builder and
-deployed onto `ubi-micro`. Walked through in
+deployed onto the Hummingbird Go runtime. Walked through in
 [§4 — Multi-stage builds, Example C](../../docs/04-multi-stage-builds.md).
 
-This is the smallest of the §4 examples — typically under 30 MB
-total, almost all of which is the binary.
+This is the smallest of the §4 examples — typically around 30 MB
+total, almost all of which is the binary itself.
 
 ## Build and run
 
@@ -17,7 +17,7 @@ podman build -t hummingbird-go-example:latest .
 podman run -d --name hb-go -p 8080:8080 hummingbird-go-example:latest
 
 curl -s http://localhost:8080
-# {"status":"ok","runtime":"hummingbird-go-on-ubi-micro"}
+# {"status":"ok","runtime":"hummingbird-go"}
 
 podman stop hb-go && podman rm hb-go
 ```
@@ -26,18 +26,45 @@ podman stop hb-go && podman rm hb-go
 
 ```bash
 podman images hummingbird-go-example:latest \
-  --format '{{.Repository}}:{{.Tag}}\t{{.Size}}'
+  --format '{% raw %}{{.Repository}}:{{.Tag}}\t{{.Size}}{% endraw %}'
 ```
 
-If you already pulled a stock distro image earlier in the tutorial,
-compare the sizes — the `ubi-micro`-based image typically lands at
-roughly an order of magnitude smaller.
+If you've pulled a stock distro Go image earlier (for comparison),
+the Hummingbird image typically lands an order of magnitude smaller.
 
-## Why `ubi-micro`
+## Why the Hummingbird Go runtime
 
-A static Go binary needs essentially nothing at runtime. `ubi-micro`
-provides just glibc and a handful of system files. There's no shell,
-no package manager, no busybox — which is exactly the point.
+A static Go binary built with `CGO_ENABLED=0` is self-contained —
+it doesn't need a Go toolchain at runtime. So the runtime image
+just needs to provide:
+
+- **glibc** — even a "static" Go binary still calls into glibc
+  for some syscalls and DNS resolution.
+- **A non-root user (UID 1001)** — Hummingbird images default to
+  running as 1001; the runtime ships an `/etc/passwd` entry so
+  any Go code that calls `os/user.Current()` works.
+- **CA certificates** — for outbound HTTPS calls.
+
+The Hummingbird `go-1.22` runtime image gives you exactly that
+and not much else. It's the right default for almost any Go
+service.
+
+## When `ubi-micro` makes sense instead
+
+If image size is the binding constraint and you don't need
+HTTPS or `os/user.Current()`, swap the runtime stage:
+
+```dockerfile
+FROM ${HB_REGISTRY}/ubi-micro:latest
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder --chown=1001:1001 /build/app ./app
+USER 1001
+CMD ["./app"]
+```
+
+That saves a few MB at the cost of two extra `COPY` lines.
+For most production services it isn't worth the complexity.
 
 ## What's in here
 
@@ -45,12 +72,18 @@ no package manager, no busybox — which is exactly the point.
 | ---------------- | -------------------------------------------------- |
 | `main.go`        | Single-file HTTP server                            |
 | `go.mod`         | Module declaration; no external deps               |
-| `Containerfile`  | Two-stage: Go builder → `ubi-micro` runtime        |
+| `Containerfile`  | Two-stage: Hummingbird Go builder → Hummingbird Go runtime |
 
 ## Image-name caveat
 
-Assumes `go-1.22-builder` and `ubi-micro` are both published in the
-Hummingbird org. If `ubi-micro` is only available from
-`registry.access.redhat.com/ubi9/ubi-micro`, change the second `FROM`
-to `${RH_REGISTRY}/ubi9/ubi-micro:latest`. See the
-[reconciliation plan](../../plans/reconciliation-plan.md) §A.
+This Containerfile assumes that `go-1.22-builder` and `go-1.22`
+both exist in the Hummingbird catalog at `quay.io/hummingbird/`.
+The builder is well-precedented (matches the Python and Java
+patterns); the runtime is parallel to `python-311` and
+`openjdk-21`.
+
+If `quay.io/hummingbird/go-1.22:latest` doesn't resolve, fall
+back to `${HB_REGISTRY}/ubi-micro:latest` and add the two `COPY`
+lines from "When `ubi-micro` makes sense" above. See the
+[reconciliation plan](../../plans/reconciliation-plan.md) §A
+for the verification status.
