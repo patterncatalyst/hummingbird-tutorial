@@ -38,15 +38,15 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
   <div class="container">
     <div class="stats">
       <div class="stat">
-        <span class="stat__value">11</span>
+        <span class="stat__value">16</span>
         <span class="stat__label">Tutorial sections</span>
       </div>
       <div class="stat">
-        <span class="stat__value">~5h</span>
+        <span class="stat__value">~7h</span>
         <span class="stat__label">End-to-end runtime</span>
       </div>
       <div class="stat">
-        <span class="stat__value">4</span>
+        <span class="stat__value">5</span>
         <span class="stat__label">Runnable example projects</span>
       </div>
       <div class="stat">
@@ -72,6 +72,9 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
     <div class="cards">
 
       {%- assign tutorial_docs = site.docs | sort: "order" -%}
+      {%- if tutorial_docs.size == 0 -%}
+        {%- assign tutorial_docs = site.pages | where_exp: "p", "p.order != nil" | sort: "order" -%}
+      {%- endif -%}
       {%- for doc in tutorial_docs -%}
         {%- case doc.order -%}
           {%- when 0 -%}{%- assign section_kind = "Map" -%}
@@ -80,6 +83,9 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
           {%- when 3, 4, 5, 6, 7 -%}{%- assign section_kind = "Build" -%}
           {%- when 8, 9, 10 -%}{%- assign section_kind = "Operate" -%}
           {%- when 11 -%}{%- assign section_kind = "Apply" -%}
+          {%- when 12, 13 -%}{%- assign section_kind = "Trust" -%}
+          {%- when 14 -%}{%- assign section_kind = "Build" -%}
+          {%- when 15, 16 -%}{%- assign section_kind = "Operate" -%}
           {%- else -%}{%- assign section_kind = "Section" -%}
         {%- endcase -%}
 
@@ -132,11 +138,13 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card" href="{{ '/examples/' | relative_url }}">
+      <a class="doc-card"
+         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/examples"
+         rel="noopener">
         <span class="doc-card__icon" aria-hidden="true">📦</span>
         <span>
-          <span class="doc-card__title">Example projects</span>
-          <span class="doc-card__desc">Five runnable companion projects: Quarkus, Python, Go, multi-container compose stack, plus an ML variant.</span>
+          <span class="doc-card__title">Example projects ↗</span>
+          <span class="doc-card__desc">Four runnable companion projects: Node, Python, Go, multi-container compose stack, plus an ML variant.</span>
         </span>
       </a>
 
@@ -150,11 +158,13 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card" href="{{ '/diagrams/' | relative_url }}">
+      <a class="doc-card"
+         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/assets/diagrams"
+         rel="noopener">
         <span class="doc-card__icon" aria-hidden="true">📐</span>
         <span>
-          <span class="doc-card__title">Excalidraw diagrams</span>
-          <span class="doc-card__desc">Ten architecture and flow diagrams in an embedded gallery — click for fullscreen, download .excalidraw to edit.</span>
+          <span class="doc-card__title">Excalidraw diagrams ↗</span>
+          <span class="doc-card__desc">Ten editable architecture and flow diagrams — both .excalidraw source and pre-rendered SVG.</span>
         </span>
       </a>
     </div>

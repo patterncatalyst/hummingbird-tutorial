@@ -4,8 +4,13 @@ layout: default
 
 {%- comment -%}
   Build sorted list of tutorial docs so we can derive prev/next.
+  Falls back to site.pages when docs/ isn't a Jekyll collection
+  (i.e. lives at docs/ rather than _docs/) so the nav still works.
 {%- endcomment -%}
 {%- assign tutorial_docs = site.docs | sort: "order" -%}
+{%- if tutorial_docs.size == 0 -%}
+  {%- assign tutorial_docs = site.pages | where_exp: "p", "p.order != nil" | sort: "order" -%}
+{%- endif -%}
 {%- for d in tutorial_docs -%}
   {%- if d.url == page.url -%}
     {%- assign current_index = forloop.index0 -%}
