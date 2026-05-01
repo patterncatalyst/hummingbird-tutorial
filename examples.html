@@ -1,0 +1,165 @@
+---
+layout: default
+title: Example projects
+description: Runnable companion projects for the tutorial sections — Quarkus, Python, Go, multi-container compose, ML inference, Node.
+---
+
+<section class="hero hero--compact">
+  <div class="container">
+    <span class="hero__eyebrow">Example projects</span>
+    <h1>Runnable companions to the tutorial.</h1>
+    <p class="hero__lead">
+      Every Containerfile in the tutorial body is mirrored here as a
+      complete, <code>podman build</code>-ready project. Read the matching
+      tutorial section for context, then build directly from the example
+      directory.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-heading">Primary examples</h2>
+    <p class="section-sub">
+      For the audience this tutorial is aimed at — JVM, Python, and Go
+      backends. Listed in the order most readers will care.
+    </p>
+
+    <div class="cards">
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/quarkus-example"
+         rel="noopener">
+        <div class="card__eyebrow">Java · <strong>Quarkus 3.15 LTS</strong></div>
+        <h3 class="card__title">Quarkus, JVM mode</h3>
+        <p class="card__desc">
+          Two-stage build: <code>openjdk-21-builder</code> compiles a Quarkus
+          fast-jar; <code>openjdk-21-runtime</code> serves it. Single REST
+          endpoint, no native-image complexity.
+        </p>
+        <div class="card__meta">
+          <span>§4 Example D</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/python-example"
+         rel="noopener">
+        <div class="card__eyebrow">Python · <strong>FastAPI</strong></div>
+        <h3 class="card__title">Python wheel-build pattern</h3>
+        <p class="card__desc">
+          Compile wheels in <code>python-311-builder</code>, install from
+          wheels in <code>python-311</code>. The runtime image never sees a
+          compiler.
+        </p>
+        <div class="card__meta">
+          <span>§4 Example B · §11 Scenario 1</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/go-example"
+         rel="noopener">
+        <div class="card__eyebrow">Go · <strong>static binary</strong></div>
+        <h3 class="card__title">Go on ubi-micro</h3>
+        <p class="card__desc">
+          The smallest of the four. <code>CGO_ENABLED=0</code> static binary
+          plus <code>ubi-micro</code> — typically under 30 MB total.
+        </p>
+        <div class="card__meta">
+          <span>§4 Example C</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/ml-example"
+         rel="noopener">
+        <div class="card__eyebrow">Python · <strong>NumPy</strong></div>
+        <h3 class="card__title">ML inference variant</h3>
+        <p class="card__desc">
+          Same wheel-build pattern as the Python example, but with a
+          NumPy dependency that compiles native code. Add
+          <code>transformers</code> + <code>torch</code> when you're ready
+          for a real ML build.
+        </p>
+        <div class="card__meta">
+          <span>§11 Scenario 2</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/compose-stack"
+         rel="noopener">
+        <div class="card__eyebrow">Compose · <strong>3 services</strong></div>
+        <h3 class="card__title">Multi-container stack</h3>
+        <p class="card__desc">
+          Web app, PostgreSQL, OpenTelemetry collector — all on
+          Hummingbird base images. Demonstrates the SELinux <code>:Z</code>
+          flag, healthcheck timing, and service-name DNS in one file.
+        </p>
+        <div class="card__meta">
+          <span>§7</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--bg-soft);">
+  <div class="container">
+    <h2 class="section-heading">Secondary example</h2>
+    <p class="section-sub">
+      The Node example exists because §4 introduces the multi-stage
+      pattern against it as a stripped-down reference. If you're not
+      shipping Node services, skim it for the pattern and skip on.
+    </p>
+
+    <div class="cards">
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/node-example"
+         rel="noopener">
+        <div class="card__eyebrow">Node.js · <strong>Express-style</strong></div>
+        <h3 class="card__title">Node.js</h3>
+        <p class="card__desc">
+          Trivial HTTP server demonstrating the two-stage pattern:
+          <code>nodejs-20-builder</code> for <code>npm ci</code>,
+          <code>nodejs-20</code> for the runtime.
+        </p>
+        <div class="card__meta">
+          <span>§4 Example A</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-prose">
+    <h2 class="section-heading">Building any example</h2>
+    <p>
+      Every Containerfile in this directory accepts the same two build
+      args, so the same command builds them all:
+    </p>
+    <pre><code>podman build \
+  --build-arg HB_REGISTRY="${HB_REGISTRY:-quay.io/hummingbird}" \
+  --build-arg RH_REGISTRY="${RH_REGISTRY:-registry.access.redhat.com}" \
+  -t my-image:latest \
+  .</code></pre>
+
+    <h2 class="section-heading">If a build fails on <code>manifest unknown</code></h2>
+    <p>
+      Image names and the existence of specific Hummingbird builder
+      images vary across the early-access and post-GA windows. The
+      <a href="{{ '/plans/reconciliation-plan/' | relative_url }}">reconciliation plan, section A</a>
+      tracks every unverified image reference. If a build fails, that's
+      the first place to check.
+    </p>
+  </div>
+</section>

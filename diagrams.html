@@ -1,0 +1,158 @@
+---
+layout: default
+title: Excalidraw diagrams
+description: Architecture and flow diagrams for the tutorial. Each diagram is shown inline; click for a fullscreen view, or download the .excalidraw source to edit.
+---
+
+<section class="hero hero--compact">
+  <div class="container">
+    <span class="hero__eyebrow">Reference</span>
+    <h1>Excalidraw diagrams.</h1>
+    <p class="hero__lead">
+      Ten diagrams covering the tutorial's architectures and flows.
+      Click any diagram to open it fullscreen. Each is also available as
+      <code>.excalidraw</code> source — open it on excalidraw.com to edit.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="gallery">
+
+      {% include diagram-card.html
+         file="01-prerequisites-toolchain"
+         section="§1"
+         title="Toolchain overview"
+         caption="Tooling that the prerequisites section installs and configures." %}
+
+      {% include diagram-card.html
+         file="02-introduction-ecosystem"
+         section="§2"
+         title="Hummingbird in the Red Hat ecosystem"
+         caption="Where Hummingbird sits relative to Fedora, RHEL, UBI, and OpenShift." %}
+
+      {% include diagram-card.html
+         file="03-podman-basics-pull-flow"
+         section="§3"
+         title="podman pull resolution"
+         caption="How podman resolves a Hummingbird image from quay.io into local containers-storage." %}
+
+      {% include diagram-card.html
+         file="03-podman-basics-debug-sidecar"
+         section="§3"
+         title="Debug sidecar pattern"
+         caption="A second container shares PID and network namespaces with the running Hummingbird container — replaces shell-into-container." %}
+
+      {% include diagram-card.html
+         file="04-multi-stage-builds-pattern"
+         section="§4"
+         title="Two-stage build pattern"
+         caption="Hummingbird builder image compiles, Hummingbird runtime image runs. The runtime never ships a compiler." %}
+
+      {% include diagram-card.html
+         file="05-sbom-and-signing-artifacts"
+         section="§5"
+         title="SBOM and signing artifacts"
+         caption="Three artifacts attached to every image: signature, SBOM attestation, and provenance attestation." %}
+
+      {% include diagram-card.html
+         file="07-podman-compose-stack"
+         section="§7"
+         title="Compose stack"
+         caption="Three services under podman-compose: web on Hummingbird Node, PostgreSQL, OpenTelemetry collector." %}
+
+      {% include diagram-card.html
+         file="08-debugging-layers"
+         section="§8"
+         title="Debugging layers"
+         caption="Four-layer debug strategy: podman commands, structured logs, ephemeral debug sidecar, kubectl debug for clusters." %}
+
+      {% include diagram-card.html
+         file="09-zstd-chunked-layer-format"
+         section="§9"
+         title="zstd:chunked layer format"
+         caption="How chunked compression enables partial pulls — only changed chunks travel on the wire." %}
+
+      {% include diagram-card.html
+         file="10-chunkah-layer-split"
+         section="§10"
+         title="chunkah layer split"
+         caption="Splitting a single OCI layer along directory or xattr boundaries for finer-grained caching." %}
+
+    </div>
+
+  </div>
+</section>
+
+{%- comment -%}
+  Fullscreen modal — populated by JS when a card is clicked.
+{%- endcomment -%}
+<div id="diagram-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <button class="modal__close" type="button" aria-label="Close fullscreen">×</button>
+  <div class="modal__inner">
+    <div class="modal__header">
+      <h2 class="modal__title" id="modal-title"></h2>
+      <p class="modal__caption"></p>
+    </div>
+    <div class="modal__viewer">
+      <object class="modal__svg" type="image/svg+xml" aria-label="Diagram"></object>
+    </div>
+    <div class="modal__actions">
+      <a class="btn btn--secondary modal__download" download>Download .excalidraw</a>
+      <a class="btn btn--secondary" href="https://excalidraw.com" target="_blank" rel="noopener">Open excalidraw.com</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var modal      = document.getElementById('diagram-modal');
+  if (!modal) return;
+  var modalSvg   = modal.querySelector('.modal__svg');
+  var modalTitle = modal.querySelector('.modal__title');
+  var modalCap   = modal.querySelector('.modal__caption');
+  var modalDl    = modal.querySelector('.modal__download');
+  var closeBtn   = modal.querySelector('.modal__close');
+
+  function open(card) {
+    var svg     = card.dataset.svg;
+    var src     = card.dataset.source;
+    var title   = card.dataset.title;
+    var caption = card.dataset.caption;
+
+    modalSvg.setAttribute('data', svg);
+    modalDl.setAttribute('href', src);
+    modalTitle.textContent = title;
+    modalCap.textContent   = caption || '';
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function close() {
+    modal.hidden = true;
+    modalSvg.setAttribute('data', '');     // unload to free memory
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.gallery-card__viewer').forEach(function (el) {
+    el.addEventListener('click', function () { open(el.closest('.gallery-card')); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open(el.closest('.gallery-card'));
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !modal.hidden) close();
+  });
+})();
+</script>

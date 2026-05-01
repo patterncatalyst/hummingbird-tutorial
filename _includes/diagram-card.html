@@ -1,0 +1,46 @@
+{%- comment -%}
+  Diagram gallery card.
+
+  Usage:
+      {% include diagram-card.html
+         file="04-multi-stage-builds-pattern"
+         section="§4"
+         title="Two-stage build pattern"
+         caption="Hummingbird builder image compiles, runtime image runs." %}
+
+  Required: file, section, title
+  Optional: caption
+{%- endcomment -%}
+
+{%- assign svg_path = "/assets/diagrams/" | append: include.file | append: ".svg" | relative_url -%}
+{%- assign source_path = "/assets/diagrams/" | append: include.file | append: ".excalidraw" | relative_url -%}
+
+<article class="gallery-card"
+         data-svg="{{ svg_path }}"
+         data-source="{{ source_path }}"
+         data-title="{{ include.title }}"
+         data-caption="{{ include.caption }}">
+  <header class="gallery-card__header">
+    <span class="gallery-card__section">{{ include.section }}</span>
+    <h2 class="gallery-card__title">{{ include.title }}</h2>
+  </header>
+
+  <button class="gallery-card__viewer" type="button"
+          aria-label="Open {{ include.title }} fullscreen">
+    <object type="image/svg+xml"
+            data="{{ svg_path }}"
+            aria-label="{{ include.title }}">
+      {{ include.title }}
+    </object>
+    <span class="gallery-card__zoom-hint" aria-hidden="true">Click to enlarge</span>
+  </button>
+
+  {%- if include.caption -%}
+    <p class="gallery-card__caption">{{ include.caption }}</p>
+  {%- endif -%}
+
+  <footer class="gallery-card__actions">
+    <a href="{{ source_path }}" download>Download <code>.excalidraw</code></a>
+    <a href="https://excalidraw.com" target="_blank" rel="noopener">Edit on excalidraw.com</a>
+  </footer>
+</article>

@@ -37,11 +37,26 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
 <section class="section-tight">
   <div class="container">
     <div class="stats">
-      <div class="stat"><span class="stat__value">11</span><span class="stat__label">Tutorial sections</span></div>
-      <div class="stat"><span class="stat__value">~5h</span><span class="stat__label">End-to-end runtime</span></div>
-      <div class="stat"><span class="stat__value">4</span><span class="stat__label">Runnable example projects</span></div>
-      <div class="stat"><span class="stat__value">2</span><span class="stat__label">Platforms — Fedora &amp; macOS</span></div>
-      <div class="stat"><span class="stat__value">10</span><span class="stat__label">Architecture diagrams</span></div>
+      <div class="stat">
+        <span class="stat__value">11</span>
+        <span class="stat__label">Tutorial sections</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">~5h</span>
+        <span class="stat__label">End-to-end runtime</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">4</span>
+        <span class="stat__label">Runnable example projects</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">2</span>
+        <span class="stat__label">Platforms — Fedora &amp; macOS</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">10</span>
+        <span class="stat__label">Architecture diagrams</span>
+      </div>
     </div>
   </div>
 </section>
@@ -50,23 +65,13 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
   <div class="container">
     <h2 class="section-heading">Tutorial</h2>
     <p class="section-sub">
-      Work through the sections in order the first time. Each section ends
-      with a prev/next pager so you don't lose your place.
+      Work through the sections in order the first time. Each section ends with a
+      prev/next pager so you don't lose your place.
     </p>
 
     <div class="cards">
-      {%- comment -%}
-        Robust source: try the `docs` collection first; fall back to any
-        page that has an `order` front-matter field. Works whether the
-        tutorial files live under _docs/ (proper Jekyll collection) or
-        docs/ (regular pages with order set).
-      {%- endcomment -%}
-      {%- assign tutorial_docs = site.docs -%}
-      {%- if tutorial_docs == nil or tutorial_docs.size == 0 -%}
-        {%- assign tutorial_docs = site.pages | where_exp: "p", "p.order != nil" -%}
-      {%- endif -%}
-      {%- assign tutorial_docs = tutorial_docs | sort: "order" -%}
 
+      {%- assign tutorial_docs = site.docs | sort: "order" -%}
       {%- for doc in tutorial_docs -%}
         {%- case doc.order -%}
           {%- when 0 -%}{%- assign section_kind = "Map" -%}
@@ -89,6 +94,7 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
           </div>
         </a>
       {%- endfor -%}
+
     </div>
   </div>
 </section>
@@ -126,13 +132,11 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card"
-         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples"
-         rel="noopener">
+      <a class="doc-card" href="{{ '/examples/' | relative_url }}">
         <span class="doc-card__icon" aria-hidden="true">📦</span>
         <span>
-          <span class="doc-card__title">Example projects ↗</span>
-          <span class="doc-card__desc">Four runnable companion projects: Node, Python, Go, multi-container compose stack, plus an ML variant.</span>
+          <span class="doc-card__title">Example projects</span>
+          <span class="doc-card__desc">Five runnable companion projects: Quarkus, Python, Go, multi-container compose stack, plus an ML variant.</span>
         </span>
       </a>
 
@@ -146,13 +150,11 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
         </span>
       </a>
 
-      <a class="doc-card"
-         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/assets/diagrams"
-         rel="noopener">
+      <a class="doc-card" href="{{ '/diagrams/' | relative_url }}">
         <span class="doc-card__icon" aria-hidden="true">📐</span>
         <span>
-          <span class="doc-card__title">Excalidraw diagrams ↗</span>
-          <span class="doc-card__desc">Ten editable architecture and flow diagrams — both .excalidraw source and pre-rendered SVG.</span>
+          <span class="doc-card__title">Excalidraw diagrams</span>
+          <span class="doc-card__desc">Ten architecture and flow diagrams in an embedded gallery — click for fullscreen, download .excalidraw to edit.</span>
         </span>
       </a>
     </div>
