@@ -30,6 +30,12 @@ WORKDIR /app
 COPY --from=builder /build/install /usr/local
 COPY --from=builder --chown=1001:1001 /build/app /app/app
 
+# Both lib and lib64 — pip splits pure-Python and C-extension packages
+# across them on RHEL-based systems. The runtime's default sys.path
+# may not include /usr/local/lib64; set PYTHONPATH explicitly so it
+# finds packages regardless of which directory pip used.
+ENV PYTHONPATH=/usr/local/lib/python3.13/site-packages:/usr/local/lib64/python3.13/site-packages
+
 USER 1001
 EXPOSE 8000
 CMD ["python3", "-m", "uvicorn", "app.main:app", \
