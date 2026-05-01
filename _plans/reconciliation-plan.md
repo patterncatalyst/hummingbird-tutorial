@@ -49,7 +49,9 @@ pattern that may need adjustment.
 | Status | What | Where | How to verify |
 |---|---|---|---|
 | unverified | Org name `quay.io/hummingbird` is the canonical post-GA pull URL | All sections | Browse `https://quay.io/organization/hummingbird` and confirm; if the early-access org is still authoritative, switch the default to `quay.io/hummingbird-hatchling` and update the prerequisites |
-| unverified | Builder images named `<lang>-<ver>-builder` (e.g. `nodejs-20-builder`, `python-311-builder`, `openjdk-21-builder`, `go-1.22-builder`) | §4, §7, §11 | Confirm against the live catalog; update names in all four examples in §4 if the convention is different |
+| in flight | An alternative canonical path exists at `registry.access.redhat.com/hi/<name>:<tag>` (Red Hat container catalog). Discovered via working command shared during §8 update: `registry.access.redhat.com/hi/python:latest-builder` resolves. | §8 (uses this path); other sections still use `quay.io/hummingbird`. | Confirm the full set of `hi/*` repos; decide whether the tutorial's primary `HB_REGISTRY` should be `registry.access.redhat.com/hi` (Red Hat customer path) or `quay.io/hummingbird` (mirror). If the former, do a tutorial-wide find-and-replace and update prerequisites |
+| in flight | Tag convention on `registry.access.redhat.com/hi/*` appears to be tag-based, not repo-based: `hi/python:latest-builder` and `hi/python:latest` rather than separate `python-311-builder` and `python-311` repos | §4, §8 | Confirm by listing tags on a few `hi/*` repos. If tag-based, the build args in §4 examples need restructuring — currently they assume `${HB_REGISTRY}/<name>-<ver>[-builder]:<tag>` |
+| unverified | Builder images named `<lang>-<ver>-builder` (e.g. `nodejs-20-builder`, `python-311-builder`, `openjdk-21-builder`, `go-1.22-builder`) | §4, §7, §11 | Confirm against the live catalog; update names in all four examples in §4 if the convention is different. May be moot if the tag-based pattern above is the canonical one |
 | unverified | Runtime images named `<lang>-<ver>` for Node and Python, `<lang>-<ver>-runtime` for OpenJDK | §3, §4, §7, §11 | Confirm — the asymmetry between Node/Python and Java naming may need to be normalised |
 | unverified | `ubi-micro` exists in the Hummingbird catalog under that name | §4 (Go example), §10 | Confirm; if it is only available from `registry.access.redhat.com/ubi9/ubi-micro`, update the Go example to fall back there |
 | unverified | A Hummingbird `nginx` image is published under the org | §3, §6 | Confirm; this is the demonstration image used throughout §3 |
@@ -123,6 +125,11 @@ cadences.
 |---|---|---|
 | verified | The `--pid=container:` and `--network=container:` flags work for the sidecar pattern under rootless Podman 5.x | Demonstrated on Fedora 43 |
 | unverified | `--volumes-from` works rootless without surprises on a Hummingbird container | Try against §3's Nginx with a mounted volume |
+| in flight | The stronger sidecar variant — `--cap-add=SYS_PTRACE`, `--security-opt label=disable`, `--user 0` — actually permits `strace -p 1` against the target container's PID 1 on rootless Podman | Run the variant from §8, install strace, attach. If `Operation not permitted` still surfaces, document the additional `userns` or rootful escape required |
+| in flight | The in-image debug pattern (mount code into builder image, install debug tools via `dnf`) works against `registry.access.redhat.com/hi/python:latest-builder` end-to-end | Run the §8 worked example for Python with pdb on Fedora 43 and macOS |
+| unverified | The Java equivalent (`hi/openjdk-21:latest-builder` + `jdb`) works; specifically, that `jdb` is in `$PATH` in the builder image | Run §8's Java worked example |
+| unverified | The Go equivalent works — `go install` of delve, then `dlv debug` against mounted source | Run §8's Go worked example |
+| unverified | `kubectl debug --image=... --target=...` against a Hummingbird-based pod actually shares the right namespaces with `--target` | Stand up a single-pod cluster (Kind/Minikube), apply `kubectl debug` from §8 |
 
 ### §9 — zstd:chunked
 

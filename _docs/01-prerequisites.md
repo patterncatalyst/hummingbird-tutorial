@@ -350,13 +350,31 @@ EOF
 exec $SHELL -l
 ```
 
-> **Note on registry hostnames.** The source material for this
-> tutorial referenced `quay.io/hummingbird-hatchling` (the
-> early-access organisation, "hatchling" meaning pre-GA). The
-> tutorial defaults to `quay.io/hummingbird` for the post-GA
-> organisation. If the image you want to pull only exists under
-> `hummingbird-hatchling`, set `HB_REGISTRY=quay.io/hummingbird-hatchling`
-> and the rest of the examples will adapt automatically.
+> **What HB_REGISTRY actually points at.** The Hummingbird image
+> catalog lives at one Quay.io organization:
+> <https://quay.io/organization/hummingbird>. Every image used
+> in this tutorial — **both builder images and runtime images** —
+> is pulled from that organization. The shell variable
+> `HB_REGISTRY=quay.io/hummingbird` is the prefix; the rest of the
+> path is the image name and tag. So a builder pull resolves to
+> `quay.io/hummingbird/<name>-<ver>-builder:<tag>`, and a runtime
+> pull resolves to `quay.io/hummingbird/<name>-<ver>:<tag>` — same
+> registry, same organization, just different repositories under it.
+>
+> Red Hat customers also have access to the same images at
+> `registry.access.redhat.com/hi/<name>:<tag>` — the tag-based path
+> in the Red Hat container catalog. The two paths should resolve to
+> the same content. The tutorial uses `quay.io/hummingbird` as the
+> default because it works without a Red Hat subscription; if you
+> want the customer path, override with
+> `HB_REGISTRY=registry.access.redhat.com/hi`.
+>
+> The source material for this tutorial referenced
+> `quay.io/hummingbird-hatchling` (the early-access organization,
+> "hatchling" meaning pre-GA). If an image you want only exists
+> under `hummingbird-hatchling`, set
+> `HB_REGISTRY=quay.io/hummingbird-hatchling` and the rest of the
+> examples will adapt automatically.
 
 ### Smoke test
 

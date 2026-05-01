@@ -11,10 +11,13 @@ links back here from the prev/next bar at the bottom of the page.
 
 ## How the tutorial is organised
 
-The tutorial is divided into eleven numbered sections, each of which
-lives in its own document under `docs/`. The sections are designed to
+The tutorial is divided into eleven core numbered sections plus
+five optional follow-up sections, each of which lives in its own
+document under `docs/`. The core sections are designed to
 be **read and executed in order** — each one builds on the state your
-machine is in when you finish the previous one. There is no separate
+machine is in when you finish the previous one. The follow-up
+sections (12 through 16) can be read in any order after the core,
+based on what you actually need. There is no separate
 lab environment: your Fedora 43 workstation or macOS laptop is the
 lab from start to finish.
 
@@ -32,7 +35,7 @@ Within a section, the structure is consistent:
 6. **Where to go next** — a pointer to the next section, plus
    optional side trips.
 
-## The eleven sections
+## The eleven core sections
 
 ### 1. [Prerequisites]({{ "/docs/01-prerequisites/" | prepend: site.baseurl }})
 
@@ -115,6 +118,43 @@ inference container, a secure edge-application stack, a
 DevSecOps pipeline, and the trusted-application stack that ties
 everything in the tutorial together.
 
+## Optional follow-ups (sections 12–16)
+
+These sections go deeper on specific topics and can be read in
+any order after the core tutorial.
+
+### 12. [Creating custom SBOMs]({{ "/docs/12-custom-sbom/" | prepend: site.baseurl }})
+
+Build SBOMs that capture build context (commit, builder image,
+SOURCE_DATE_EPOCH), merge image-derived and source-derived SBOMs,
+and attach them as Cosign attestations. Goes beyond what §5 covers.
+
+### 13. [Hummingbird with Red Hat Trusted Libraries]({{ "/docs/13-trusted-libraries/" | prepend: site.baseurl }})
+
+Extend the trust chain from base image to application
+dependencies. Configure pip to use the Trusted Libraries pip
+index, verify SLSA L3 provenance, and integrate with Hummingbird
+Python images. Python only as of early 2026.
+
+### 14. [Installing RPMs into the runtime image]({{ "/docs/14-installing-rpms/" | prepend: site.baseurl }})
+
+Three patterns for adding OS packages to a Hummingbird runtime
+that has no `dnf`: staged install with `--installroot`,
+`rpm2cpio` extraction, and selective file copy. Worked example
+adding `tzdata` and `ca-certificates` to a Python runtime.
+
+### 15. [Automated updates with Renovate]({{ "/docs/15-renovate/" | prepend: site.baseurl }})
+
+Configure Renovate to watch `quay.io/hummingbird` tags, with a
+custom regex manager for the tutorial's `${HB_REGISTRY}` build-arg
+pattern. Three tag-pinning strategies and CI gating with `grype`.
+
+### 16. [Pruning Podman images and build cache]({{ "/docs/16-pruning/" | prepend: site.baseurl }})
+
+Reclaim laptop disk as Hummingbird base updates accumulate.
+`podman image prune`, `podman system prune`, age-based filters,
+and a scheduled-cleanup recipe via systemd or launchd.
+
 ## What this tutorial deliberately does not cover
 
 A few things are out of scope on purpose:
@@ -125,9 +165,6 @@ A few things are out of scope on purpose:
 - **Tekton pipelines.** Tekton is a fine target for Hummingbird, but
   it's another full tutorial. References to Tekton in the source
   material were lifted out and are being collected separately.
-- **Renovate bot integration.** Same reason as Tekton — important
-  for a real platform, not the right starting point for a hands-on
-  tutorial.
 - **Air-gapped registry mirroring as a first-class topic.** We
   parameterise registry hosts via environment variables so the
   examples are mirror-friendly, but a full Satellite / Quay-mirror
@@ -146,6 +183,8 @@ If you read every section and run every command, expect:
 - **2 to 3 hours** for sections 1 through 6 (the core path).
 - **1 to 2 hours** for sections 7 and 8 (compose and debugging).
 - **2 to 3 hours** for sections 9, 10, and 11 (advanced material).
+- **1 to 2 hours** for sections 12 through 16 (optional follow-ups,
+  read individually as needed).
 
 Sections 1 through 6 are the recommended first pass. The rest can
 wait until you have a real reason to reach for them.

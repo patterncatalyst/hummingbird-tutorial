@@ -328,6 +328,15 @@ You finished the tutorial. You should be able to:
 
 ## Where to go next
 
+You've finished the **core tutorial**. Sections 12 through 16 are
+optional follow-ups that go deeper on specific topics:
+
+- [Creating custom SBOMs]({{ "/docs/12-custom-sbom/" | prepend: site.baseurl }}) — extend §5 with build-context-aware SBOMs and signed attestations.
+- [Hummingbird with Red Hat Trusted Libraries]({{ "/docs/13-trusted-libraries/" | prepend: site.baseurl }}) — extend the trust chain from base image down to your application's Python dependencies.
+- [Installing RPMs into the runtime image]({{ "/docs/14-installing-rpms/" | prepend: site.baseurl }}) — three patterns for adding OS packages to a runtime that has no `dnf`.
+- [Automated updates with Renovate]({{ "/docs/15-renovate/" | prepend: site.baseurl }}) — keep your base images current as Hummingbird publishes new tags.
+- [Pruning Podman images and build cache]({{ "/docs/16-pruning/" | prepend: site.baseurl }}) — reclaim disk on a laptop where bases accumulate.
+
 The [reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
 tracks what needs to be verified or expanded. If you spotted
 something in the tutorial that didn't match what your environment

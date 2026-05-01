@@ -1,7 +1,7 @@
 ---
 title: Multi-stage builds
 order: 4
-description: Use Hummingbird builder images for the build stage and Hummingbird runtime images for the final stage. Examples in Node.js, Python, Go, and Java.
+description: Use Hummingbird builder images for the build stage and Hummingbird runtime images for the final stage. Examples in Java (Quarkus), Python, Go, with a Node.js appendix.
 duration: 45 minutes
 ---
 
@@ -14,10 +14,12 @@ The final image inherits the small footprint and minimal attack
 surface of Hummingbird, while the build still gets the full
 toolchain it needs.
 
-We'll work through four worked examples — Node.js, Python, Go,
-and Java — in increasing order of complexity. Pick whichever
-matches the work you actually do, and skim the others for the
-patterns.
+We'll work through three primary examples — Java (Quarkus, JVM
+mode), Python (FastAPI with the wheel-build pattern), and Go (a
+static binary on `ubi-micro`) — in roughly the order most readers
+will care about them. A fourth example for Node.js is in the
+appendix at the bottom of the section, included as a reference for
+the same multi-stage pattern.
 
 ## The two-stage pattern in one diagram
 
@@ -52,135 +54,89 @@ mkdir -p ~/hummingbird-tutorial/examples
 cd ~/hummingbird-tutorial/examples
 ```
 
-## Example A — Node.js
+## Example A — Java (Quarkus, JVM mode)
 
-A small Express-style app. Realistic enough that the `npm ci`
-step actually does work, but small enough to read in one screen.
+Java is the example with the most subtleties. We'll start with
+the straightforward JVM mode here. A native-image variant is in
+section 11.
 
-### Set up the project
+### A pitfall worth knowing about up front
+
+If you are training a JDK 25 AOT cache (Project Leyden) inside
+your build, the **training JVM and runtime JVM must be exactly
+the same build**, not just the same major version. A Maven
+container with Eclipse Temurin and a Hummingbird OpenJDK runtime
+have different JVM build identifiers, and the AOT cache will
+refuse to load at runtime with a confusing "unable to map shared
+spaces" error.
+
+The fix is a three-stage build (compile → train → run) where the
+train stage and the run stage use the same JVM. We'll show the
+classic two-stage pattern here; the three-stage AOT variant is
+covered in section 11 with the full AOT discussion.
+
+### Set up
+
+This example assumes you have a Quarkus skeleton from
+`mvn quarkus:create` or the Quarkus CLI. If you don't, the
+short version:
 
 ```bash
-mkdir -p node-example && cd node-example
+cd ~/hummingbird-tutorial/examples
+mkdir -p java-example && cd java-example
 
-# A trivial server that returns a JSON heartbeat.
-cat > server.js <<'EOF'
-const http = require('http');
-const port = process.env.PORT || 3000;
-
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({
-    status: 'ok',
-    runtime: 'hummingbird-nodejs',
-    nodeVersion: process.version
-  }));
-});
-
-server.listen(port, '0.0.0.0', () => {
-  console.log(`Listening on ${port}`);
-});
-EOF
-
-# Minimal package.json with no real deps so the build is fast.
-cat > package.json <<'EOF'
-{
-  "name": "hummingbird-node-example",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  }
-}
-EOF
-
-# A package-lock.json so npm ci has something to lock against.
-echo '{}' > package-lock.json
+# A fully fleshed-out Quarkus app is too much for a tutorial step.
+# See the examples/ directory in the repository for a complete
+# reference; the snippet below is the structure of the Containerfile
+# you'd use against any standard Quarkus build.
 ```
 
-### Write the Containerfile
+### Containerfile (JVM mode)
 
 ```bash
-cat > Containerfile <<'EOF'
-# Build args make the same Containerfile work against the public
-# registry or against an internal mirror. Override on the command
-# line: --build-arg HB_REGISTRY=registry.internal.example.com/hb
+cat > Containerfile.jvm <<'EOF'
 ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
-# ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+# ── Stage 1: Build with the Hummingbird OpenJDK builder ─────────────────────
+# This image has Maven, the JDK, and the headers needed for Quarkus
+# build-time processing.
+FROM ${HB_REGISTRY}/openjdk-21-builder:latest AS builder
 WORKDIR /build
+USER 1001
 
-# Cache deps separately from source. If package*.json don't change,
-# the install layer is reused on the next build.
-COPY --chown=1001:1001 package*.json ./
-RUN npm ci --include=dev
+COPY --chown=1001:1001 mvnw pom.xml ./
+COPY --chown=1001:1001 .mvn .mvn
 
-# Copy source and build. There's nothing to compile in this trivial
-# example, but real apps would run `npm run build` here.
-COPY --chown=1001:1001 . .
+# Cache dependencies as a separate layer. If pom.xml does not change,
+# this layer is reused.
+RUN ./mvnw -B dependency:go-offline
 
-# Drop dev deps before copying node_modules forward.
-RUN npm prune --production
+COPY --chown=1001:1001 src ./src
+RUN ./mvnw -B package -DskipTests
 
-# ── Stage 2: Runtime on Hummingbird Node ────────────────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20:latest
+# ── Stage 2: Runtime on the Hummingbird OpenJDK runtime ─────────────────────
+FROM ${HB_REGISTRY}/openjdk-21-runtime:latest
 WORKDIR /app
 
-# Copy only what the runtime needs.
-COPY --from=builder --chown=1001:1001 /build/server.js ./
-COPY --from=builder --chown=1001:1001 /build/node_modules ./node_modules
-COPY --from=builder --chown=1001:1001 /build/package.json ./
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/lib/      ./lib/
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/*.jar     ./
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/app/      ./app/
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/quarkus/  ./quarkus/
 
 USER 1001
-ENV NODE_ENV=production
-EXPOSE 3000
+EXPOSE 8080
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0"
 
-# Explicit entrypoint — no shell glob expansion to worry about.
-CMD ["node", "server.js"]
+ENTRYPOINT ["java", "-jar", "quarkus-run.jar"]
 EOF
 ```
 
-> **Note on the builder image name.** This tutorial assumes the
-> Hummingbird Node builder is published as `nodejs-20-builder`. If
-> the image you have access to is named differently
-> (`nodejs-20-devel`, `nodejs-20-build`, etc.), substitute that
-> here. If no Hummingbird Node builder exists in your environment
-> yet, replace the first `FROM` with `${RH_REGISTRY}/ubi9/nodejs-20:latest`
-> as a fall-back.
-
-### Build it
+The build invocation is the same as the other examples:
 
 ```bash
-podman build -t hummingbird-node-example:latest .
+podman build -f Containerfile.jvm -t hummingbird-quarkus-jvm:latest .
 ```
-
-If the build fails on the first `FROM` because the
-`nodejs-20-builder` image is not yet available in your registry,
-switch to the UBI fall-back:
-
-```bash
-podman build \
-  --build-arg HB_REGISTRY="$HB_REGISTRY" \
-  --build-arg RH_REGISTRY="$RH_REGISTRY" \
-  -t hummingbird-node-example:latest .
-```
-
-### Run it
-
-```bash
-podman run -d \
-  --name hb-node \
-  -p 3000:3000 \
-  hummingbird-node-example:latest
-
-curl -s http://localhost:3000 | jq
-
-podman stop hb-node && podman rm hb-node
-```
-
-You should see a JSON response from the app, then the cleanup
-removes the container.
 
 ## Example B — Python
 
@@ -371,90 +327,6 @@ A static binary plus `ubi-micro` is typically under 30 MB
 total — orders of magnitude smaller than the equivalent
 general-purpose image.
 
-## Example D — Java (Quarkus, JVM mode)
-
-Java is the example with the most subtleties. We'll start with
-the straightforward JVM mode here. A native-image variant is in
-section 11.
-
-### A pitfall worth knowing about up front
-
-If you are training a JDK 25 AOT cache (Project Leyden) inside
-your build, the **training JVM and runtime JVM must be exactly
-the same build**, not just the same major version. A Maven
-container with Eclipse Temurin and a Hummingbird OpenJDK runtime
-have different JVM build identifiers, and the AOT cache will
-refuse to load at runtime with a confusing "unable to map shared
-spaces" error.
-
-The fix is a three-stage build (compile → train → run) where the
-train stage and the run stage use the same JVM. We'll show the
-classic two-stage pattern here; the three-stage AOT variant is
-covered in section 11 with the full AOT discussion.
-
-### Set up
-
-This example assumes you have a Quarkus skeleton from
-`mvn quarkus:create` or the Quarkus CLI. If you don't, the
-short version:
-
-```bash
-cd ~/hummingbird-tutorial/examples
-mkdir -p java-example && cd java-example
-
-# A fully fleshed-out Quarkus app is too much for a tutorial step.
-# See the examples/ directory in the repository for a complete
-# reference; the snippet below is the structure of the Containerfile
-# you'd use against any standard Quarkus build.
-```
-
-### Containerfile (JVM mode)
-
-```bash
-cat > Containerfile.jvm <<'EOF'
-ARG HB_REGISTRY=quay.io/hummingbird
-ARG RH_REGISTRY=registry.access.redhat.com
-
-# ── Stage 1: Build with the Hummingbird OpenJDK builder ─────────────────────
-# This image has Maven, the JDK, and the headers needed for Quarkus
-# build-time processing.
-FROM ${HB_REGISTRY}/openjdk-21-builder:latest AS builder
-WORKDIR /build
-USER 1001
-
-COPY --chown=1001:1001 mvnw pom.xml ./
-COPY --chown=1001:1001 .mvn .mvn
-
-# Cache dependencies as a separate layer. If pom.xml does not change,
-# this layer is reused.
-RUN ./mvnw -B dependency:go-offline
-
-COPY --chown=1001:1001 src ./src
-RUN ./mvnw -B package -DskipTests
-
-# ── Stage 2: Runtime on the Hummingbird OpenJDK runtime ─────────────────────
-FROM ${HB_REGISTRY}/openjdk-21-runtime:latest
-WORKDIR /app
-
-COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/lib/      ./lib/
-COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/*.jar     ./
-COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/app/      ./app/
-COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/quarkus/  ./quarkus/
-
-USER 1001
-EXPOSE 8080
-ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0"
-
-ENTRYPOINT ["java", "-jar", "quarkus-run.jar"]
-EOF
-```
-
-The build invocation is the same as the other examples:
-
-```bash
-podman build -f Containerfile.jvm -t hummingbird-quarkus-jvm:latest .
-```
-
 ## Cross-cutting: build args for environment switching
 
 All four examples above use the same `HB_REGISTRY` and `RH_REGISTRY`
@@ -484,6 +356,138 @@ podman build \
   --build-arg RH_REGISTRY="$RH_REGISTRY" \
   -t myapp:latest .
 ```
+
+## Appendix — Node.js
+
+> The Node example is included as an appendix because the audience this tutorial is aimed at — JVM, Python, and Go backends — sees less Node in production. The two-stage pattern is identical, so if you do ship Node services, the same shape applies. Read it for the pattern; reach for the language-specific examples above for code you will actually copy.
+
+A small Express-style app. Realistic enough that the `npm ci`
+step actually does work, but small enough to read in one screen.
+
+### Set up the project
+
+```bash
+mkdir -p node-example && cd node-example
+
+# A trivial server that returns a JSON heartbeat.
+cat > server.js <<'EOF'
+const http = require('http');
+const port = process.env.PORT || 3000;
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    status: 'ok',
+    runtime: 'hummingbird-nodejs',
+    nodeVersion: process.version
+  }));
+});
+
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Listening on ${port}`);
+});
+EOF
+
+# Minimal package.json with no real deps so the build is fast.
+cat > package.json <<'EOF'
+{
+  "name": "hummingbird-node-example",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+EOF
+
+# A package-lock.json so npm ci has something to lock against.
+echo '{}' > package-lock.json
+```
+
+### Write the Containerfile
+
+```bash
+cat > Containerfile <<'EOF'
+# Build args make the same Containerfile work against the public
+# registry or against an internal mirror. Override on the command
+# line: --build-arg HB_REGISTRY=registry.internal.example.com/hb
+ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
+
+# ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
+FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+WORKDIR /build
+
+# Cache deps separately from source. If package*.json don't change,
+# the install layer is reused on the next build.
+COPY --chown=1001:1001 package*.json ./
+RUN npm ci --include=dev
+
+# Copy source and build. There's nothing to compile in this trivial
+# example, but real apps would run `npm run build` here.
+COPY --chown=1001:1001 . .
+
+# Drop dev deps before copying node_modules forward.
+RUN npm prune --production
+
+# ── Stage 2: Runtime on Hummingbird Node ────────────────────────────────────
+FROM ${HB_REGISTRY}/nodejs-20:latest
+WORKDIR /app
+
+# Copy only what the runtime needs.
+COPY --from=builder --chown=1001:1001 /build/server.js ./
+COPY --from=builder --chown=1001:1001 /build/node_modules ./node_modules
+COPY --from=builder --chown=1001:1001 /build/package.json ./
+
+USER 1001
+ENV NODE_ENV=production
+EXPOSE 3000
+
+# Explicit entrypoint — no shell glob expansion to worry about.
+CMD ["node", "server.js"]
+EOF
+```
+
+> **Note on the builder image name.** This tutorial assumes the
+> Hummingbird Node builder is published as `nodejs-20-builder`. If
+> the image you have access to is named differently
+> (`nodejs-20-devel`, `nodejs-20-build`, etc.), substitute that
+> here. If no Hummingbird Node builder exists in your environment
+> yet, replace the first `FROM` with `${RH_REGISTRY}/ubi9/nodejs-20:latest`
+> as a fall-back.
+
+### Build it
+
+```bash
+podman build -t hummingbird-node-example:latest .
+```
+
+If the build fails on the first `FROM` because the
+`nodejs-20-builder` image is not yet available in your registry,
+switch to the UBI fall-back:
+
+```bash
+podman build \
+  --build-arg HB_REGISTRY="$HB_REGISTRY" \
+  --build-arg RH_REGISTRY="$RH_REGISTRY" \
+  -t hummingbird-node-example:latest .
+```
+
+### Run it
+
+```bash
+podman run -d \
+  --name hb-node \
+  -p 3000:3000 \
+  hummingbird-node-example:latest
+
+curl -s http://localhost:3000 | jq
+
+podman stop hb-node && podman rm hb-node
+```
+
+You should see a JSON response from the app, then the cleanup
+removes the container.
 
 ## Verify before moving on
 
