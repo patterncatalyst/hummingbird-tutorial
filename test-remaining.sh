@@ -28,7 +28,7 @@ pass "Go build succeeded"
 podman rm -f hb-test-go-run 2>/dev/null || true
 podman run -d --name hb-test-go-run -p 18081:8080 hb-test-go
 sleep 2
-RESP=$(curl -fsSL http://localhost:18081/ || true)
+RESP=$(curl -fsSL http://127.0.0.1:18081/ || true)
 podman stop hb-test-go-run >/dev/null
 podman rm hb-test-go-run >/dev/null
 
@@ -46,7 +46,7 @@ pass "ML build succeeded"
 podman rm -f hb-test-ml-run 2>/dev/null || true
 podman run -d --name hb-test-ml-run -p 18082:8000 hb-test-ml
 sleep 4   # FastAPI startup is slower than a bare Go listener
-RESP=$(curl -fsSL http://localhost:18082/ || true)
+RESP=$(curl -fsSL http://127.0.0.1:18082/ || true)
 podman stop hb-test-ml-run >/dev/null
 podman rm hb-test-ml-run >/dev/null
 
@@ -68,11 +68,11 @@ pass "compose up succeeded"
 # Wait for web to be healthy (compose's own healthcheck handles db→web wait).
 echo "Waiting up to 60s for web tier to start responding..."
 for i in $(seq 1 30); do
-  if curl -fsSL http://localhost:3000/ >/dev/null 2>&1; then break; fi
+  if curl -fsSL http://127.0.0.1:3000/ >/dev/null 2>&1; then break; fi
   sleep 2
 done
 
-RESP=$(curl -fsSL http://localhost:3000/ || true)
+RESP=$(curl -fsSL http://127.0.0.1:3000/ || true)
 [[ "$RESP" == *'"status":"ok"'* ]] && pass "web tier responds: $RESP" \
   || { podman-compose logs --tail=50 web; fail "web didn't return expected JSON. Got: $RESP"; }
 
