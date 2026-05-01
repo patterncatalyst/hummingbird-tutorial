@@ -205,5 +205,109 @@ landing. Roughly priority-ordered.
 
 ---
 
-When everything in sections A through D has moved to `verified`
+## G. Testing matrix
+
+End-to-end testing is its own track. None of the rows below mean
+"the tutorial is broken if this doesn't pass" — they mean "we
+haven't actually run the steps end-to-end on a clean machine and
+recorded the result". As tests pass, the corresponding rows in
+sections A through D can usually be flipped to `verified`.
+
+Testing is split into three layers, cheapest to most expensive:
+
+### G.1 — Catalog availability (cheap, scriptable)
+
+One `skopeo inspect` per image used in the tutorial. Confirms the
+image exists, the manifest is healthy, and the SBOM/signature
+attestations are attached. Takes ~30 seconds total.
+
+| Status | Image | Test command |
+|---|---|---|
+| not yet run | `quay.io/hummingbird/openjdk:21-builder` | `skopeo inspect docker://quay.io/hummingbird/openjdk:21-builder` |
+| not yet run | `quay.io/hummingbird/openjdk:21-runtime` | `skopeo inspect docker://quay.io/hummingbird/openjdk:21-runtime` |
+| not yet run | `quay.io/hummingbird/python:3.13-builder` | `skopeo inspect docker://quay.io/hummingbird/python:3.13-builder` |
+| not yet run | `quay.io/hummingbird/python:3.13` | `skopeo inspect docker://quay.io/hummingbird/python:3.13` |
+| not yet run | `quay.io/hummingbird/go:1.26-builder` | `skopeo inspect docker://quay.io/hummingbird/go:1.26-builder` |
+| not yet run | `quay.io/hummingbird/go:1.26` | `skopeo inspect docker://quay.io/hummingbird/go:1.26` |
+| not yet run | `quay.io/hummingbird/nodejs:20-builder` | `skopeo inspect docker://quay.io/hummingbird/nodejs:20-builder` |
+| not yet run | `quay.io/hummingbird/nodejs:20` | `skopeo inspect docker://quay.io/hummingbird/nodejs:20` |
+| not yet run | `quay.io/hummingbird/postgresql:18` | `skopeo inspect docker://quay.io/hummingbird/postgresql:18` |
+| not yet run | `quay.io/hummingbird/nginx:1` | `skopeo inspect docker://quay.io/hummingbird/nginx:1` |
+
+A loop that runs the lot:
+
+```bash
+for img in \
+  openjdk:21-builder openjdk:21-runtime \
+  python:3.13-builder python:3.13 \
+  go:1.26-builder go:1.26 \
+  nodejs:20-builder nodejs:20 \
+  postgresql:18 nginx:1; do
+  echo "=== ${img} ==="
+  skopeo inspect "docker://quay.io/hummingbird/${img}" 2>&1 \
+    | head -3
+  echo
+done
+```
+
+### G.2 — Build-and-run smoke tests (medium, ~15 min)
+
+Build each example end-to-end and confirm it runs. Doesn't validate
+the tutorial prose around it — just that the Containerfile produces
+a working image.
+
+| Status | What | Command |
+|---|---|---|
+| not yet run | `examples/quarkus-example` builds | `cd examples/quarkus-example && podman build -t test .` |
+| not yet run | Quarkus app responds on :8080 | `podman run -d --name t -p 8080:8080 test && sleep 5 && curl -fsSL localhost:8080 \| jq` |
+| not yet run | `examples/python-example` builds | `cd examples/python-example && podman build -t test .` |
+| not yet run | Python app responds | Same shape as above |
+| not yet run | `examples/go-example` builds | `cd examples/go-example && podman build -t test .` |
+| not yet run | Go app responds | Same shape as above |
+| not yet run | `examples/ml-example` builds | `cd examples/ml-example && podman build -t test .` |
+| not yet run | `examples/node-example` builds | `cd examples/node-example && podman build -t test .` |
+| not yet run | `examples/compose-stack` brings up | `cd examples/compose-stack && podman-compose up -d` |
+| not yet run | Compose stack web tier reachable | `curl -fsSL localhost:3000` |
+| not yet run | Compose stack DB queryable | `podman exec compose-stack-db-1 psql -U app -d appdb -c 'select 1'` |
+
+### G.3 — Tutorial walkthroughs (expensive, ~5 hours)
+
+Run the tutorial sections end-to-end on a clean machine, record any
+prose that didn't match what happened. This is the gold-standard
+test; the §1 walkthrough alone catches most issues.
+
+| Status | What | Where to run |
+|---|---|---|
+| not yet run | §1 prerequisites — full install on fresh Fedora 43 VM | Clean VM |
+| not yet run | §1 prerequisites — full install on fresh macOS | Clean macOS install or VM |
+| not yet run | §3 podman basics — pull, run, sidecar pattern | Either platform after §1 passes |
+| not yet run | §4 multi-stage — Quarkus example | Either platform |
+| not yet run | §4 multi-stage — Python example | Either platform |
+| not yet run | §4 multi-stage — Go example | Either platform |
+| not yet run | §5 SBOM and signing — generate and verify | Either platform |
+| not yet run | §6 CVE scanning — clean and dirty image | Either platform |
+| not yet run | §7 compose stack — full bring-up | Fedora primarily (SELinux surface) |
+| not yet run | §8 debugging — sidecar pattern, in-image-builder | Either platform |
+| not yet run | §9 zstd:chunked — partial-pull verification | Fedora |
+| not yet run | §10 chunkah — split, recombine | Fedora |
+| not yet run | §11 real-world examples — at least one of the five | Either platform |
+| not yet run | §12 custom SBOM — full augment-merge-sign cycle | Either platform |
+| not yet run | §13 Trusted Libraries — pip install with provenance verify | Either platform; needs Red Hat account |
+| not yet run | §14 RPM install — staged install + COPY rootfs | Either platform |
+| not yet run | §15 Renovate — config validates against a real repo | Wherever |
+| not yet run | §16 pruning — every command runs cleanly | Either platform |
+
+### G.4 — How to record results
+
+When a row passes, change `not yet run` to `verified <YYYY-MM-DD>`.
+When a row fails, change to `FAIL <YYYY-MM-DD>` and add a footnote
+with the error and a link to a fix-up issue. Don't delete failing
+rows; the failure history is the record of what's been hit.
+
+When a row passes on one platform but not the other, split it into
+two rows (Fedora / macOS) so the partial verification is captured.
+
+---
+
+When everything in sections A through G has moved to `verified`
 or `out of scope`, this tutorial is done.

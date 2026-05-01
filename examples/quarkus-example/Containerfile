@@ -1,21 +1,17 @@
-# Companion Containerfile for §4 Example D of the tutorial. JVM mode
-# (not native). Uses Hummingbird's openjdk-21 builder and runtime.
-#
-# Why JVM mode rather than native: native-image build needs a separate
-# image and roughly doubles the build time. JVM mode is the realistic
-# choice for most teams; native is covered conceptually in §4 but not
-# walked through here.
+# Companion Containerfile for §4 Example A of the tutorial. JVM mode
+# (not native). Uses the verified Hummingbird image catalog naming:
+# tag-based versions, with -builder suffix for the build image and
+# -runtime suffix for the JRE-only deploy image.
 #
 # Note from FINDINGS.md: when chasing JVM AOT-cache or build-ID
-# matching across multi-stage builds, the JVM in the runtime stage
-# must match the one in the builder stage. We use openjdk-21 in both;
-# do not mix.
+# matching across multi-stage builds, the JVM major version in the
+# runtime stage must match the one in the builder stage. We use
+# OpenJDK 21 in both; do not mix.
 
 ARG HB_REGISTRY=quay.io/hummingbird
-ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: build the application with the Hummingbird OpenJDK builder ─────
-FROM ${HB_REGISTRY}/openjdk-21-builder:latest AS builder
+FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -30,10 +26,13 @@ RUN mvn -B -ntp package -DskipTests
 
 # Quarkus 3.x produces target/quarkus-app/ — a directory with the
 # launcher jar plus a flat lib/ tree. Smaller and faster to copy than
-# a fat-jar.
+# a fat-jar, and the layers cache better across rebuilds.
 
-# ── Stage 2: runtime on Hummingbird OpenJDK ─────────────────────────────────
-FROM ${HB_REGISTRY}/openjdk-21-runtime:latest
+# ── Stage 2: runtime on Hummingbird OpenJDK JRE ─────────────────────────────
+# openjdk:21-runtime is JRE-only — no javac, no Maven, no extra
+# tooling. Smaller than the full JDK runtime; correct choice for an
+# app that only needs to RUN bytecode, not compile it.
+FROM ${HB_REGISTRY}/openjdk:21-runtime
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/lib/      ./lib/
