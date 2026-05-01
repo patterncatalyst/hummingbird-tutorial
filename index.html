@@ -69,7 +69,7 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
       prev/next pager so you don't lose your place.
     </p>
 
-    <div class="cards">
+    <div class="cards"><!-- DEBUG: site.docs size = {{ site.docs.size }} | site.collections.docs.docs.size = {{ site.collections | where: "label", "docs" | first | map: "docs" | first | size }} -->
 
       {%- assign tutorial_docs = site.docs | sort: "order" -%}
       {%- for doc in tutorial_docs -%}
