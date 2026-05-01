@@ -78,4 +78,4 @@ exclude:
   - scripts
   # examples/ holds runnable code that is referenced from the docs but is
   # not part of the rendered site. Comment this out if you want it published.
-  - examples
+  - examples/
