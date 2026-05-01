@@ -69,13 +69,13 @@ re-emit it with the layers split along defined boundaries.
 
 ```bash
 # Pull the source image.
-podman pull "$HB_REGISTRY/nginx:latest"
+podman pull "$HB_REGISTRY/nginx:1"
 
 # Hypothetical chunkah invocation that splits the image along
 # defined paths — substitute the actual tool flags after
 # verification.
 chunkah split \
-  --source "$HB_REGISTRY/nginx:latest" \
+  --source "$HB_REGISTRY/nginx:1" \
   --output containers-storage:hummingbird-nginx-split:latest \
   --boundary /usr/lib \
   --boundary /etc \

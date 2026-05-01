@@ -125,14 +125,14 @@ EOF
 cat > Containerfile <<'EOF'
 ARG HB_REGISTRY=quay.io/hummingbird
 
-FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 WORKDIR /build
 USER 1001
 
 COPY --chown=1001:1001 requirements.txt .
 RUN pip wheel --no-cache-dir --wheel-dir /tmp/wheels -r requirements.txt
 
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
 COPY --from=builder /tmp/wheels /tmp/wheels

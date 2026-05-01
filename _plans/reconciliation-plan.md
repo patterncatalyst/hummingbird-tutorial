@@ -36,32 +36,23 @@ which platform passed.
 
 ## A. Image catalog and naming
 
-The single biggest source of unverified claims in the tutorial is
-the **exact set of Hummingbird images that exist** and **how they
-are named**. The user-supplied registry pointer is
-`https://quay.io/organization/hummingbird`; the source material
-referenced both `quay.io/hummingbird` (post-GA) and
-`quay.io/hummingbird-hatchling` (early-access). Until the image
-catalog is confirmed, every Containerfile in the tutorial relies
-on an environment variable (`HB_REGISTRY`) and image-name
-pattern that may need adjustment.
+This section was the largest source of unverified claims in early
+drafts of the tutorial. As of the catalog audit, all of the
+section's claims have been **verified** against the live Quay.io
+catalog. Status is `verified` unless otherwise noted.
 
-| Status | What | Where | How to verify |
+| Status | What | Where | Notes / verification |
 |---|---|---|---|
-| unverified | Org name `quay.io/hummingbird` is the canonical post-GA pull URL | All sections | Browse `https://quay.io/organization/hummingbird` and confirm; if the early-access org is still authoritative, switch the default to `quay.io/hummingbird-hatchling` and update the prerequisites |
-| in flight | An alternative canonical path exists at `registry.access.redhat.com/hi/<name>:<tag>` (Red Hat container catalog). Discovered via working command shared during §8 update: `registry.access.redhat.com/hi/python:latest-builder` resolves. | §8 (uses this path); other sections still use `quay.io/hummingbird`. | Confirm the full set of `hi/*` repos; decide whether the tutorial's primary `HB_REGISTRY` should be `registry.access.redhat.com/hi` (Red Hat customer path) or `quay.io/hummingbird` (mirror). If the former, do a tutorial-wide find-and-replace and update prerequisites |
-| in flight | Tag convention on `registry.access.redhat.com/hi/*` appears to be tag-based, not repo-based: `hi/python:latest-builder` and `hi/python:latest` rather than separate `python-311-builder` and `python-311` repos | §4, §8 | Confirm by listing tags on a few `hi/*` repos. If tag-based, the build args in §4 examples need restructuring — currently they assume `${HB_REGISTRY}/<name>-<ver>[-builder]:<tag>` |
-| unverified | Builder images named `<lang>-<ver>-builder` (e.g. `nodejs-20-builder`, `python-311-builder`, `openjdk-21-builder`, `go-1.22-builder`) | §4, §7, §11 | Confirm against the live catalog; update names in all four examples in §4 if the convention is different. May be moot if the tag-based pattern above is the canonical one |
-| unverified | Runtime images named `<lang>-<ver>` for Node and Python, `<lang>-<ver>-runtime` for OpenJDK | §3, §4, §7, §11 | Confirm — the asymmetry between Node/Python and Java naming may need to be normalised |
-| unverified | A Hummingbird Go *runtime* image exists at `${HB_REGISTRY}/go-1.22:latest` (separate from the `-builder` variant) and contains glibc, /etc/passwd with UID 1001, and ca-certificates | §4 (Go example) | Confirm via `skopeo inspect docker://quay.io/hummingbird/go-1.22:latest`. If it doesn't exist, the Go example needs to fall back to `${RH_REGISTRY}/ubi9/ubi-micro:latest` (a UBI image, not Hummingbird) and the §4 prose must be revised to acknowledge that the runtime is a UBI fallback |
-| unverified | A Hummingbird `nginx` image is published under the org | §3, §6 | Confirm; this is the demonstration image used throughout §3 |
-| unverified | A Hummingbird `postgresql-16` image is published | §7 | Confirm; the compose stack depends on it. If only `postgresql-15` or a different naming exists, update §7 |
-
-**Recommended fix path.** Once the catalog is confirmed, replace
-any `unverified` row above with the actual image name and bump
-its status. If a name in the tutorial differs, do a global
-find-and-replace across `docs/` and update §4 example
-Containerfiles to match.
+| **verified** | Org name `quay.io/hummingbird` is the canonical pull URL | All sections | Confirmed via `curl https://quay.io/v2/hummingbird/<name>/tags/list`. Pre-GA `hummingbird-hatchling` org is no longer the authoritative source for the images we reference |
+| **verified** | Repository naming is **just the software name**: `go`, `python`, `openjdk`, `nodejs`, `postgresql`, `nginx` — version is in the **tag**, not the repo | All sections | Earlier tutorial drafts assumed `<name>-<ver>-builder` repos (the wrong shape). All Containerfiles have been rewritten to `<name>:<ver>-builder` and `<name>:<ver>` tag-based form |
+| **verified** | Tags exist at major (`:3`), major-minor (`:3.13`), and patch (`:3.13.5`) granularities, plus floating `:latest` | All sections | Tutorial pins to major-version tags (`:3.13`, `:21`, `:1.26`, `:20`, `:18`, `:1`) for stability |
+| **verified** | Both runtime and builder variants are published as tag suffixes: `:<ver>` is runtime, `:<ver>-builder` is builder | All sections | All §4 examples and the Quarkus example use this pattern |
+| **verified** | OpenJDK has both full JDK (`:21`) and JRE-only (`:21-runtime`) deploy variants | §4 Quarkus example | `:21-runtime` is the smaller deploy image; the Quarkus example uses `:21-builder` → `:21-runtime` |
+| **verified** | A `-fips` suffix exists on every variant (e.g. `python:3.13-fips-builder`) for FIPS-validated environments | §1 prerequisites callout | Mentioned but not used in the main tutorial flow |
+| **verified** | An alternative canonical path exists at `registry.access.redhat.com/hi/<name>:<tag>` (Red Hat container catalog) | §8 (uses this path); §1 callout documents it as an alternative `HB_REGISTRY` value | Confirmed by working command: `registry.access.redhat.com/hi/python:latest-builder` resolves |
+| **verified** | `nginx` is published as `quay.io/hummingbird/nginx`, current major-tag `:1` (1.28 is the latest minor) | §3, §5, §6 | Tutorial uses `nginx:1` after the catalog rewrite |
+| **verified** | `postgresql` is published, current major-tag `:18` (18.3 is the latest minor) | §7 compose stack | Tutorial originally referenced `postgresql-16`, which doesn't exist; corrected to `postgresql:18` |
+| **verified** | A Hummingbird Go runtime image exists at `${HB_REGISTRY}/go:1.26` separate from the `-builder` variant | §4 Go example | Confirmed via tag-list. The runtime is a minimal base for Go static binaries |
 
 ## B. Tool versions
 
@@ -91,10 +82,10 @@ cadences.
 
 | Status | What | How to verify |
 |---|---|---|
-| unverified | The Node example builds end-to-end with the `nodejs-20-builder` and `nodejs-20` runtime images | `podman build -t hb-node . && podman run hb-node` |
-| unverified | The Python example's wheel-build pattern works against `python-311-builder` (i.e., gcc/headers are present in the builder image) | Build with a requirement that needs C-extension compilation (e.g. `psycopg2`) and confirm wheel build succeeds |
+| unverified | The Node example builds end-to-end with the `nodejs:20-builder` and `nodejs:20` runtime images | `podman build -t hb-node . && podman run hb-node` |
+| unverified | The Python example's wheel-build pattern works against `python:3.13-builder` (i.e., gcc/headers are present in the builder image) | Build with a requirement that needs C-extension compilation (e.g. `psycopg2`) and confirm wheel build succeeds |
 | unverified | The Go example produces a static binary that runs on the Hummingbird Go runtime without missing-library errors | `podman run hb-go && curl localhost:8080` |
-| unverified | The Quarkus JVM example's `mvnw` invocation works with the JDK and Maven shipped in `openjdk-21-builder` | Quarkus `getting-started` skeleton + the §4 Containerfile |
+| unverified | The Quarkus JVM example's `mvnw` invocation works with the JDK and Maven shipped in `openjdk:21-builder` | Quarkus `getting-started` skeleton + the §4 Containerfile |
 | in flight | The 3-stage AOT-cache Containerfile (compile / train / run) referenced in §11 needs to be written out | Adapt FINDINGS.md §1.4 into a working multi-stage Containerfile |
 
 ### §5 — SBOMs and signing

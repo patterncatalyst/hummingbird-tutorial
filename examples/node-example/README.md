@@ -45,7 +45,7 @@ podman build \
 
 ## Image-name caveat
 
-This Containerfile assumes `nodejs-20-builder` and `nodejs-20`. If the
+This Containerfile assumes `nodejs:20-builder` and `nodejs:20`. If the
 images you have access to are named differently, edit the two `FROM`
 lines or supply `--build-arg HB_REGISTRY=…`. See the
 [reconciliation plan](../../plans/reconciliation-plan.md) §A for

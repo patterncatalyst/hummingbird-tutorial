@@ -45,7 +45,7 @@ just needs to provide:
   any Go code that calls `os/user.Current()` works.
 - **CA certificates** — for outbound HTTPS calls.
 
-The Hummingbird `go-1.22` runtime image gives you exactly that
+The Hummingbird `go:1.26` runtime image gives you exactly that
 and not much else. It's the right default for any Go service.
 
 ## What's in here
@@ -58,9 +58,9 @@ and not much else. It's the right default for any Go service.
 
 ## Image-name caveat
 
-This Containerfile assumes that `go-1.22-builder` and `go-1.22`
+This Containerfile assumes that `go:1.26-builder` and `go:1.26`
 both exist in the Hummingbird catalog at `quay.io/hummingbird/`.
 The builder is well-precedented (matches the Python and Java
-patterns); the runtime is parallel to `python-311` and
-`openjdk-21`. Verification status is tracked in the
+patterns); the runtime is parallel to `python:3.13` and
+`openjdk:21`. Verification status is tracked in the
 [reconciliation plan](../../plans/reconciliation-plan.md) §A.

@@ -6,7 +6,7 @@ ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
 WORKDIR /build
 
 COPY --chown=1001:1001 package*.json ./
@@ -15,7 +15,7 @@ RUN npm install --omit=dev --no-audit --no-fund
 COPY --chown=1001:1001 . .
 
 # ── Stage 2: Runtime on Hummingbird Node ────────────────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20:latest
+FROM ${HB_REGISTRY}/nodejs:20
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/server.js ./

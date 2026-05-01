@@ -162,7 +162,7 @@ flow to extract the SBOM that came pre-attached.
 
 ```bash
 # Pick any Hummingbird image — Nginx will do.
-HUMMINGBIRD_IMG="$HB_REGISTRY/nginx:latest"
+HUMMINGBIRD_IMG="$HB_REGISTRY/nginx:1"
 
 # This will list the package names in the SBOM that shipped with
 # the image. Output is one package name per line.

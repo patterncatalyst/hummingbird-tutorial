@@ -35,7 +35,7 @@ Nginx image shows up immediately.
 
 ```bash
 # Use the registry shortcut from the prerequisites.
-podman pull "$HB_REGISTRY/nginx:latest"
+podman pull "$HB_REGISTRY/nginx:1"
 ```
 
 While that is running, take a look at what is happening:
@@ -64,7 +64,7 @@ pulled, let's use both forms so the syntax is familiar.
 
 ```bash
 # Inspect the manifest of the local copy.
-podman inspect "$HB_REGISTRY/nginx:latest" \
+podman inspect "$HB_REGISTRY/nginx:1" \
   | jq '{
       digest: .[0].Digest,
       created: .[0].Created,
@@ -78,7 +78,7 @@ podman inspect "$HB_REGISTRY/nginx:latest" \
 The same data via Skopeo, without ever needing the image local:
 
 ```bash
-skopeo inspect "docker://$HB_REGISTRY/nginx:latest" \
+skopeo inspect "docker://$HB_REGISTRY/nginx:1" \
   | jq '{
       digest: .Digest,
       created: .Created,
@@ -106,7 +106,7 @@ Two things to look at in the output:
 podman run -d \
   --name hummingbird-nginx \
   -p 8080:8080 \
-  "$HB_REGISTRY/nginx:latest"
+  "$HB_REGISTRY/nginx:1"
 
 # Confirm it is running.
 podman ps --filter name=hummingbird-nginx
@@ -217,7 +217,7 @@ podman images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.Created}}"
 
 # Compare layer counts.
 echo "Hummingbird nginx layers:"
-skopeo inspect "docker://$HB_REGISTRY/nginx:latest" \
+skopeo inspect "docker://$HB_REGISTRY/nginx:1" \
   | jq '.Layers | length'
 
 echo "Stock nginx layers:"

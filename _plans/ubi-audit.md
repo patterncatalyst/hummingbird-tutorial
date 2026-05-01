@@ -13,7 +13,7 @@ for each.
 > Hummingbird does not republish UBI images under its org. Where
 > the tutorial used to refer to a "Hummingbird `ubi-micro`
 > runtime", that was wrong — there is no such thing. The Go
-> example's runtime is now `${HB_REGISTRY}/go-1.22`. UBI's actual
+> example's runtime is now `${HB_REGISTRY}/go:1.26`. UBI's actual
 > `ubi-micro` lives at `registry.access.redhat.com/ubi9/ubi-micro`
 > and is a legitimate fall-back when a Hummingbird equivalent
 > doesn't exist.
@@ -72,7 +72,7 @@ for each.
 
 ## Action items
 
-1. **Confirm `quay.io/hummingbird/go-1.22:latest` exists.** This
+1. **Confirm `quay.io/hummingbird/go:1.26` exists.** This
    is the Go example's runtime image. If it doesn't exist, the
    Go example must fall back to
    `${RH_REGISTRY}/ubi9/ubi-micro:latest` (a UBI image), and §4's
@@ -83,7 +83,7 @@ for each.
    smoke test at line 382 should pull from `${HB_REGISTRY}/...`
    instead of UBI. Blocked on a stable image name with no auth.
    Candidates once confirmed: `${HB_REGISTRY}/python:latest`,
-   `${HB_REGISTRY}/go-1.22:latest`.
+   `${HB_REGISTRY}/go:1.26`.
 
 3. **Toolbox lock-in is intentional.** Don't try to replace the
    debug-toolbox references with a Hummingbird image. Hummingbird

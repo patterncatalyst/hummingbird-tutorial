@@ -33,8 +33,8 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <div class="card__eyebrow">Java · <strong>Quarkus 3.15 LTS</strong></div>
         <h3 class="card__title">Quarkus, JVM mode</h3>
         <p class="card__desc">
-          Two-stage build: <code>openjdk-21-builder</code> compiles a Quarkus
-          fast-jar; <code>openjdk-21-runtime</code> serves it. Single REST
+          Two-stage build: <code>openjdk:21-builder</code> compiles a Quarkus
+          fast-jar; <code>openjdk:21-runtime</code> serves it. Single REST
           endpoint, no native-image complexity.
         </p>
         <div class="card__meta">
@@ -49,8 +49,8 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <div class="card__eyebrow">Python · <strong>FastAPI</strong></div>
         <h3 class="card__title">Python wheel-build pattern</h3>
         <p class="card__desc">
-          Compile wheels in <code>python-311-builder</code>, install from
-          wheels in <code>python-311</code>. The runtime image never sees a
+          Compile wheels in <code>python:3.13-builder</code>, install from
+          wheels in <code>python:3.13</code>. The runtime image never sees a
           compiler.
         </p>
         <div class="card__meta">
@@ -66,7 +66,7 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <h3 class="card__title">Go on Hummingbird Go runtime</h3>
         <p class="card__desc">
           The smallest of the four. <code>CGO_ENABLED=0</code> static binary
-          on the Hummingbird <code>go-1.22</code> runtime — typically around
+          on the Hummingbird <code>go:1.26</code> runtime — typically around
           30 MB total.
         </p>
         <div class="card__meta">
@@ -129,8 +129,8 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <h3 class="card__title">Node.js</h3>
         <p class="card__desc">
           Trivial HTTP server demonstrating the two-stage pattern:
-          <code>nodejs-20-builder</code> for <code>npm ci</code>,
-          <code>nodejs-20</code> for the runtime.
+          <code>nodejs:20-builder</code> for <code>npm ci</code>,
+          <code>nodejs:20</code> for the runtime.
         </p>
         <div class="card__meta">
           <span>§4 Example A</span>

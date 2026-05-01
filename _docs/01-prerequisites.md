@@ -352,27 +352,45 @@ exec $SHELL -l
 
 > **What HB_REGISTRY actually points at.** The Hummingbird image
 > catalog lives at one Quay.io organization:
-> <https://quay.io/organization/hummingbird>. Every image used
-> in this tutorial — **both builder images and runtime images** —
-> is pulled from that organization. The shell variable
+> <https://quay.io/organization/hummingbird>. Every image used in
+> this tutorial — **both builder and runtime images** — is pulled
+> from that organization. The shell variable
 > `HB_REGISTRY=quay.io/hummingbird` is the prefix; the rest of the
-> path is the image name and tag. So a builder pull resolves to
-> `quay.io/hummingbird/<name>-<ver>-builder:<tag>`, and a runtime
-> pull resolves to `quay.io/hummingbird/<name>-<ver>:<tag>` — same
-> registry, same organization, just different repositories under it.
+> path is the image name and tag.
 >
-> Red Hat customers also have access to the same images at
-> `registry.access.redhat.com/hi/<name>:<tag>` — the tag-based path
-> in the Red Hat container catalog. The two paths should resolve to
-> the same content. The tutorial uses `quay.io/hummingbird` as the
-> default because it works without a Red Hat subscription; if you
-> want the customer path, override with
-> `HB_REGISTRY=registry.access.redhat.com/hi`.
+> The repository name is just the software (`go`, `python`,
+> `openjdk`, `nodejs`, `postgresql`, `nginx`); the **version is in
+> the tag**, not in the repository name. So:
+>
+> - **Builder pull**: `quay.io/hummingbird/<name>:<ver>-builder` —
+>   for example `quay.io/hummingbird/python:3.13-builder`.
+> - **Runtime pull**: `quay.io/hummingbird/<name>:<ver>` — for
+>   example `quay.io/hummingbird/python:3.13`.
+>
+> Tags exist at three granularities — major (`:3`), major-minor
+> (`:3.13`), and full patch (`:3.13.5`). Floating `:latest` and
+> `:latest-builder` aliases also exist. A `-fips` suffix is
+> available on every variant if your environment requires
+> FIPS-validated cryptography (`python:3.13-fips-builder`,
+> `python:3.13-fips`, etc.); the tutorial doesn't use FIPS by
+> default but every example would work with the suffix added.
+>
+> OpenJDK has one extra wrinkle worth knowing: there's a JDK/JRE
+> split. `openjdk:21` is the full JDK; `openjdk:21-runtime` is
+> JRE-only and meaningfully smaller as a runtime image. Build
+> with `openjdk:21-builder`, deploy on `openjdk:21-runtime`.
+>
+> Red Hat customers can also use `registry.access.redhat.com/hi/<name>:<tag>`
+> — the same images via the Red Hat container catalog. The two
+> paths should resolve to the same content. The tutorial uses
+> `quay.io/hummingbird` as the default because it works without a
+> Red Hat subscription; if you want the customer path, override
+> with `HB_REGISTRY=registry.access.redhat.com/hi`.
 >
 > The source material for this tutorial referenced
 > `quay.io/hummingbird-hatchling` (the early-access organization,
-> "hatchling" meaning pre-GA). If an image you want only exists
-> under `hummingbird-hatchling`, set
+> "hatchling" meaning pre-GA). If you're working against the
+> early-access org rather than the GA one, set
 > `HB_REGISTRY=quay.io/hummingbird-hatchling` and the rest of the
 > examples will adapt automatically.
 

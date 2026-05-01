@@ -51,5 +51,5 @@ podman build \
 
 ## Image-name caveat
 
-Assumes `python-311-builder` and `python-311`. See the
+Assumes `python:3.13-builder` and `python:3.13`. See the
 [reconciliation plan](../../plans/reconciliation-plan.md) §A.

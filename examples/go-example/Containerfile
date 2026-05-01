@@ -2,7 +2,7 @@ ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Compile with the Hummingbird Go builder ────────────────────────
-FROM ${HB_REGISTRY}/go-1.22-builder:latest AS builder
+FROM ${HB_REGISTRY}/go:1.26-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux \
 # in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
 # certificates, and not much else. It does not contain the Go
 # toolchain — that's what the builder is for.
-FROM ${HB_REGISTRY}/go-1.22:latest
+FROM ${HB_REGISTRY}/go:1.26
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/app ./app

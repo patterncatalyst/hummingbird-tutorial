@@ -9,7 +9,7 @@
 
 services:
   db:
-    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql-16:latest
+    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql:18
     environment:
       POSTGRESQL_USER: app
       POSTGRESQL_PASSWORD: appsecret

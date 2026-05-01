@@ -36,7 +36,7 @@ podman-compose down
 | Service | Image                                                    | Port(s)         |
 | ------- | -------------------------------------------------------- | --------------- |
 | `web`   | Built locally from `web/Containerfile`                   | 3000            |
-| `db`    | `${HB_REGISTRY}/postgresql-16:latest`                    | (compose net)   |
+| `db`    | `${HB_REGISTRY}/postgresql:18`                    | (compose net)   |
 | `otel`  | `docker.io/otel/opentelemetry-collector-contrib:latest`  | 4317, 4318      |
 
 ## Things to notice
@@ -68,6 +68,6 @@ compose-stack/
 
 ## Image-name caveat
 
-Assumes `nodejs-20-builder`, `nodejs-20`, and `postgresql-16` are all
+Assumes `nodejs:20-builder`, `nodejs:20`, and `postgresql:18` are all
 published in the Hummingbird org. See the
 [reconciliation plan](../../plans/reconciliation-plan.md) §A.

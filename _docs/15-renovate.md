@@ -48,12 +48,12 @@ npx --yes renovate \
 ## Regex manager for FROM lines
 
 Renovate's built-in `dockerfile` manager handles `FROM
-quay.io/hummingbird/python-311:1.2.3` directly. But the tutorial's
+quay.io/hummingbird/python:3.13.5` directly. But the tutorial's
 Containerfiles use build args:
 
 ```dockerfile
 ARG HB_REGISTRY=quay.io/hummingbird
-FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 ```
 
 Renovate's plain dockerfile manager doesn't dereference `${...}`
@@ -106,7 +106,7 @@ Fast, low-risk for patch-level CVE catches; risky if the
 upstream introduces a breaking change in a minor release.
 
 ```dockerfile
-FROM ${HB_REGISTRY}/python-311-builder:1
+FROM ${HB_REGISTRY}/python:3.13-builder
 ```
 
 ```json
@@ -132,7 +132,7 @@ flags every change. Each PR requires human review. Slow but
 explicit; appropriate for tightly regulated environments.
 
 ```dockerfile
-FROM ${HB_REGISTRY}/python-311-builder:1.2.3-20260201
+FROM ${HB_REGISTRY}/python:3.13.5-builder-20260201
 ```
 
 No `automerge` rule — the PR sits until a human approves.
@@ -144,7 +144,7 @@ silently substitute. Renovate keeps the digest current as new
 images are pushed.
 
 ```dockerfile
-FROM ${HB_REGISTRY}/python-311-builder@sha256:abcdef0123...
+FROM ${HB_REGISTRY}/python@sha256:abcdef0123...
 ```
 
 ```json
@@ -173,11 +173,11 @@ ARG HB_REGISTRY=quay.io/hummingbird
 
 # Builder: floating major. We don't ship the builder, so it just
 # needs to compile.
-FROM ${HB_REGISTRY}/python-311-builder:1 AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 # ...
 
 # Runtime: digest-pinned. This is the layer that goes to prod.
-FROM ${HB_REGISTRY}/python-311@sha256:abcdef... AS runtime
+FROM ${HB_REGISTRY}/python@sha256:abcdef... AS runtime
 # ...
 ```
 

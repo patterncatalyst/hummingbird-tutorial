@@ -40,7 +40,7 @@ runs scriptlets in the right order.
 ```dockerfile
 ARG HB_REGISTRY=quay.io/hummingbird
 
-FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 USER 0
 
 # Install tzdata + ca-certificates into a staging root.
@@ -64,7 +64,7 @@ RUN rm -rf /staged/var/cache/dnf \
            /staged/usr/share/doc \
            /staged/usr/share/locale
 
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
 # Layer the staged content onto the runtime image. Order matters:
@@ -102,7 +102,7 @@ using dnf:
 ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
-FROM ${HB_REGISTRY}/python-311-builder:latest AS extractor
+FROM ${HB_REGISTRY}/python:3.13-builder AS extractor
 USER 0
 
 # Download the RPM but don't install it.
@@ -113,7 +113,7 @@ RUN dnf install -y --downloadonly --downloaddir=/rpms \
     mkdir -p /extracted && cd /extracted && \
     rpm2cpio /rpms/curl-minimal-*.rpm | cpio -idmv
 
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
 # Copy only the binary you actually want.
@@ -164,7 +164,7 @@ ships with a stock Hummingbird Python image:
 # Containerfile
 ARG HB_REGISTRY=quay.io/hummingbird
 
-FROM ${HB_REGISTRY}/python-311-builder:latest AS deps
+FROM ${HB_REGISTRY}/python:3.13-builder AS deps
 USER 0
 
 # OS-level deps: tzdata for ZoneInfo, ca-certificates for HTTPS.
@@ -181,13 +181,13 @@ RUN mkdir -p /staged && \
            /staged/usr/share/{man,doc,locale}
 
 # Python deps in a separate builder stage (orthogonal to OS deps).
-FROM ${HB_REGISTRY}/python-311-builder:latest AS pybuild
+FROM ${HB_REGISTRY}/python:3.13-builder AS pybuild
 WORKDIR /build
 USER 1001
 COPY --chown=1001:1001 requirements.txt ./
 RUN pip wheel --wheel-dir=/build/wheels -r requirements.txt
 
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
 # OS-level overlay first.
@@ -206,7 +206,7 @@ EXPOSE 8000
 CMD ["python", "-m", "src.main"]
 ```
 
-What this image now has that a stock `python-311` doesn't:
+What this image now has that a stock `python:3.13` doesn't:
 
 - `/etc/ssl/certs/ca-bundle.crt` — Python's `ssl` module finds it
   automatically; HTTPS requests to public URLs work.

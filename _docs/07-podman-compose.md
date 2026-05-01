@@ -69,13 +69,13 @@ EOF
 cat > web/Containerfile <<'EOF'
 ARG HB_REGISTRY=quay.io/hummingbird
 
-FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
 WORKDIR /build
 COPY --chown=1001:1001 package*.json ./
 RUN npm ci --omit=dev --no-audit
 COPY --chown=1001:1001 server.js ./
 
-FROM ${HB_REGISTRY}/nodejs-20:latest
+FROM ${HB_REGISTRY}/nodejs:20
 WORKDIR /app
 COPY --from=builder --chown=1001:1001 /build /app
 USER 1001
@@ -132,7 +132,7 @@ cat > compose.yaml <<'EOF'
 
 services:
   db:
-    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql-16:latest
+    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql:18
     environment:
       POSTGRESQL_USER: app
       POSTGRESQL_PASSWORD: appsecret
@@ -253,7 +253,7 @@ A summary of what bites people on this section:
 | `connection refused` from web to otel          | `OTEL_EXPORTER_OTLP_ENDPOINT` set to localhost   |
 | `web` reported unhealthy during normal boot    | Missing or too-short `start_period`              |
 | `db` connection refused immediately            | `depends_on` without `condition: service_healthy`|
-| `pull access denied` on `postgresql-16:latest` | `HB_REGISTRY` not set, or wrong image name       |
+| `pull access denied` on `postgresql:18` | `HB_REGISTRY` not set, or wrong image name       |
 
 ## Verify before moving on
 

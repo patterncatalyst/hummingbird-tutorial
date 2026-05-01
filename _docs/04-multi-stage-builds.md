@@ -36,8 +36,8 @@ A few rules apply to every example:
   available.
 - **Runtime image last.** The final `FROM` is always a Hummingbird
   runtime image.
-- **Pin tags.** Use a specific tag (e.g. `nodejs-20:latest` rather
-  than `nodejs:latest`) so a major-version bump never silently
+- **Pin tags.** Use a specific major-version tag (e.g. `nodejs:20`
+  rather than `nodejs:latest`) so a major-version bump never silently
   enters your build.
 - **`COPY --from` only.** No `RUN` instructions in the runtime
   stage that need a package manager — there isn't one.
@@ -101,7 +101,7 @@ ARG RH_REGISTRY=registry.access.redhat.com
 # ── Stage 1: Build with the Hummingbird OpenJDK builder ─────────────────────
 # This image has Maven, the JDK, and the headers needed for Quarkus
 # build-time processing.
-FROM ${HB_REGISTRY}/openjdk-21-builder:latest AS builder
+FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -116,7 +116,7 @@ COPY --chown=1001:1001 src ./src
 RUN ./mvnw -B package -DskipTests
 
 # ── Stage 2: Runtime on the Hummingbird OpenJDK runtime ─────────────────────
-FROM ${HB_REGISTRY}/openjdk-21-runtime:latest
+FROM ${HB_REGISTRY}/openjdk:21-runtime
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/lib/      ./lib/
@@ -179,7 +179,7 @@ ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Compile wheels with the Hummingbird Python builder ─────────────
-FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -190,7 +190,7 @@ COPY --chown=1001:1001 requirements.txt .
 RUN pip wheel --no-cache-dir --wheel-dir /tmp/wheels -r requirements.txt
 
 # ── Stage 2: Runtime on Hummingbird Python ──────────────────────────────────
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
 # Copy the pre-built wheels into the runtime stage and install from
@@ -282,7 +282,7 @@ ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Compile with the Hummingbird Go builder ────────────────────────
-FROM ${HB_REGISTRY}/go-1.22-builder:latest AS builder
+FROM ${HB_REGISTRY}/go:1.26-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -301,7 +301,7 @@ RUN CGO_ENABLED=0 GOOS=linux \
 # in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
 # certificates, and not much else. It does not contain the Go
 # toolchain — that's what the builder is for.
-FROM ${HB_REGISTRY}/go-1.22:latest
+FROM ${HB_REGISTRY}/go:1.26
 WORKDIR /app
 
 COPY --from=builder --chown=1001:1001 /build/app ./app
@@ -374,8 +374,8 @@ people in the source material that this tutorial is built from.
 ### Java (Quarkus)
 
 **Match the JDK exactly between builder and runtime.** Hummingbird
-publishes `openjdk-21-builder` and `openjdk-21-runtime` as a
-matched pair. Don't mix `openjdk-21-builder` with
+publishes `openjdk:21-builder` and `openjdk:21-runtime` as a
+matched pair. Don't mix `openjdk:21-builder` with
 `openjdk-17-runtime` — the JVM AOT cache and the bytecode-version
 floor both depend on identical major versions. Mixing produces
 either runtime errors at first method invocation or — worse —
@@ -419,12 +419,12 @@ The runtime never reaches the network, never runs a compiler.
 **Native dependencies need build tools in the builder.** Packages
 like `numpy`, `cryptography`, `psycopg2`, and `pillow` ship native
 code that pip compiles unless a pre-built wheel is available for
-your platform. The Hummingbird `python-311-builder` image carries
+your platform. The Hummingbird `python:3.13-builder` image carries
 the C toolchain. The runtime doesn't need to.
 
 **Match Python versions exactly.** A wheel built against Python
 3.11 won't load in a 3.12 runtime. Keep
-`python-311-builder` paired with `python-311`. If you need a
+`python:3.13-builder` paired with `python:3.13`. If you need a
 different version, switch *both* together.
 
 **TLS and time zones are not in the runtime by default.**
@@ -435,7 +435,7 @@ pattern covers exactly this case.
 
 **Debugging — install `python3-debug` in the builder, not the
 runtime.** The §8 in-image-builder pattern: mount your source into
-a `python-311-builder` container, `dnf install python3-debug`, run
+a `python:3.13-builder` container, `dnf install python3-debug`, run
 `python3-debug -m pdb your-app.py`. Set breakpoints, fix on the
 host, restart. The runtime stays clean.
 
@@ -449,7 +449,7 @@ trivially small.
 
 **The runtime image isn't really a runtime.** Unlike Python or
 Java, a static Go binary doesn't need a language runtime.
-Hummingbird's `go-1.22` runtime image is essentially a minimal
+Hummingbird's `go:1.26` runtime image is essentially a minimal
 base — glibc, a non-root user, CA certificates. You're picking it
 for the user/glibc/certs, not for any "Go runtime".
 
@@ -464,12 +464,12 @@ build-host fingerprints.
 **Non-root UID 1001 ships in the runtime.** If your code calls
 anything that looks up the running user (`os/user.Current()`,
 certain logging libraries), the runtime image needs `/etc/passwd`
-to have UID 1001. The Hummingbird `go-1.22` runtime ships this by
+to have UID 1001. The Hummingbird `go:1.26` runtime ships this by
 default — no extra `COPY` needed.
 
 **Debugging with delve — install in the builder, attach over
 network.** `dlv` doesn't exist in the runtime image. The §8
-in-image-builder pattern with `${HB_REGISTRY}/go-1.22-builder`,
+in-image-builder pattern with `${HB_REGISTRY}/go:1.26-builder`,
 mount your source, `go install
 github.com/go-delve/delve/cmd/dlv@latest`, then `dlv exec ./app`
 or `dlv attach <pid>` against a deployed binary. Expose the
@@ -481,7 +481,7 @@ delve port from the prod container only when actively debugging.
   use `--chown=1001:1001` on every `COPY` so the runtime user can
   read what you copied.
 - **Always pin tags, ideally digests.** A `FROM
-  ${HB_REGISTRY}/python-311:latest` is fine for a tutorial; in
+  ${HB_REGISTRY}/python:3.13` is fine for a tutorial; in
   production, pin to a specific tag or a SHA digest. §15 covers
   the tag strategies.
 - **Always two stages.** Mixing build-time tools into the runtime
@@ -547,7 +547,7 @@ ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
 WORKDIR /build
 
 # Cache deps separately from source. If package*.json don't change,
@@ -563,7 +563,7 @@ COPY --chown=1001:1001 . .
 RUN npm prune --production
 
 # ── Stage 2: Runtime on Hummingbird Node ────────────────────────────────────
-FROM ${HB_REGISTRY}/nodejs-20:latest
+FROM ${HB_REGISTRY}/nodejs:20
 WORKDIR /app
 
 # Copy only what the runtime needs.
@@ -581,7 +581,7 @@ EOF
 ```
 
 > **Note on the builder image name.** This tutorial assumes the
-> Hummingbird Node builder is published as `nodejs-20-builder`. If
+> Hummingbird Node builder is published as `nodejs:20-builder`. If
 > the image you have access to is named differently
 > (`nodejs-20-devel`, `nodejs-20-build`, etc.), substitute that
 > here. If no Hummingbird Node builder exists in your environment
@@ -595,7 +595,7 @@ podman build -t hummingbird-node-example:latest .
 ```
 
 If the build fails on the first `FROM` because the
-`nodejs-20-builder` image is not yet available in your registry,
+`nodejs:20-builder` image is not yet available in your registry,
 switch to the UBI fall-back:
 
 ```bash

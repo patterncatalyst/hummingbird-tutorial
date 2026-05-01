@@ -98,7 +98,7 @@ two lines in the builder stage:
 ```dockerfile
 ARG HB_REGISTRY=quay.io/hummingbird
 
-FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+FROM ${HB_REGISTRY}/python:3.13-builder AS builder
 WORKDIR /build
 USER 1001
 
@@ -111,7 +111,7 @@ RUN pip wheel --wheel-dir=/build/wheels -r requirements.txt
 
 COPY --chown=1001:1001 src/ ./src/
 
-FROM ${HB_REGISTRY}/python-311:latest
+FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 COPY --from=builder --chown=1001:1001 /build/wheels /tmp/wheels
 COPY --from=builder --chown=1001:1001 /build/src /app/src

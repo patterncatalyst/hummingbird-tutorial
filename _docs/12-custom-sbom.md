@@ -49,7 +49,7 @@ This is the §5 starting point, with one extra flag for the
 schema we'll standardize on:
 
 ```bash
-IMAGE="quay.io/hummingbird/python-311:latest"
+IMAGE="quay.io/hummingbird/python:3.13"
 
 # CycloneDX 1.5 — broadly supported, maps cleanly onto SPDX 2.3 if
 # downstream tools want SPDX. Use --output cyclonedx-json so we get
@@ -71,9 +71,9 @@ on the root component.
 ```bash
 COMMIT=$(git rev-parse HEAD)
 SHORT=$(git rev-parse --short HEAD)
-BUILDER_IMG="quay.io/hummingbird/python-311-builder@$(skopeo inspect \
+BUILDER_IMG="quay.io/hummingbird/python@$(skopeo inspect \
   --format '{{.Digest}}' \
-  docker://quay.io/hummingbird/python-311-builder:latest)"
+  docker://quay.io/hummingbird/python:3.13-builder)"
 SDE=${SOURCE_DATE_EPOCH:-$(git log -1 --format=%ct)}
 
 jq --arg commit "$COMMIT" \
