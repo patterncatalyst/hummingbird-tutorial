@@ -267,9 +267,9 @@ a working image.
 | not yet run | Go app responds | After the fix above lands |
 | not yet run | `examples/ml-example` builds | Same fix as python-example applied; re-run needed |
 | not yet run | `examples/node-example` builds | `cd examples/node-example && podman build -t test .` |
-| not yet run | `examples/compose-stack` brings up | `cd examples/compose-stack && podman-compose up -d` |
-| not yet run | Compose stack web tier reachable | `curl -fsSL localhost:3000` |
-| not yet run | Compose stack DB queryable | `podman exec compose-stack-db-1 psql -U app -d appdb -c 'select 1'` |
+| **FAIL → fixed** 2026-05-01 | `examples/compose-stack` brings up | First test failed: db exited with `Error: Database is uninitialized and superuser password is not specified` — Hummingbird's `postgresql:18` uses upstream Postgres env var names (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`), not sclorg names (`POSTGRESQL_USER`, etc.). Fixed by switching env var names in `compose.yaml`. Re-run needed |
+| not yet run | Compose stack web tier reachable | After the fix above lands |
+| not yet run | Compose stack DB queryable | After the fix above lands |
 
 ### G.3 — Tutorial walkthroughs (expensive, ~5 hours)
 

@@ -337,6 +337,51 @@ Languages where you have to opt in:
 These come up in compose files and orchestration, not the Containerfile
 itself.
 
+### Postgres exits at startup with "POSTGRES_PASSWORD is not specified"
+
+**Symptom:** The Hummingbird `postgresql:18` container exits seconds
+after `compose up`. Logs show:
+
+```
+Error: Database is uninitialized and superuser password is not specified.
+       You must specify POSTGRES_PASSWORD to a non-empty value for the
+       superuser. For example, "-e POSTGRES_PASSWORD=password" on "docker run".
+```
+
+**Root cause:** Hummingbird's `postgresql:18` is built on the **upstream
+Postgres** entrypoint conventions, not Red Hat's sclorg conventions.
+The two ecosystems use different environment variable names for the
+same thing:
+
+| Variable purpose | Upstream Postgres (Hummingbird uses these) | sclorg (rhscl, what Red Hat traditionally used) |
+|---|---|---|
+| Initial superuser | `POSTGRES_USER` | `POSTGRESQL_USER` |
+| Password | `POSTGRES_PASSWORD` | `POSTGRESQL_PASSWORD` |
+| Database name | `POSTGRES_DB` | `POSTGRESQL_DATABASE` |
+
+If you're coming from `registry.redhat.io/rhscl/postgresql-*` or
+`registry.access.redhat.com/rhscl/postgresql-*`, you've internalized
+the `POSTGRESQL_*` names. Hummingbird went the other direction.
+
+**Fix:** Use the upstream names in compose.yaml or `podman run -e`:
+
+```yaml
+services:
+  db:
+    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql:18
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: appsecret
+      POSTGRES_DB: appdb
+```
+
+Once the data directory has been initialized, the env vars are only
+consulted by the entrypoint to create roles and databases on first
+boot — subsequent boots ignore them. So if you swap names on a
+container that already initialized with the old names, you'll get
+"database does not exist" errors instead. Easiest recovery is to
+delete the volume (`podman-compose down -v`) and start fresh.
+
 ### Healthcheck commands that don't exist
 
 **Symptom:** `podman-compose up` reports a service stuck in `unhealthy`,

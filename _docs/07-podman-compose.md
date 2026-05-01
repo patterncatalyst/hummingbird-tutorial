@@ -134,9 +134,9 @@ services:
   db:
     image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql:18
     environment:
-      POSTGRESQL_USER: app
-      POSTGRESQL_PASSWORD: appsecret
-      POSTGRESQL_DATABASE: appdb
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: appsecret
+      POSTGRES_DB: appdb
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "appdb"]
       interval: 5s
