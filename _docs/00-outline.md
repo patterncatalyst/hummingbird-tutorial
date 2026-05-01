@@ -118,7 +118,7 @@ inference container, a secure edge-application stack, a
 DevSecOps pipeline, and the trusted-application stack that ties
 everything in the tutorial together.
 
-## Optional follow-ups (sections 12–16)
+## Optional follow-ups (sections 12–17)
 
 These sections go deeper on specific topics and can be read in
 any order after the core tutorial.
@@ -154,6 +154,18 @@ pattern. Three tag-pinning strategies and CI gating with `grype`.
 Reclaim laptop disk as Hummingbird base updates accumulate.
 `podman image prune`, `podman system prune`, age-based filters,
 and a scheduled-cleanup recipe via systemd or launchd.
+
+### 17. [Distroless gotchas — lessons from the field]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
+
+A debugging-and-prevention reference for the rough edges that
+surface running real workloads on Hummingbird's distroless runtime.
+Covers `RUN` failures from missing shells, `HOME`/cache
+permission errors, the `lib`/`lib64` split that breaks PYTHONPATH,
+the shared-library `COPY` pattern for adding `libstdc++`/`libgomp`
+to support NumPy, IPv4/IPv6 binding caveats that surface as
+"Connection reset by peer", and decision criteria for when
+Hummingbird isn't the right runtime for your workload. Each
+gotcha is documented as symptom → root cause → fix.
 
 ## What this tutorial deliberately does not cover
 

@@ -7,10 +7,8 @@
     <nav class="site-nav" aria-label="Primary">
       <a href="{{ '/docs/00-outline/' | relative_url }}"
          {% if page.url contains '/docs/' %}aria-current="page"{% endif %}>Tutorial</a>
-      <a href="{{ '/examples/' | relative_url }}"
-         {% if page.url contains '/examples' %}aria-current="page"{% endif %}>Examples</a>
-      <a href="{{ '/diagrams/' | relative_url }}"
-         {% if page.url contains '/diagrams' %}aria-current="page"{% endif %}>Diagrams</a>
+      <a href="{{ '/docs/01-prerequisites/' | relative_url }}">Prerequisites</a>
+      <a href="{{ '/docs/17-distroless-gotchas/' | relative_url }}">Gotchas</a>
       <a href="{{ '/plans/reconciliation-plan/' | relative_url }}"
          {% if page.url contains '/plans/' %}aria-current="page"{% endif %}>Plan</a>
       <a href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial"
