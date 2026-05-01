@@ -16,10 +16,10 @@ toolchain it needs.
 
 We'll work through three primary examples — Java (Quarkus, JVM
 mode), Python (FastAPI with the wheel-build pattern), and Go (a
-static binary on `ubi-micro`) — in roughly the order most readers
-will care about them. A fourth example for Node.js is in the
-appendix at the bottom of the section, included as a reference for
-the same multi-stage pattern.
+static binary on the Hummingbird Go runtime) — in roughly the
+order most readers will care about them. A fourth example for
+Node.js is in the appendix at the bottom of the section,
+included as a reference for the same multi-stage pattern.
 
 ## The two-stage pattern in one diagram
 
@@ -228,9 +228,9 @@ podman stop hb-py && podman rm hb-py
 ## Example C — Go
 
 Go is the easy example. Compile to a static binary in the builder
-stage, copy the binary into a Hummingbird `ubi-micro` runtime,
-done. No language-specific runtime image needed because the binary
-is already self-contained.
+stage, copy the binary into the Hummingbird Go runtime, done. The
+runtime image is essentially just glibc and a non-root user — Go's
+static binaries don't need a language runtime in the deploy stage.
 
 ### Set up
 
@@ -301,11 +301,6 @@ RUN CGO_ENABLED=0 GOOS=linux \
 # in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
 # certificates, and not much else. It does not contain the Go
 # toolchain — that's what the builder is for.
-#
-# Alternative: ${HB_REGISTRY}/ubi-micro:latest is a few MB smaller
-# but doesn't ship CA certificates, so HTTPS calls from your Go
-# code will fail until you copy /etc/ssl/certs/ from the builder.
-# Stick with go-1.22 unless image size is the binding constraint.
 FROM ${HB_REGISTRY}/go-1.22:latest
 WORKDIR /app
 
@@ -338,10 +333,7 @@ podman stop hb-go && podman rm hb-go
 The Go example is the one where the size win is most dramatic.
 A static Go binary on the Hummingbird Go runtime typically lands
 around 30 MB — orders of magnitude smaller than the equivalent
-general-purpose image. If you swap the runtime to
-`${HB_REGISTRY}/ubi-micro` (no CA certs, no /etc/passwd entries),
-you can shave another 5–10 MB at the cost of having to bring
-those in yourself.
+general-purpose image.
 
 ## Cross-cutting: build args for environment switching
 
@@ -459,10 +451,7 @@ trivially small.
 Java, a static Go binary doesn't need a language runtime.
 Hummingbird's `go-1.22` runtime image is essentially a minimal
 base — glibc, a non-root user, CA certificates. You're picking it
-for the user/glibc/certs, not for any "Go runtime". If you don't
-need any of those, `${HB_REGISTRY}/ubi-micro` (or even `scratch`)
-is technically valid; the §11 examples discuss when each makes
-sense.
+for the user/glibc/certs, not for any "Go runtime".
 
 **`-trimpath` and `-ldflags="-s -w"` aren't optional.** `-trimpath`
 strips local build paths from the binary for reproducible builds —
@@ -472,16 +461,11 @@ byte-identical binary regardless of who built it where.
 Together they shave ~30% off the binary size and remove
 build-host fingerprints.
 
-**Non-root UID 1001 — copy the user entry, or live without one.**
-If your code calls anything that looks up the running user
-(`os/user.Current()`, certain logging libraries), the runtime
-image needs `/etc/passwd` to have UID 1001. The Hummingbird
-`go-1.22` runtime ships this by default; `ubi-micro` does not.
-If you switch to `ubi-micro`, copy the entry from the builder:
-
-```dockerfile
-COPY --from=builder /etc/passwd /etc/passwd
-```
+**Non-root UID 1001 ships in the runtime.** If your code calls
+anything that looks up the running user (`os/user.Current()`,
+certain logging libraries), the runtime image needs `/etc/passwd`
+to have UID 1001. The Hummingbird `go-1.22` runtime ships this by
+default — no extra `COPY` needed.
 
 **Debugging with delve — install in the builder, attach over
 network.** `dlv` doesn't exist in the runtime image. The §8

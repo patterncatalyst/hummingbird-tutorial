@@ -21,11 +21,6 @@ RUN CGO_ENABLED=0 GOOS=linux \
 # in the Hummingbird catalog: glibc, a non-root UID 1001 user, ca
 # certificates, and not much else. It does not contain the Go
 # toolchain — that's what the builder is for.
-#
-# Alternative: ${HB_REGISTRY}/ubi-micro:latest is a few MB smaller
-# but doesn't ship CA certificates, so HTTPS calls from your Go
-# code will fail until you copy /etc/ssl/certs/ from the builder.
-# Stick with go-1.22 unless image size is the binding constraint.
 FROM ${HB_REGISTRY}/go-1.22:latest
 WORKDIR /app
 

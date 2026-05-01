@@ -1,7 +1,7 @@
 # go-example
 
-Static Go HTTP server compiled with the Hummingbird Go builder and
-deployed onto the Hummingbird Go runtime. Walked through in
+Static Go HTTP server compiled with the Hummingbird Go builder
+and deployed onto the Hummingbird Go runtime. Walked through in
 [§4 — Multi-stage builds, Example C](../../docs/04-multi-stage-builds.md).
 
 This is the smallest of the §4 examples — typically around 30 MB
@@ -46,25 +46,7 @@ just needs to provide:
 - **CA certificates** — for outbound HTTPS calls.
 
 The Hummingbird `go-1.22` runtime image gives you exactly that
-and not much else. It's the right default for almost any Go
-service.
-
-## When `ubi-micro` makes sense instead
-
-If image size is the binding constraint and you don't need
-HTTPS or `os/user.Current()`, swap the runtime stage:
-
-```dockerfile
-FROM ${HB_REGISTRY}/ubi-micro:latest
-COPY --from=builder /etc/ssl/certs /etc/ssl/certs
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder --chown=1001:1001 /build/app ./app
-USER 1001
-CMD ["./app"]
-```
-
-That saves a few MB at the cost of two extra `COPY` lines.
-For most production services it isn't worth the complexity.
+and not much else. It's the right default for any Go service.
 
 ## What's in here
 
@@ -80,10 +62,5 @@ This Containerfile assumes that `go-1.22-builder` and `go-1.22`
 both exist in the Hummingbird catalog at `quay.io/hummingbird/`.
 The builder is well-precedented (matches the Python and Java
 patterns); the runtime is parallel to `python-311` and
-`openjdk-21`.
-
-If `quay.io/hummingbird/go-1.22:latest` doesn't resolve, fall
-back to `${HB_REGISTRY}/ubi-micro:latest` and add the two `COPY`
-lines from "When `ubi-micro` makes sense" above. See the
-[reconciliation plan](../../plans/reconciliation-plan.md) §A
-for the verification status.
+`openjdk-21`. Verification status is tracked in the
+[reconciliation plan](../../plans/reconciliation-plan.md) §A.
