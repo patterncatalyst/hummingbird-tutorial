@@ -2,7 +2,7 @@
 
 Trivial Quarkus app demonstrating the two-stage JVM-mode build pattern
 on Hummingbird OpenJDK images. Walked through in
-[§4 — Multi-stage builds, Example A](../../docs/04-multi-stage-builds.md).
+[§4 — Multi-stage builds, Example A](../../_docs/04-multi-stage-builds.md).
 
 JVM mode rather than native — building a native image needs a different
 builder image and roughly doubles build time. JVM mode is what most

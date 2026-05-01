@@ -3,7 +3,7 @@
 Three-service multi-container example: a Node web app, a PostgreSQL
 database, and an OpenTelemetry collector — all on Hummingbird base
 images, orchestrated with Podman Compose. Walked through in detail
-in [§7 — Multi-container apps](../../docs/07-podman-compose.md).
+in [§7 — Multi-container apps](../../_docs/07-podman-compose.md).
 
 ## Bring it up
 

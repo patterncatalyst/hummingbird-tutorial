@@ -2,7 +2,7 @@
 
 Static Go HTTP server compiled with the Hummingbird Go builder
 and deployed onto the Hummingbird Go runtime. Walked through in
-[§4 — Multi-stage builds, Example C](../../docs/04-multi-stage-builds.md).
+[§4 — Multi-stage builds, Example C](../../_docs/04-multi-stage-builds.md).
 
 This is the smallest of the §4 examples — typically around 30 MB
 total, almost all of which is the binary itself.

@@ -2,7 +2,7 @@
 
 Trivial Node.js HTTP server demonstrating the two-stage build pattern
 on Hummingbird base images. Walked through in detail in
-[§4 — Multi-stage builds, Example A](../../docs/04-multi-stage-builds.md).
+[§4 — Multi-stage builds, Node.js appendix](../../_docs/04-multi-stage-builds.md#appendix--nodejs).
 
 Also referenced from §6 (CVE scanning), §9 (zstd:chunked), and §10
 (chunkah) — those sections reuse this same project rather than

@@ -3,7 +3,7 @@
 FastAPI service with a NumPy dependency, demonstrating the wheel-build
 multi-stage pattern when the runtime needs scientific Python libraries
 that compile native code. Walked through in
-[§11 — Real-world examples (Scenario 2)](../../docs/11-real-world-examples.md).
+[§11 — Real-world examples (Scenario 2)](../../_docs/11-real-world-examples.md).
 
 The default `requirements.txt` is deliberately light (just NumPy) so
 the build finishes in a reasonable time for a tutorial. Uncomment the
