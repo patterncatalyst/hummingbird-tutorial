@@ -14,7 +14,7 @@ github_username: patterncatalyst
 # Set baseurl to match the repository name when published on GitHub Pages.
 # Override locally with: bundle exec jekyll serve --baseurl ""
 baseurl: "/hummingbird-tutorial"
-url: "https://example.github.io"
+url: "https://patterncatalyst.github.io"
 
 # ── Build settings ────────────────────────────────────────────────────────────
 markdown: kramdown
@@ -31,6 +31,11 @@ kramdown:
 # `docs` is the tutorial body. `plans` is project-management material
 # (reconciliation plan, progress tracking) — included in the build so it
 # can be cross-linked, but not advertised in the main nav.
+#
+# NOTE: the actual tutorial files live at `docs/*.md` (no underscore prefix),
+# so they are read by Jekyll as regular pages, not as proper collection
+# items. The `defaults` block below applies the tutorial layout to them
+# via path scope, which works regardless of collection membership.
 collections:
   docs:
     output: true
@@ -39,16 +44,17 @@ collections:
     output: true
     permalink: /plans/:name/
 
+# Layout defaults. We scope by path rather than by collection type because
+# our files live under docs/ and plans/ (not _docs/ and _plans/), which
+# means Jekyll classifies them as pages, not as collection items.
 defaults:
   - scope:
-      path: ""
-      type: docs
+      path: "docs"
     values:
       layout: tutorial
       sectionid: docs
   - scope:
-      path: ""
-      type: plans
+      path: "plans"
     values:
       layout: plan
       sectionid: plans
