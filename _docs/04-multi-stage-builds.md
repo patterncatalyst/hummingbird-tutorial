@@ -39,8 +39,19 @@ A few rules apply to every example:
 - **Pin tags.** Use a specific major-version tag (e.g. `nodejs:20`
   rather than `nodejs:latest`) so a major-version bump never silently
   enters your build.
-- **`COPY --from` only.** No `RUN` instructions in the runtime
-  stage that need a package manager — there isn't one.
+- **`COPY` only in the runtime stage; never `RUN`.** Hummingbird
+  runtime images are distroless — no `/bin/sh`, no package
+  manager, nothing to interpret a `RUN` line. Buildah will fail
+  with `executable file '/bin/sh' not found` if you try. Anything
+  that needs to execute (`pip install`, `dnf install`, custom
+  setup scripts) must run in the builder stage; the runtime
+  receives only the resulting filesystem via `COPY --from`.
+- **Set `HOME` in the builder.** UID 1001 doesn't have a home
+  directory in the Hummingbird builder images, so tools that
+  default to `~/.cache` or `~/.m2` (Go, Maven, pip, npm) will try
+  to write to `/.cache` or `/.m2` and fail with permission
+  denied. `ENV HOME=/build` near the top of the builder stage
+  fixes this once for the whole stage.
 - **Run as a non-root user.** Hummingbird images default to
   UID 1001. Use `--chown=1001:1001` on every `COPY`.
 
@@ -102,18 +113,21 @@ ARG RH_REGISTRY=registry.access.redhat.com
 # This image has Maven, the JDK, and the headers needed for Quarkus
 # build-time processing.
 FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
 
-COPY --chown=1001:1001 mvnw pom.xml ./
-COPY --chown=1001:1001 .mvn .mvn
+# Maven uses ~/.m2 for the dependency cache. Set HOME so it
+# resolves to a directory UID 1001 can write to.
+ENV HOME=/build
+
+COPY --chown=1001:1001 pom.xml ./
 
 # Cache dependencies as a separate layer. If pom.xml does not change,
 # this layer is reused.
-RUN ./mvnw -B dependency:go-offline
+RUN mvn -B -ntp dependency:go-offline
 
 COPY --chown=1001:1001 src ./src
-RUN ./mvnw -B package -DskipTests
+RUN mvn -B -ntp package -DskipTests
 
 # ── Stage 2: Runtime on the Hummingbird OpenJDK runtime ─────────────────────
 FROM ${HB_REGISTRY}/openjdk:21-runtime
@@ -178,30 +192,39 @@ cat > Containerfile <<'EOF'
 ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
-# ── Stage 1: Compile wheels with the Hummingbird Python builder ─────────────
+# ── Stage 1: Build wheels and install them into a stage-local prefix ────────
+# Hummingbird runtime images are distroless: there's no /bin/sh in
+# stage 2, so we cannot RUN anything there. Everything that requires
+# a shell — pip install in particular — happens here in the builder.
+# We install into /install with --prefix to get a clean tree to copy.
 FROM ${HB_REGISTRY}/python:3.13-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
+
+# pip writes to ~/.cache by default. Set HOME explicitly so it points
+# at /build, which UID 1001 owns.
+ENV HOME=/build PIP_NO_CACHE_DIR=1
 
 COPY --chown=1001:1001 requirements.txt .
 
-# Compile wheels for everything in requirements.txt. This pulls in
-# any C-extension build dependencies present in the builder image.
-RUN pip wheel --no-cache-dir --wheel-dir /tmp/wheels -r requirements.txt
+# Compile wheels for everything in requirements.txt, then install into
+# /install. This pulls in any C-extension build dependencies present
+# in the builder image.
+RUN pip wheel --wheel-dir /build/wheels -r requirements.txt && \
+    pip install --no-index --find-links=/build/wheels --prefix=/install \
+        /build/wheels/*.whl
 
-# ── Stage 2: Runtime on Hummingbird Python ──────────────────────────────────
+COPY --chown=1001:1001 app/ /build/app/
+
+# ── Stage 2: Runtime on Hummingbird Python (distroless, no shell) ───────────
+# Only COPY here — RUN cannot work because the runtime has no shell.
 FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
-# Copy the pre-built wheels into the runtime stage and install from
-# them. The runtime image does not need a compiler because every
-# wheel has already been built upstream.
-COPY --from=builder /tmp/wheels /tmp/wheels
-RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels \
-        /tmp/wheels/*.whl \
-    && rm -rf /tmp/wheels
-
-COPY --chown=1001:1001 app/ ./app/
+# /install/lib/python3.13/site-packages lands at
+# /usr/local/lib/python3.13/site-packages, which Python finds by default.
+COPY --from=builder /install /usr/local
+COPY --from=builder --chown=1001:1001 /build/app /app/app
 
 USER 1001
 EXPOSE 8000
@@ -283,8 +306,13 @@ ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Compile with the Hummingbird Go builder ────────────────────────
 FROM ${HB_REGISTRY}/go:1.26-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
+
+# Go writes to HOME/.cache/go-build by default. The Hummingbird builder
+# image doesn't set HOME for UID 1001, so Go falls back to /.cache and
+# fails with permission denied. Point GOCACHE at a writable directory.
+ENV HOME=/build GOCACHE=/build/.cache/go-build
 
 COPY --chown=1001:1001 go.mod ./
 COPY --chown=1001:1001 main.go ./

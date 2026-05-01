@@ -1,27 +1,39 @@
 ARG HB_REGISTRY=quay.io/hummingbird
 ARG RH_REGISTRY=registry.access.redhat.com
 
-# ── Stage 1: Compile wheels with the Hummingbird Python builder ─────────────
+# ── Stage 1: Build wheels and install them into a stage-local prefix ────────
+# Hummingbird runtime images are distroless: no /bin/sh, no pip, nothing
+# that would let us RUN anything in stage 2. Everything that needs a
+# shell happens here in the builder. We install into /install with
+# --prefix so we have a clean tree to copy across.
 FROM ${HB_REGISTRY}/python:3.13-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
+
+# pip needs HOME for its cache directory. Set explicitly because
+# the builder image doesn't set HOME for UID 1001.
+ENV HOME=/build PIP_NO_CACHE_DIR=1
 
 COPY --chown=1001:1001 requirements.txt .
 
 # Compile wheels for everything in requirements.txt. This pulls in
 # any C-extension build dependencies present in the builder image.
-RUN pip wheel --no-cache-dir --wheel-dir /tmp/wheels -r requirements.txt
+RUN pip wheel --wheel-dir /build/wheels -r requirements.txt && \
+    pip install --no-index --find-links=/build/wheels --prefix=/install \
+        /build/wheels/*.whl
 
-# ── Stage 2: Runtime on Hummingbird Python ──────────────────────────────────
+COPY --chown=1001:1001 app/ /build/app/
+
+# ── Stage 2: Runtime on Hummingbird Python (distroless, no shell) ───────────
+# Only COPY here. RUN cannot work — there is no /bin/sh in the runtime.
 FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
 
-COPY --from=builder /tmp/wheels /tmp/wheels
-RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels \
-        /tmp/wheels/*.whl \
-    && rm -rf /tmp/wheels
-
-COPY --chown=1001:1001 app/ ./app/
+# Copy the prefix from the builder. /install/lib/python3.13/site-packages
+# lands at /usr/local/lib/python3.13/site-packages, which the runtime's
+# Python finds by default.
+COPY --from=builder /install /usr/local
+COPY --from=builder --chown=1001:1001 /build/app /app/app
 
 USER 1001
 EXPOSE 8000

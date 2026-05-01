@@ -260,11 +260,11 @@ a working image.
 |---|---|---|
 | not yet run | `examples/quarkus-example` builds | `cd examples/quarkus-example && podman build -t test .` |
 | not yet run | Quarkus app responds on :8080 | `podman run -d --name t -p 8080:8080 test && sleep 5 && curl -fsSL localhost:8080 \| jq` |
-| not yet run | `examples/python-example` builds | `cd examples/python-example && podman build -t test .` |
-| not yet run | Python app responds | Same shape as above |
-| not yet run | `examples/go-example` builds | `cd examples/go-example && podman build -t test .` |
-| not yet run | Go app responds | Same shape as above |
-| not yet run | `examples/ml-example` builds | `cd examples/ml-example && podman build -t test .` |
+| **FAIL → fixed** 2026-05-01 | `examples/python-example` builds | First test failed: runtime stage `RUN pip install` errored with `/bin/sh not found` — Hummingbird runtime images are distroless, no shell. Fixed by moving install to the builder with `--prefix=/install` and copying the prefix across in the runtime stage. Re-run needed |
+| not yet run | Python app responds | After the fix above lands |
+| **FAIL → fixed** 2026-05-01 | `examples/go-example` builds | First test failed: `mkdir /.cache: permission denied` — UID 1001 can't write to `/`. Fixed by setting `ENV HOME=/build GOCACHE=/build/.cache/go-build` in the builder stage. Re-run needed |
+| not yet run | Go app responds | After the fix above lands |
+| not yet run | `examples/ml-example` builds | Same fix as python-example applied; re-run needed |
 | not yet run | `examples/node-example` builds | `cd examples/node-example && podman build -t test .` |
 | not yet run | `examples/compose-stack` brings up | `cd examples/compose-stack && podman-compose up -d` |
 | not yet run | Compose stack web tier reachable | `curl -fsSL localhost:3000` |

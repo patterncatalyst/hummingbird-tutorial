@@ -181,11 +181,16 @@ RUN mkdir -p /staged && \
            /staged/usr/share/{man,doc,locale}
 
 # Python deps in a separate builder stage (orthogonal to OS deps).
+# Install into a /install prefix so we can COPY across — the runtime
+# image has no /bin/sh and cannot RUN pip install itself.
 FROM ${HB_REGISTRY}/python:3.13-builder AS pybuild
-WORKDIR /build
 USER 1001
+WORKDIR /build
+ENV HOME=/build PIP_NO_CACHE_DIR=1
 COPY --chown=1001:1001 requirements.txt ./
-RUN pip wheel --wheel-dir=/build/wheels -r requirements.txt
+RUN pip wheel --wheel-dir=/build/wheels -r requirements.txt && \
+    pip install --no-index --find-links=/build/wheels --prefix=/install \
+        /build/wheels/*.whl
 
 FROM ${HB_REGISTRY}/python:3.13
 WORKDIR /app
@@ -194,12 +199,11 @@ WORKDIR /app
 COPY --from=deps /staged/etc/ /etc/
 COPY --from=deps /staged/usr/ /usr/
 
-# Then app deps and source.
-COPY --from=pybuild --chown=1001:1001 /build/wheels /tmp/wheels
+# Then app deps and source — no RUN, only COPY.
+COPY --from=pybuild /install /usr/local
 COPY --chown=1001:1001 src/ /app/src/
 
 USER 1001
-RUN pip install --no-index --find-links=/tmp/wheels /tmp/wheels/*.whl
 ENV PYTHONPATH=/app/src
 ENV TZ=UTC
 EXPOSE 8000

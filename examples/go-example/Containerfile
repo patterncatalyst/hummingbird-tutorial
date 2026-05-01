@@ -3,8 +3,13 @@ ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Compile with the Hummingbird Go builder ────────────────────────
 FROM ${HB_REGISTRY}/go:1.26-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
+
+# Go uses HOME/.cache/go-build by default. The Hummingbird builder
+# image doesn't set HOME for UID 1001, so Go tries to write to
+# /.cache and fails. Point it explicitly at /build/.cache.
+ENV HOME=/build GOCACHE=/build/.cache/go-build
 
 COPY --chown=1001:1001 go.mod ./
 COPY --chown=1001:1001 main.go ./

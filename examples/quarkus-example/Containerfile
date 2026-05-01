@@ -12,8 +12,12 @@ ARG HB_REGISTRY=quay.io/hummingbird
 
 # ── Stage 1: build the application with the Hummingbird OpenJDK builder ─────
 FROM ${HB_REGISTRY}/openjdk:21-builder AS builder
-WORKDIR /build
 USER 1001
+WORKDIR /build
+
+# Maven uses ~/.m2 for the dependency cache. Set HOME so it
+# resolves to a directory UID 1001 can write to.
+ENV HOME=/build
 
 # Copy pom first so the dependency-resolution layer is cached
 # independently of source changes.
