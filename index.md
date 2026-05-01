@@ -1,53 +1,164 @@
 ---
 layout: default
-title: Hummingbird Tutorial
-description: A follow-along, cut-and-paste tutorial for Red Hat Project Hummingbird using Podman.
-sectionid: home
+title: Project Hummingbird, hands on
+description: A follow-along tutorial for Project Hummingbird — Red Hat's near-zero-CVE rebuild-don't-patch container base — with Podman, Podman Compose, and Podman Desktop on Fedora 43 and macOS.
 ---
 
-# Hummingbird Tutorial
+<section class="hero">
+  <div class="container">
+    <span class="hero__eyebrow">Hands-on tutorial</span>
+    <h1>Project Hummingbird, hands&nbsp;on.</h1>
+    <p class="hero__lead">
+      A follow-along guide to Red Hat's rebuild-don't-patch container base —
+      twelve sections, four worked example projects, ten Excalidraw diagrams.
+      Cut, paste, run.
+    </p>
 
-This is a hands-on tutorial for **Project Hummingbird** — Red Hat's
-catalog of minimal, hardened, near-zero-CVE container images — built
-around the Podman family of tools (Podman, Podman Compose, Podman
-Desktop).
+    <div class="hero__chips">
+      <span class="chip chip--accent">Podman 5.x</span>
+      <span class="chip">Podman Compose</span>
+      <span class="chip">Podman Desktop</span>
+      <span class="chip">Fedora 43</span>
+      <span class="chip">macOS</span>
+      <span class="chip">cosign · syft · grype</span>
+    </div>
 
-The tutorial is meant to be **read in order, with a terminal open
-beside the page**. Every command is intended to be copied and pasted
-directly. There is no separate lab environment to provision: your
-Fedora 43 workstation or macOS laptop is the lab.
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="{{ '/docs/00-outline/' | relative_url }}">
+        Start with the outline →
+      </a>
+      <a class="btn btn--secondary" href="{{ '/docs/01-prerequisites/' | relative_url }}">
+        Skip to prerequisites
+      </a>
+    </div>
+  </div>
+</section>
 
-## Start here
+<section class="section-tight">
+  <div class="container">
+    <div class="stats">
+      <div class="stat">
+        <span class="stat__value">11</span>
+        <span class="stat__label">Tutorial sections</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">~5h</span>
+        <span class="stat__label">End-to-end runtime</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">4</span>
+        <span class="stat__label">Runnable example projects</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">2</span>
+        <span class="stat__label">Platforms — Fedora &amp; macOS</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">10</span>
+        <span class="stat__label">Architecture diagrams</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-If this is your first time:
+<section class="section">
+  <div class="container">
+    <h2 class="section-heading">Tutorial</h2>
+    <p class="section-sub">
+      Work through the sections in order the first time. Each section ends with a
+      prev/next pager so you don't lose your place.
+    </p>
 
-1. Read the [outline]({{ site.baseurl }}/docs/00-outline/) to see the
-   full progression and decide where to stop the first time through.
-2. Work through the [prerequisites]({{ site.baseurl }}/docs/01-prerequisites/)
-   to make sure your machine has the tools you'll need.
-3. Continue with [What is Project Hummingbird]({{ site.baseurl }}/docs/02-introduction/)
-   for the conceptual grounding before any commands.
+    <div class="cards">
 
-If you already know what Hummingbird is and just want to start
-running it, jump to [Pulling and inspecting your first image]({{ site.baseurl }}/docs/03-podman-basics/).
+      {%- assign tutorial_docs = site.docs | sort: "order" -%}
+      {%- for doc in tutorial_docs -%}
+        {%- assign section_kind = "Section" -%}
+        {%- if doc.order == 0 -%}{%- assign section_kind = "Map" -%}{%- endif -%}
+        {%- if doc.order == 1 -%}{%- assign section_kind = "Setup" -%}{%- endif -%}
+        {%- if doc.order == 2 -%}{%- assign section_kind = "Concepts" -%}{%- endif -%}
+        {%- if doc.order >= 3 and doc.order <= 7 -%}{%- assign section_kind = "Build" -%}{%- endif -%}
+        {%- if doc.order >= 8 and doc.order <= 10 -%}{%- assign section_kind = "Operate" -%}{%- endif -%}
+        {%- if doc.order == 11 -%}{%- assign section_kind = "Apply" -%}{%- endif -%}
 
-## Tutorial sections
+        <a class="card" href="{{ doc.url | relative_url }}">
+          <div class="card__eyebrow">
+            {{ section_kind }} · <strong>{{ doc.order }}</strong>
+          </div>
+          <h3 class="card__title">{{ doc.title }}</h3>
+          <p class="card__desc">{{ doc.description }}</p>
+          <div class="card__meta">
+            {%- if doc.duration -%}<span>⏱ {{ doc.duration }}</span>{%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
 
-{% assign tutorial_docs = site.docs | sort: "order" %}
-<ol>
-  {% for doc in tutorial_docs %}
-    {% if doc.hidden != true %}
-      <li>
-        <a href="{{ doc.url | prepend: site.baseurl }}">{{ doc.title }}</a>
-        {% if doc.description %} &mdash; {{ doc.description }}{% endif %}
-      </li>
-    {% endif %}
-  {% endfor %}
-</ol>
+    </div>
+  </div>
+</section>
 
-## Project status
+<section class="section" style="background: var(--bg-soft);">
+  <div class="container">
+    <h2 class="section-heading">Reference</h2>
+    <p class="section-sub">
+      Out-of-band documents that support the tutorial. Read the plan if
+      something doesn't work as written — chances are it's tracked there.
+    </p>
 
-This tutorial is under active development. See the
-[reconciliation plan]({{ site.baseurl }}/plans/reconciliation-plan/)
-for what is complete, what is in flight, and where contributions are
-most useful.
+    <div class="cards">
+      <a class="doc-card" href="{{ '/docs/00-outline/' | relative_url }}">
+        <span class="doc-card__icon" aria-hidden="true">🗺️</span>
+        <span>
+          <span class="doc-card__title">Outline &amp; reading order</span>
+          <span class="doc-card__desc">The whole map on one page — what each section covers, what's in scope, what's not.</span>
+        </span>
+      </a>
+
+      <a class="doc-card" href="{{ '/docs/01-prerequisites/' | relative_url }}">
+        <span class="doc-card__icon" aria-hidden="true">🧰</span>
+        <span>
+          <span class="doc-card__title">Prerequisites — Fedora &amp; macOS</span>
+          <span class="doc-card__desc">Podman, podman-compose, Podman Desktop, cosign, syft, grype — full install for both platforms.</span>
+        </span>
+      </a>
+
+      <a class="doc-card" href="{{ '/plans/reconciliation-plan/' | relative_url }}">
+        <span class="doc-card__icon" aria-hidden="true">📋</span>
+        <span>
+          <span class="doc-card__title">Reconciliation plan</span>
+          <span class="doc-card__desc">What's verified end-to-end vs. what's taken from source material and still needs validation.</span>
+        </span>
+      </a>
+
+      <a class="doc-card"
+         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/examples"
+         rel="noopener">
+        <span class="doc-card__icon" aria-hidden="true">📦</span>
+        <span>
+          <span class="doc-card__title">Example projects ↗</span>
+          <span class="doc-card__desc">Four runnable companion projects: Node, Python, Go, multi-container compose stack, plus an ML variant.</span>
+        </span>
+      </a>
+
+      <a class="doc-card"
+         href="https://quay.io/organization/hummingbird"
+         rel="noopener">
+        <span class="doc-card__icon" aria-hidden="true">🐦</span>
+        <span>
+          <span class="doc-card__title">Hummingbird image catalog ↗</span>
+          <span class="doc-card__desc">The canonical pull URL for Hummingbird base images on Quay.</span>
+        </span>
+      </a>
+
+      <a class="doc-card"
+         href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial/tree/main/assets/diagrams"
+         rel="noopener">
+        <span class="doc-card__icon" aria-hidden="true">📐</span>
+        <span>
+          <span class="doc-card__title">Excalidraw diagrams ↗</span>
+          <span class="doc-card__desc">Ten editable architecture and flow diagrams — both .excalidraw source and pre-rendered SVG.</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>

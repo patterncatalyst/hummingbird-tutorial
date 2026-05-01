@@ -1,15 +1,17 @@
-<header class="site-header">
-  <div class="container site-header-inner">
-    <a class="site-title" href="{{ '/' | prepend: site.baseurl }}">{{ site.title }}</a>
-    <nav class="site-nav">
-      <ul>
-        {% for item in site.data.navigation.main %}
-          {% assign item_url = item.url | prepend: site.baseurl %}
-          <li{% if page.url == item.url %} class="is-current"{% endif %}>
-            <a href="{{ item_url }}">{{ item.title }}</a>
-          </li>
-        {% endfor %}
-      </ul>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <span class="brand__mark" aria-hidden="true">🐦</span>
+      <span>Hummingbird Tutorial</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="{{ '/docs/00-outline/' | relative_url }}"
+         {% if page.url contains '/docs/' %}aria-current="page"{% endif %}>Tutorial</a>
+      <a href="{{ '/docs/01-prerequisites/' | relative_url }}">Prerequisites</a>
+      <a href="{{ '/plans/reconciliation-plan/' | relative_url }}"
+         {% if page.url contains '/plans/' %}aria-current="page"{% endif %}>Plan</a>
+      <a href="https://github.com/{{ site.github_username | default: 'YOURUSER' }}/hummingbird-tutorial"
+         rel="noopener">GitHub ↗</a>
     </nav>
   </div>
 </header>

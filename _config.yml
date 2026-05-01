@@ -5,6 +5,11 @@ description: >-
   using Podman, Podman Compose, and Podman Desktop on Fedora 43 or macOS.
 author: Hummingbird Tutorial Contributors
 
+# Set this to your GitHub username/org once the repo is pushed; the
+# header and footer use it to build the "GitHub ↗" link and the
+# examples/ and diagrams/ directory links.
+github_username: YOURUSER
+
 # ── URL configuration ─────────────────────────────────────────────────────────
 # Set baseurl to match the repository name when published on GitHub Pages.
 # Override locally with: bundle exec jekyll serve --baseurl ""
@@ -45,7 +50,7 @@ defaults:
       path: ""
       type: plans
     values:
-      layout: default
+      layout: plan
       sectionid: plans
 
 # ── Plugins ───────────────────────────────────────────────────────────────────

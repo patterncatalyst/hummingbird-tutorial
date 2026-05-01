@@ -1,0 +1,28 @@
+---
+layout: default
+---
+
+<article class="doc-page">
+  <div class="doc-page__inner">
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ '/' | relative_url }}">Home</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">{{ page.title }}</span>
+    </nav>
+
+    <header class="tutorial__header" style="grid-template-columns: 1fr;">
+      <div class="tutorial__title-group">
+        <h1>{{ page.title }}</h1>
+        {%- if page.description -%}
+          <p class="hero__lead" style="font-size:1.05rem;margin-bottom:0;">{{ page.description }}</p>
+        {%- endif -%}
+      </div>
+    </header>
+
+    <div class="tutorial__body">
+      {{ content }}
+    </div>
+
+  </div>
+</article>

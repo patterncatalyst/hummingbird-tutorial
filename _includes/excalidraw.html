@@ -1,57 +1,38 @@
 {%- comment -%}
   Excalidraw diagram include.
 
-  Usage from a markdown page:
-
+  Usage:
       {% include excalidraw.html
          file="03-podman-basics-pull-flow"
          alt="Sequence diagram showing podman pull"
          caption="Figure 3.1 — How podman pull resolves a Hummingbird image" %}
 
-  This include expects two files to live under assets/diagrams/:
+  Expects two files under assets/diagrams/:
+      <file>.excalidraw   ← editable source (Excalidraw v2 JSON)
+      <file>.svg          ← pre-rendered export
 
-      assets/diagrams/<file>.excalidraw   ← the editable source
-      assets/diagrams/<file>.svg          ← a pre-rendered export
-
-  The pre-rendered SVG is what the page actually displays — it loads
-  fast, prints well, and works without JavaScript. The .excalidraw
-  source file is offered as a download so a contributor can open it
-  on https://excalidraw.com, edit it, re-export to SVG, and commit
-  both files together. This keeps the editing workflow and the
-  reading workflow cleanly separated.
-
-  Required parameters:
-    file     — basename of the .excalidraw and .svg files (no extension)
-    alt      — alt text for the SVG (accessibility)
-
-  Optional parameters:
-    caption  — caption shown below the figure
-    width    — max-width CSS value, default "100%"
+  Required: file, alt
+  Optional: caption
 {%- endcomment -%}
 
 {%- assign diagram_base = "/assets/diagrams/" | append: include.file -%}
-{%- assign svg_path = diagram_base | append: ".svg" | prepend: site.baseurl -%}
-{%- assign source_path = diagram_base | append: ".excalidraw" | prepend: site.baseurl -%}
-{%- assign max_width = include.width | default: "100%" -%}
+{%- assign svg_path = diagram_base | append: ".svg" | relative_url -%}
+{%- assign source_path = diagram_base | append: ".excalidraw" | relative_url -%}
 
-<figure class="excalidraw-figure" style="max-width: {{ max_width }};">
-  <div class="excalidraw-frame">
-    <object
-      type="image/svg+xml"
-      data="{{ svg_path }}"
-      class="excalidraw-svg"
-      aria-label="{{ include.alt }}">
-      {{ include.alt }}
-    </object>
-  </div>
-  {% if include.caption %}
-    <figcaption class="excalidraw-caption">{{ include.caption }}</figcaption>
-  {% endif %}
-  <p class="excalidraw-actions">
-    <a href="{{ source_path }}" download>Download Excalidraw source</a>
-    &middot;
-    <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      Open excalidraw.com to edit
-    </a>
+<figure class="excalidraw-embed">
+  <object type="image/svg+xml"
+          data="{{ svg_path }}"
+          aria-label="{{ include.alt }}">
+    {{ include.alt }}
+  </object>
+
+  {%- if include.caption -%}
+    <figcaption class="excalidraw-embed__caption">{{ include.caption }}</figcaption>
+  {%- endif -%}
+
+  <p class="excalidraw-embed__links">
+    <a href="{{ source_path }}" download>Download .excalidraw source</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://excalidraw.com" target="_blank" rel="noopener">Edit on excalidraw.com</a>
   </p>
 </figure>

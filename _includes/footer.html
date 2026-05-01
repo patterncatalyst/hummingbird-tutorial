@@ -1,14 +1,30 @@
-<footer class="site-footer">
-  <div class="container site-footer-inner">
-    <p>
-      Tutorial content licensed under
-      <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-      Sample code licensed under
-      <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>.
-    </p>
-    <p>
-      Built with <a href="https://jekyllrb.com">Jekyll</a>. Source on
-      <a href="https://github.com/example/hummingbird-tutorial">GitHub</a>.
-    </p>
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Tutorial</h4>
+        <p>A follow-along guide to Project Hummingbird with Podman, Podman Compose, and Podman Desktop on Fedora&nbsp;43 and macOS.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Reference</h4>
+        <ul>
+          <li><a href="{{ '/docs/00-outline/' | relative_url }}">Outline</a></li>
+          <li><a href="{{ '/docs/01-prerequisites/' | relative_url }}">Prerequisites</a></li>
+          <li><a href="{{ '/plans/reconciliation-plan/' | relative_url }}">Reconciliation plan</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Source</h4>
+        <ul>
+          <li><a href="https://quay.io/organization/hummingbird" rel="noopener">Hummingbird images on Quay ↗</a></li>
+          <li><a href="https://catalog.redhat.com/" rel="noopener">Red Hat container catalog ↗</a></li>
+          <li><a href="https://podman.io/" rel="noopener">Podman ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>Open source · Apache 2.0</span>
+      <span>Last built {{ site.time | date: "%Y-%m-%d" }}</span>
+    </div>
   </div>
 </footer>

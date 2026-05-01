@@ -1,45 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page.title }} &mdash; {{ site.title }}</title>
-  <meta name="description" content="{{ page.description | default: site.description }}">
-  {% seo %}
-  <link rel="stylesheet" href="{{ '/assets/css/site.css' | prepend: site.baseurl }}">
-</head>
-<body class="layout-tutorial sectionid-docs">
-  {% include header.html %}
-  <main class="site-main tutorial">
-    <div class="container tutorial-grid">
-      <aside class="tutorial-sidebar">
-        <h2 class="sidebar-heading">Tutorial</h2>
-        <nav class="sidebar-nav">
-          <ol class="sidebar-list">
-            {% for item in site.data.navigation.tutorial %}
-              {% assign item_url = item.url | prepend: site.baseurl %}
-              <li class="sidebar-item{% if page.url == item.url %} is-current{% endif %}">
-                <a href="{{ item_url }}">{{ item.title }}</a>
-              </li>
-            {% endfor %}
-          </ol>
-        </nav>
-      </aside>
+---
+layout: default
+---
 
-      <article class="tutorial-content">
-        <header class="tutorial-header">
-          {% if page.order %}<p class="tutorial-section-number">Section {{ page.order }}</p>{% endif %}
-          <h1>{{ page.title }}</h1>
-          {% if page.description %}<p class="tutorial-description">{{ page.description }}</p>{% endif %}
-          {% if page.duration %}<p class="tutorial-duration"><strong>Estimated time:</strong> {{ page.duration }}</p>{% endif %}
-        </header>
+{%- comment -%}
+  Build sorted list of tutorial docs so we can derive prev/next.
+{%- endcomment -%}
+{%- assign tutorial_docs = site.docs | sort: "order" -%}
+{%- for d in tutorial_docs -%}
+  {%- if d.url == page.url -%}
+    {%- assign current_index = forloop.index0 -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign prev_index = current_index | minus: 1 -%}
+{%- assign next_index = current_index | plus: 1 -%}
+{%- assign prev_doc = tutorial_docs[prev_index] -%}
+{%- assign next_doc = tutorial_docs[next_index] -%}
 
-        {{ content }}
+{%- comment -%}
+  Pad order to two digits for the big numeric marker.
+{%- endcomment -%}
+{%- assign order_num = page.order | default: 0 -%}
+{%- if order_num < 10 -%}
+  {%- assign order_padded = order_num | prepend: '0' -%}
+{%- else -%}
+  {%- assign order_padded = order_num | append: '' -%}
+{%- endif -%}
 
-        {% include prev_next.html %}
-      </article>
+<article class="tutorial">
+  <div class="tutorial__inner">
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ '/' | relative_url }}">Home</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="{{ '/docs/00-outline/' | relative_url }}">Tutorial</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">{{ page.title }}</span>
+    </nav>
+
+    <header class="tutorial__header">
+      <div class="tutorial__num" aria-hidden="true">{{ order_padded }}</div>
+      <div class="tutorial__title-group">
+        <h1>{{ page.title }}</h1>
+        {%- if page.description -%}
+          <p class="hero__lead" style="font-size:1.05rem;margin-bottom:var(--space-4);">{{ page.description }}</p>
+        {%- endif -%}
+        <div class="tutorial__chips">
+          {%- if page.duration -%}
+            <span class="chip">⏱ {{ page.duration }}</span>
+          {%- endif -%}
+          <span class="chip">Section {{ page.order }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="tutorial__body">
+      {{ content }}
     </div>
-  </main>
-  {% include footer.html %}
-</body>
-</html>
+
+    <nav class="pager" aria-label="Tutorial navigation">
+      {%- if prev_doc -%}
+        <a class="pager__link pager__link--prev" href="{{ prev_doc.url | relative_url }}">
+          <span class="pager__dir">← Previous</span>
+          <span class="pager__title">{{ prev_doc.title }}</span>
+        </a>
+      {%- else -%}
+        <span></span>
+      {%- endif -%}
+
+      {%- if next_doc -%}
+        <a class="pager__link pager__link--next" href="{{ next_doc.url | relative_url }}">
+          <span class="pager__dir">Next →</span>
+          <span class="pager__title">{{ next_doc.title }}</span>
+        </a>
+      {%- else -%}
+        <span></span>
+      {%- endif -%}
+    </nav>
+
+  </div>
+</article>
