@@ -8,13 +8,14 @@ name: Build and deploy site
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:    # lets you re-run from the Actions UI
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Cancel in-flight runs if a new push comes in for the same ref.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,13 +31,15 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
-          bundler-cache: true
+          bundler-cache: true     # caches Gemfile.lock deps automatically
 
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@v5
 
       - name: Build with Jekyll
+        # The --baseurl flag here is what tells Jekyll to render absolute
+        # URLs as /<repo-name>/ when the site lives under a project Pages URL.
         run: |
           bundle exec jekyll build \
             --baseurl "${{ steps.pages.outputs.base_path }}"
@@ -45,6 +48,7 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        # actions/configure-pages already points this at _site/.
 
   deploy:
     needs: build

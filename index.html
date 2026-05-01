@@ -73,13 +73,15 @@ description: A follow-along tutorial for Project Hummingbird — Red Hat's near-
 
       {%- assign tutorial_docs = site.docs | sort: "order" -%}
       {%- for doc in tutorial_docs -%}
-        {%- assign section_kind = "Section" -%}
-        {%- if doc.order == 0 -%}{%- assign section_kind = "Map" -%}{%- endif -%}
-        {%- if doc.order == 1 -%}{%- assign section_kind = "Setup" -%}{%- endif -%}
-        {%- if doc.order == 2 -%}{%- assign section_kind = "Concepts" -%}{%- endif -%}
-        {%- if doc.order >= 3 and doc.order <= 7 -%}{%- assign section_kind = "Build" -%}{%- endif -%}
-        {%- if doc.order >= 8 and doc.order <= 10 -%}{%- assign section_kind = "Operate" -%}{%- endif -%}
-        {%- if doc.order == 11 -%}{%- assign section_kind = "Apply" -%}{%- endif -%}
+        {%- case doc.order -%}
+          {%- when 0 -%}{%- assign section_kind = "Map" -%}
+          {%- when 1 -%}{%- assign section_kind = "Setup" -%}
+          {%- when 2 -%}{%- assign section_kind = "Concepts" -%}
+          {%- when 3, 4, 5, 6, 7 -%}{%- assign section_kind = "Build" -%}
+          {%- when 8, 9, 10 -%}{%- assign section_kind = "Operate" -%}
+          {%- when 11 -%}{%- assign section_kind = "Apply" -%}
+          {%- else -%}{%- assign section_kind = "Section" -%}
+        {%- endcase -%}
 
         <a class="card" href="{{ doc.url | relative_url }}">
           <div class="card__eyebrow">
