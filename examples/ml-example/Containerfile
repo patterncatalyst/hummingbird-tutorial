@@ -30,6 +30,20 @@ WORKDIR /app
 COPY --from=builder /build/install /usr/local
 COPY --from=builder --chown=1001:1001 /build/app /app/app
 
+# Carry C++ runtime libraries from the builder. NumPy's compiled
+# extensions need libstdc++ (C++ symbols) and libgcc_s (stack
+# unwinding); Hummingbird's distroless Python runtime ships only the
+# interpreter and its direct dependencies, so we have to bring the
+# C++ runtime across explicitly. Adds ~2 MB to the deploy image.
+#
+# This pattern — selectively copying shared libraries across the
+# multi-stage boundary — is also useful for other native-extension
+# packages (scipy, pandas with arrow, lxml). When a package fails
+# at import with `libfoo.so.X: cannot open shared object file`,
+# the cure is to add another COPY line here.
+COPY --from=builder /usr/lib64/libstdc++.so.6* /usr/lib64/
+COPY --from=builder /usr/lib64/libgcc_s.so.1*  /usr/lib64/
+
 # Both lib and lib64 — pip splits pure-Python and C-extension packages
 # across them on RHEL-based systems. The runtime's default sys.path
 # may not include /usr/local/lib64; set PYTHONPATH explicitly so it
