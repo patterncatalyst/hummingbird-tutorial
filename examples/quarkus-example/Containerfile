@@ -1,0 +1,51 @@
+# Companion Containerfile for §4 Example D of the tutorial. JVM mode
+# (not native). Uses Hummingbird's openjdk-21 builder and runtime.
+#
+# Why JVM mode rather than native: native-image build needs a separate
+# image and roughly doubles the build time. JVM mode is the realistic
+# choice for most teams; native is covered conceptually in §4 but not
+# walked through here.
+#
+# Note from FINDINGS.md: when chasing JVM AOT-cache or build-ID
+# matching across multi-stage builds, the JVM in the runtime stage
+# must match the one in the builder stage. We use openjdk-21 in both;
+# do not mix.
+
+ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
+
+# ── Stage 1: build the application with the Hummingbird OpenJDK builder ─────
+FROM ${HB_REGISTRY}/openjdk-21-builder:latest AS builder
+WORKDIR /build
+USER 1001
+
+# Copy pom first so the dependency-resolution layer is cached
+# independently of source changes.
+COPY --chown=1001:1001 pom.xml ./
+RUN mvn -B -ntp dependency:go-offline
+
+# Now bring source and build the JVM-mode artefact.
+COPY --chown=1001:1001 src ./src
+RUN mvn -B -ntp package -DskipTests
+
+# Quarkus 3.x produces target/quarkus-app/ — a directory with the
+# launcher jar plus a flat lib/ tree. Smaller and faster to copy than
+# a fat-jar.
+
+# ── Stage 2: runtime on Hummingbird OpenJDK ─────────────────────────────────
+FROM ${HB_REGISTRY}/openjdk-21-runtime:latest
+WORKDIR /app
+
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/lib/      ./lib/
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/*.jar     ./
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/app/      ./app/
+COPY --from=builder --chown=1001:1001 /build/target/quarkus-app/quarkus/  ./quarkus/
+
+USER 1001
+EXPOSE 8080
+
+# JVM tuning. Keep these conservative; the runtime image is small and
+# real production workloads will tune separately.
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+
+CMD ["java", "-jar", "quarkus-run.jar"]

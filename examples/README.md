@@ -10,18 +10,30 @@ so you can either:
 - **clone this repository** and `cd` straight into the relevant
   example directory.
 
-| Directory          | Tutorial section                                                      |
-|--------------------|-----------------------------------------------------------------------|
-| `node-example/`    | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Node     |
-| `python-example/`  | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Python   |
-| `go-example/`      | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Go       |
-| `compose-stack/`   | [§7 — Multi-container apps with Podman Compose](../docs/07-podman-compose.md) |
-| `ml-example/`      | [§11 — Real-world examples](../docs/11-real-world-examples.md), Scenario 2 (ML inference) |
+## Primary examples
 
-The Quarkus / Java example is described in section 4 but isn't
-shipped here as a runnable skeleton — it requires a Maven project
-of non-trivial size. See section 4 for the Containerfile pattern
-to apply to your existing Quarkus project.
+For the audience this tutorial is aimed at — JVM, Python, and Go
+backends — these three are the focus. They're listed in roughly the
+order a typical reader will care about them.
+
+| Directory                                  | Tutorial section                                                                | What it shows                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`quarkus-example/`](./quarkus-example)    | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Example D          | Quarkus 3.15 LTS, JVM mode, two-stage `openjdk-21-builder` → runtime build |
+| [`python-example/`](./python-example)      | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Example B          | FastAPI, wheel-build pattern (compile in builder, install in runtime)      |
+| [`go-example/`](./go-example)              | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Example C          | Static Go binary on `ubi-micro` — the smallest of the four examples        |
+| [`ml-example/`](./ml-example)              | [§11 — Real-world examples](../docs/11-real-world-examples.md), Scenario 2     | FastAPI + NumPy variant of the Python example with native-code wheels      |
+| [`compose-stack/`](./compose-stack)        | [§7 — Multi-container apps](../docs/07-podman-compose.md)                       | Three-service stack: Node web, PostgreSQL, OpenTelemetry collector         |
+
+## Secondary example
+
+| Directory                              | Tutorial section                                                          | What it shows                                                  |
+| -------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [`node-example/`](./node-example)      | [§4 — Multi-stage builds](../docs/04-multi-stage-builds.md), Example A    | Node.js, two-stage `nodejs-20-builder` → `nodejs-20` build     |
+
+The Node example exists because the multi-stage pattern in §4 is
+explained against it first as a stripped-down reference. If you're not
+shipping Node services, skim it for the pattern and skip to the
+language you actually use.
 
 ## Building any example
 
@@ -35,6 +47,16 @@ podman build \
   -t my-image:latest \
   .
 ```
+
+## What's deliberately not here
+
+- **A native-image Quarkus skeleton.** The JVM-mode example covers
+  the realistic default. Native-image builds need a Mandrel/GraalVM
+  builder image whose Hummingbird name isn't yet confirmed; see the
+  reconciliation plan §A and the note at the bottom of the
+  `quarkus-example/` README.
+- **A `secure-build.sh` end-to-end pipeline script.** Referenced from
+  §11 scenario 4; tracked in the reconciliation plan.
 
 ## Reconciliation
 
