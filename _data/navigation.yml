@@ -1,0 +1,45 @@
+# Site navigation. Edit this file to change what appears in the
+# header / sidebar without touching the layout templates.
+#
+# Each entry has:
+#   title  — what shows in the nav
+#   url    — site-relative URL (the layout will prepend site.baseurl)
+#
+# Tutorial sections are intentionally listed individually here rather
+# than auto-generated, so the order is explicit and stable.
+
+main:
+  - title: Home
+    url: /
+  - title: Outline
+    url: /docs/00-outline/
+  - title: Prerequisites
+    url: /docs/01-prerequisites/
+  - title: Reconciliation plan
+    url: /plans/reconciliation-plan/
+
+tutorial:
+  - title: 0. Outline
+    url: /docs/00-outline/
+  - title: 1. Prerequisites
+    url: /docs/01-prerequisites/
+  - title: 2. What is Project Hummingbird
+    url: /docs/02-introduction/
+  - title: 3. Podman basics with Hummingbird
+    url: /docs/03-podman-basics/
+  - title: 4. Multi-stage builds
+    url: /docs/04-multi-stage-builds/
+  - title: 5. SBOMs and signing
+    url: /docs/05-sbom-and-signing/
+  - title: 6. CVE scanning
+    url: /docs/06-cve-scanning/
+  - title: 7. Multi-container apps with Podman Compose
+    url: /docs/07-podman-compose/
+  - title: 8. Debugging Hummingbird containers
+    url: /docs/08-debugging/
+  - title: 9. Layer optimisation with zstd:chunked
+    url: /docs/09-zstd-chunked/
+  - title: 10. Splitting layers with chunkah
+    url: /docs/10-chunkah/
+  - title: 11. Real-world examples
+    url: /docs/11-real-world-examples/

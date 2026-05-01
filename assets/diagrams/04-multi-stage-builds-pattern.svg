@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" width="100%" style="max-width:880px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="440.0" y="32" class="title" text-anchor="middle">Two-stage build with Hummingbird</text>
+  <rect x="40" y="80" width="360" height="320" rx="10" class="box"/>
+  <text x="220" y="105" class="label" text-anchor="middle">Stage 1: builder</text>
+  <text x="220" y="125" class="small" text-anchor="middle">Hummingbird &lt;lang&gt;-&lt;ver&gt;-builder</text>
+  <rect x="70" y="150" width="300" height="50" rx="6" class="box"/>
+  <text x="220.0" y="171.0" text-anchor="middle" class="label">compiler / package manager</text>
+  <text x="220.0" y="189.0" text-anchor="middle" class="small">present in the builder</text>
+  <rect x="70" y="215" width="300" height="50" rx="6" class="box"/>
+  <text x="220.0" y="236.0" text-anchor="middle" class="label">your source code</text>
+  <text x="220.0" y="254.0" text-anchor="middle" class="small">COPY src/ .</text>
+  <rect x="70" y="280" width="300" height="60" rx="6" class="box-accent"/>
+  <text x="220.0" y="306.0" text-anchor="middle" class="label">build artifact</text>
+  <text x="220.0" y="324.0" text-anchor="middle" class="small">binary / JAR / wheels / dist</text>
+  <rect x="490" y="80" width="360" height="320" rx="10" class="box"/>
+  <text x="670" y="105" class="label" text-anchor="middle">Stage 2: runtime</text>
+  <text x="670" y="125" class="small" text-anchor="middle">Hummingbird &lt;lang&gt;-&lt;ver&gt;</text>
+  <rect x="520" y="150" width="300" height="50" rx="6" class="box"/>
+  <text x="670.0" y="171.0" text-anchor="middle" class="label">minimal runtime</text>
+  <text x="670.0" y="189.0" text-anchor="middle" class="small">no compiler, no shell</text>
+  <rect x="520" y="215" width="300" height="60" rx="6" class="box-accent"/>
+  <text x="670.0" y="241.0" text-anchor="middle" class="label">build artifact</text>
+  <text x="670.0" y="259.0" text-anchor="middle" class="small">from stage 1</text>
+  <rect x="520" y="290" width="300" height="50" rx="6" class="box"/>
+  <text x="670.0" y="311.0" text-anchor="middle" class="label">USER 1001  +  EXPOSE</text>
+  <text x="670.0" y="329.0" text-anchor="middle" class="small">non-root by default</text>
+  <line x1="400" y1="295" x2="490" y2="245" class="conn-red" marker-end="url(#arrow-red)"/>
+  <text x="445" y="270" class="small" text-anchor="middle">COPY --from=builder</text>
+  <text x="440.0" y="430" class="small" text-anchor="middle">The runtime image carries no build tooling — only what runs</text>
+</svg>

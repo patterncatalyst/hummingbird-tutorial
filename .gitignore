@@ -1,0 +1,27 @@
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+
+# Ruby / Bundler
+Gemfile.lock
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local container artifacts (in case examples/ get filled in and built locally)
+*.tar
+*.tar.gz
+sbom-*.spdx.json
+*.cosign.bundle
+
+# Local Cosign keys — never commit these
+cosign.key
+*.cosign.key

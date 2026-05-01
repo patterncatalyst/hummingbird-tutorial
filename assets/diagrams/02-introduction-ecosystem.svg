@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" style="max-width:800px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="400.0" y="32" class="title" text-anchor="middle">Hummingbird's place in the Red Hat ecosystem</text>
+  <rect x="120" y="85" width="560" height="60" rx="6" class="box-muted"/>
+  <text x="400.0" y="111.0" text-anchor="middle" class="label">Fedora</text>
+  <text x="400.0" y="129.0" text-anchor="middle" class="small">Upstream component source</text>
+  <rect x="120" y="170" width="560" height="60" rx="6" class="box"/>
+  <text x="400.0" y="196.0" text-anchor="middle" class="label">RHEL / UBI</text>
+  <text x="400.0" y="214.0" text-anchor="middle" class="small">Stable enterprise base images</text>
+  <rect x="120" y="255" width="560" height="60" rx="6" class="box-accent"/>
+  <text x="400.0" y="281.0" text-anchor="middle" class="label">Project Hummingbird</text>
+  <text x="400.0" y="299.0" text-anchor="middle" class="small">Minimal hardened runtime images</text>
+  <rect x="120" y="340" width="560" height="60" rx="6" class="box"/>
+  <text x="400.0" y="366.0" text-anchor="middle" class="label">OpenShift / Kubernetes</text>
+  <text x="400.0" y="384.0" text-anchor="middle" class="small">Platform layer</text>
+  <line x1="400" y1="148" x2="400" y2="170" class="conn" marker-end="url(#arrow)"/>
+  <line x1="400" y1="233" x2="400" y2="255" class="conn" marker-end="url(#arrow)"/>
+  <line x1="400" y1="318" x2="400" y2="340" class="conn" marker-end="url(#arrow)"/>
+  <text x="400.0" y="420" class="small" text-anchor="middle">Each layer is built from the one above and is independently versionable</text>
+</svg>

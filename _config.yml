@@ -1,0 +1,68 @@
+# ── Site identity ─────────────────────────────────────────────────────────────
+title: Hummingbird Tutorial
+description: >-
+  A follow-along, cut-and-paste tutorial for Red Hat Project Hummingbird
+  using Podman, Podman Compose, and Podman Desktop on Fedora 43 or macOS.
+author: Hummingbird Tutorial Contributors
+
+# ── URL configuration ─────────────────────────────────────────────────────────
+# Set baseurl to match the repository name when published on GitHub Pages.
+# Override locally with: bundle exec jekyll serve --baseurl ""
+baseurl: "/hummingbird-tutorial"
+url: "https://example.github.io"
+
+# ── Build settings ────────────────────────────────────────────────────────────
+markdown: kramdown
+highlighter: rouge
+permalink: /:path/:basename/
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  toc_levels: 2..3
+  hard_wrap: false
+
+# ── Collections ───────────────────────────────────────────────────────────────
+# `docs` is the tutorial body. `plans` is project-management material
+# (reconciliation plan, progress tracking) — included in the build so it
+# can be cross-linked, but not advertised in the main nav.
+collections:
+  docs:
+    output: true
+    permalink: /docs/:name/
+  plans:
+    output: true
+    permalink: /plans/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: docs
+    values:
+      layout: tutorial
+      sectionid: docs
+  - scope:
+      path: ""
+      type: plans
+    values:
+      layout: default
+      sectionid: plans
+
+# ── Plugins ───────────────────────────────────────────────────────────────────
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-redirect-from
+
+# ── Build excludes ────────────────────────────────────────────────────────────
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - node_modules
+  - README.md
+  - .gitignore
+  - scripts
+  # examples/ holds runnable code that is referenced from the docs but is
+  # not part of the rendered site. Comment this out if you want it published.
+  - examples

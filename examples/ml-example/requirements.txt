@@ -1,0 +1,7 @@
+fastapi==0.115.*
+uvicorn[standard]==0.32.*
+numpy==2.*
+# transformers / torch are large; uncomment only if you want to
+# wait through the wheel build.
+# transformers==4.*
+# torch==2.*

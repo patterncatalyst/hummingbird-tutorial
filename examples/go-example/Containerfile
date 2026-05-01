@@ -1,0 +1,23 @@
+ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
+
+# ── Stage 1: Compile with the Hummingbird Go builder ────────────────────────
+FROM ${HB_REGISTRY}/go-1.22-builder:latest AS builder
+WORKDIR /build
+USER 1001
+
+COPY --chown=1001:1001 go.mod ./
+COPY --chown=1001:1001 main.go ./
+
+# Static binary: no cgo, no dynamic linker needed.
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o app .
+
+# ── Stage 2: ubi-micro runtime — just glibc + a non-root user ───────────────
+FROM ${HB_REGISTRY}/ubi-micro:latest
+WORKDIR /app
+
+COPY --from=builder --chown=1001:1001 /build/app ./app
+
+USER 1001
+EXPOSE 8080
+CMD ["./app"]

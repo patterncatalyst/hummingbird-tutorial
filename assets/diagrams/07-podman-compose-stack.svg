@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="100%" style="max-width:800px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="400.0" y="32" class="title" text-anchor="middle">The compose stack (web, db, otel)</text>
+  <rect x="40" y="70" width="720" height="320" rx="10" class="box-muted"/>
+  <text x="60" y="92" class="small" text-anchor="start">compose network: app</text>
+  <rect x="80" y="130" width="220" height="100" rx="6" class="box-accent"/>
+  <text x="190.0" y="176.0" text-anchor="middle" class="label">web</text>
+  <text x="190.0" y="194.0" text-anchor="middle" class="small">Hummingbird Node runtime</text>
+  <text x="190" y="200" class="small" text-anchor="middle">expose 3000</text>
+  <rect x="420" y="130" width="220" height="100" rx="6" class="box"/>
+  <text x="530.0" y="176.0" text-anchor="middle" class="label">db</text>
+  <text x="530.0" y="194.0" text-anchor="middle" class="small">Hummingbird PostgreSQL</text>
+  <text x="530" y="200" class="small" text-anchor="middle">5432 internal</text>
+  <rect x="420" y="260" width="220" height="100" rx="6" class="box"/>
+  <text x="530.0" y="306.0" text-anchor="middle" class="label">otel</text>
+  <text x="530.0" y="324.0" text-anchor="middle" class="small">OpenTelemetry collector</text>
+  <text x="530" y="330" class="small" text-anchor="middle">OTLP 4317 / 4318</text>
+  <line x1="300" y1="180" x2="420" y2="180" class="conn" marker-end="url(#arrow)"/>
+  <text x="360" y="170" class="small" text-anchor="middle">DATABASE_URL</text>
+  <line x1="300" y1="200" x2="420" y2="310" class="conn-red" marker-end="url(#arrow-red)"/>
+  <text x="380" y="250" class="small" text-anchor="middle">OTEL_EXPORTER_OTLP_ENDPOINT</text>
+  <text x="380" y="268" class="small" text-anchor="middle">(use service name, not localhost)</text>
+  <text x="190" y="250" class="small" text-anchor="middle">host:3000 → web:3000</text>
+  <text x="400.0" y="415" class="small" text-anchor="middle">All three services use Hummingbird base images; bind mounts use :Z on Fedora</text>
+</svg>

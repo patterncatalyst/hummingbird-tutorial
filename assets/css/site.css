@@ -1,0 +1,220 @@
+---
+# This empty front matter tells Jekyll to process this file with Liquid
+# (we don't use any Liquid here yet, but keeping it processable means
+# we can add asset paths via {{ site.baseurl }} later if needed).
+---
+
+/* ─── Reset / base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #1a1a1a;
+  background: #fafafa;
+}
+
+a { color: #cc0000; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────── */
+.site-header {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 0.75rem 0;
+  border-bottom: 3px solid #cc0000;
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.site-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.25rem;
+}
+.site-nav a {
+  color: #ddd;
+  font-size: 0.9rem;
+}
+.site-nav li.is-current a { color: #fff; font-weight: 600; }
+
+/* ─── Main / typography ───────────────────────────────────────────────── */
+.site-main { padding: 2.5rem 0 4rem; }
+
+h1 { font-size: 2rem; margin-top: 0; line-height: 1.2; }
+h2 { font-size: 1.5rem; margin-top: 2.5rem; border-bottom: 1px solid #ddd; padding-bottom: 0.3rem; }
+h3 { font-size: 1.2rem; margin-top: 1.75rem; }
+p, li { font-size: 1rem; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
+  font-size: 0.9em;
+  background: #f0f0f0;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+pre { background: #1e1e1e; color: #eee; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+pre code { background: transparent; padding: 0; color: inherit; font-size: 0.85rem; }
+
+blockquote {
+  border-left: 4px solid #cc0000;
+  margin: 1.25rem 0;
+  padding: 0.5rem 1rem;
+  background: #fff5f5;
+  color: #444;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+th { background: #f0f0f0; }
+
+/* ─── Tutorial layout ─────────────────────────────────────────────────── */
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2.5rem;
+}
+@media (max-width: 760px) {
+  .tutorial-grid { grid-template-columns: 1fr; }
+  .tutorial-sidebar { order: 2; }
+}
+
+.tutorial-sidebar {
+  border-right: 1px solid #e5e5e5;
+  padding-right: 1rem;
+}
+.sidebar-heading {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin: 0 0 0.75rem;
+}
+.sidebar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sidebar-item {
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+}
+.sidebar-item a { color: #444; display: block; padding: 0.2rem 0; }
+.sidebar-item.is-current a { color: #cc0000; font-weight: 600; }
+
+.tutorial-content { min-width: 0; }
+.tutorial-section-number {
+  font-size: 0.85rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+.tutorial-description {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0.25rem 0 0.75rem;
+}
+.tutorial-duration { font-size: 0.9rem; color: #666; }
+
+/* ─── Prev / next ─────────────────────────────────────────────────────── */
+.tutorial-prev-next {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+  gap: 1rem;
+}
+.tutorial-prev-next a {
+  display: block;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fff;
+}
+.tutorial-prev-next a:hover { border-color: #cc0000; text-decoration: none; }
+.tutorial-prev-next .label {
+  display: block;
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+}
+.tutorial-prev-next .title {
+  display: block;
+  font-weight: 600;
+  margin-top: 0.15rem;
+}
+.tutorial-prev-next .next { text-align: right; margin-left: auto; }
+
+/* ─── Excalidraw figures ──────────────────────────────────────────────── */
+.excalidraw-figure {
+  margin: 1.5rem 0;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 1rem;
+}
+.excalidraw-frame {
+  background: #fcfcfc;
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+}
+.excalidraw-svg {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+}
+.excalidraw-caption {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.75rem;
+  text-align: center;
+  font-style: italic;
+}
+.excalidraw-actions {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #888;
+  text-align: center;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────────── */
+.site-footer {
+  background: #1a1a1a;
+  color: #aaa;
+  padding: 1.5rem 0;
+  margin-top: 4rem;
+}
+.site-footer p { margin: 0.25rem 0; font-size: 0.85rem; }
+.site-footer a { color: #fff; }

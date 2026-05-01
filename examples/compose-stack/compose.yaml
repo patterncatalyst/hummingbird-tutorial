@@ -1,0 +1,63 @@
+# Compose file for the §7 multi-container example. Designed to work
+# under both `podman-compose up` and `docker compose up`.
+#
+# IMPORTANT: every bind-mounted volume below ends with `:Z`. On
+# Fedora's SELinux-enforcing storage this relabels the host directory
+# so the container can read it. On macOS and other non-SELinux hosts,
+# `:Z` is a harmless no-op. Leaving it in keeps the same compose file
+# portable across both platforms.
+
+services:
+  db:
+    image: ${HB_REGISTRY:-quay.io/hummingbird}/postgresql-16:latest
+    environment:
+      POSTGRESQL_USER: app
+      POSTGRESQL_PASSWORD: appsecret
+      POSTGRESQL_DATABASE: appdb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks: [app]
+
+  otel:
+    image: docker.io/otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel/config.yaml:/etc/otelcol-contrib/config.yaml:Z
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    networks: [app]
+
+  web:
+    build:
+      context: ./web
+      args:
+        HB_REGISTRY: ${HB_REGISTRY:-quay.io/hummingbird}
+    depends_on:
+      db:
+        condition: service_healthy
+      otel:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgres://app:appsecret@db:5432/appdb
+      # Service names work as DNS inside the compose network. Do not
+      # use localhost here — that would point at the web container
+      # itself, not the otel container.
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel:4318
+    healthcheck:
+      test: ["CMD", "/bin/test", "-f", "/proc/1/cmdline"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 30s
+    ports:
+      - "3000:3000"
+    networks: [app]
+
+networks:
+  app:
+    driver: bridge

@@ -1,0 +1,37 @@
+{%- comment -%}
+  Renders previous / next links for a tutorial page based on the
+  `order` front-matter value. Pages with `hidden: true` or no `order`
+  are skipped.
+{%- endcomment -%}
+
+{% assign sorted_docs = site.docs | where_exp: "d", "d.hidden != true" | sort: "order" %}
+{% assign current_index = nil %}
+{% for d in sorted_docs %}
+  {% if d.url == page.url %}{% assign current_index = forloop.index0 %}{% endif %}
+{% endfor %}
+
+{% if current_index != nil %}
+  {% assign prev_index = current_index | minus: 1 %}
+  {% assign next_index = current_index | plus: 1 %}
+
+  <nav class="tutorial-prev-next" aria-label="Tutorial navigation">
+    <div class="prev">
+      {% if prev_index >= 0 %}
+        {% assign prev = sorted_docs[prev_index] %}
+        <a href="{{ prev.url | prepend: site.baseurl }}">
+          <span class="label">&larr; Previous</span>
+          <span class="title">{{ prev.title }}</span>
+        </a>
+      {% endif %}
+    </div>
+    <div class="next">
+      {% if next_index < sorted_docs.size %}
+        {% assign next = sorted_docs[next_index] %}
+        <a href="{{ next.url | prepend: site.baseurl }}">
+          <span class="label">Next &rarr;</span>
+          <span class="title">{{ next.title }}</span>
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+{% endif %}

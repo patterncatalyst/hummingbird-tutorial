@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" width="100%" style="max-width:880px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="440.0" y="32" class="title" text-anchor="middle">chunkah re-partitions layer content</text>
+  <rect x="40" y="80" width="360" height="360" rx="10" class="box"/>
+  <text x="220" y="105" class="label" text-anchor="middle">Before — natural build layers</text>
+  <rect x="80" y="140" width="280" height="80" rx="6" class="box-muted"/>
+  <text x="220.0" y="176.0" text-anchor="middle" class="label">everything in one layer</text>
+  <text x="220.0" y="194.0" text-anchor="middle" class="small">base + deps + app code mingled</text>
+  <text x="220" y="250" class="small" text-anchor="middle">Any app change invalidates the</text>
+  <text x="220" y="268" class="small" text-anchor="middle">deps too — full re-pull on update.</text>
+  <rect x="480" y="80" width="360" height="360" rx="10" class="box-accent"/>
+  <text x="660" y="105" class="label" text-anchor="middle">After chunkah split</text>
+  <rect x="520" y="140" width="280" height="60" rx="6" class="box"/>
+  <text x="660.0" y="166.0" text-anchor="middle" class="label">Layer 1: Hummingbird base</text>
+  <text x="660.0" y="184.0" text-anchor="middle" class="small">stable</text>
+  <rect x="520" y="215" width="280" height="60" rx="6" class="box"/>
+  <text x="660.0" y="241.0" text-anchor="middle" class="label">Layer 2: dependencies</text>
+  <text x="660.0" y="259.0" text-anchor="middle" class="small">slow-changing</text>
+  <rect x="520" y="290" width="280" height="60" rx="6" class="box-accent"/>
+  <text x="660.0" y="316.0" text-anchor="middle" class="label">Layer 3: application code</text>
+  <text x="660.0" y="334.0" text-anchor="middle" class="small">fast-changing</text>
+  <text x="660" y="380" class="small" text-anchor="middle">App-only updates re-push and re-pull</text>
+  <text x="660" y="398" class="small" text-anchor="middle">Layer 3 only — minutes become seconds</text>
+  <line x1="400" y1="250" x2="480" y2="250" class="conn-red" marker-end="url(#arrow-red)"/>
+  <text x="440" y="240" class="small" text-anchor="middle">split</text>
+  <text x="440.0" y="460" class="small" text-anchor="middle">chunkah pairs naturally with zstd:chunked from the previous section</text>
+</svg>

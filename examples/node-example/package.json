@@ -1,0 +1,10 @@
+{
+  "name": "hummingbird-node-example",
+  "version": "1.0.0",
+  "description": "Companion example for §4 of the Hummingbird tutorial.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "Apache-2.0"
+}

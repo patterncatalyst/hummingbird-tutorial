@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" width="100%" style="max-width:880px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="440.0" y="32" class="title" text-anchor="middle">Why zstd:chunked enables partial pulls</text>
+  <rect x="40" y="80" width="360" height="320" rx="10" class="box"/>
+  <text x="220" y="105" class="label" text-anchor="middle">gzip-compressed layer</text>
+  <text x="220" y="125" class="small" text-anchor="middle">single compressed blob</text>
+  <rect x="70" y="170" width="46" height="80" class="box"/>
+  <rect x="120" y="170" width="46" height="80" class="box"/>
+  <rect x="170" y="170" width="46" height="80" class="box"/>
+  <rect x="220" y="170" width="46" height="80" class="box"/>
+  <rect x="270" y="170" width="46" height="80" class="box"/>
+  <rect x="320" y="170" width="46" height="80" class="box"/>
+  <text x="220" y="290" class="small" text-anchor="middle">1 byte change → entire blob changes</text>
+  <text x="220" y="320" class="small" text-anchor="middle">Client must re-pull the whole layer.</text>
+  <rect x="480" y="80" width="360" height="320" rx="10" class="box-accent"/>
+  <text x="660" y="105" class="label" text-anchor="middle">zstd:chunked layer</text>
+  <text x="660" y="125" class="small" text-anchor="middle">addressable chunks + manifest</text>
+  <rect x="510" y="170" width="46" height="80" class="box"/>
+  <rect x="560" y="170" width="46" height="80" class="box"/>
+  <rect x="610" y="170" width="46" height="80" class="box"/>
+  <rect x="660" y="170" width="46" height="80" class="box-accent"/>
+  <rect x="710" y="170" width="46" height="80" class="box"/>
+  <rect x="760" y="170" width="46" height="80" class="box"/>
+  <text x="660" y="290" class="small" text-anchor="middle">1 chunk changes → only that chunk re-pulled</text>
+  <text x="660" y="320" class="small" text-anchor="middle">Other chunks stay byte-identical.</text>
+  <text x="440.0" y="430" class="small" text-anchor="middle">The chunk-level checksum manifest is what makes selective fetch possible</text>
+</svg>

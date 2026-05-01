@@ -1,0 +1,14 @@
+ARG HB_REGISTRY=quay.io/hummingbird
+
+FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+WORKDIR /build
+COPY --chown=1001:1001 package*.json ./
+RUN npm install --omit=dev --no-audit --no-fund || true
+COPY --chown=1001:1001 server.js ./
+
+FROM ${HB_REGISTRY}/nodejs-20:latest
+WORKDIR /app
+COPY --from=builder --chown=1001:1001 /build /app
+USER 1001
+EXPOSE 3000
+CMD ["node", "server.js"]

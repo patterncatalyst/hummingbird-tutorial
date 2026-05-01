@@ -1,0 +1,29 @@
+# Companion Containerfile for §4 of the tutorial. Identical to the
+# inline snippet — kept here as a runnable file so `podman build .`
+# in this directory works without copy-pasting from the docs.
+
+ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
+
+# ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
+FROM ${HB_REGISTRY}/nodejs-20-builder:latest AS builder
+WORKDIR /build
+
+COPY --chown=1001:1001 package*.json ./
+RUN npm install --omit=dev --no-audit --no-fund
+
+COPY --chown=1001:1001 . .
+
+# ── Stage 2: Runtime on Hummingbird Node ────────────────────────────────────
+FROM ${HB_REGISTRY}/nodejs-20:latest
+WORKDIR /app
+
+COPY --from=builder --chown=1001:1001 /build/server.js ./
+COPY --from=builder --chown=1001:1001 /build/node_modules ./node_modules
+COPY --from=builder --chown=1001:1001 /build/package.json ./
+
+USER 1001
+ENV NODE_ENV=production
+EXPOSE 3000
+
+CMD ["node", "server.js"]

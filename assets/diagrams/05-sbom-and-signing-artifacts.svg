@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="100%" style="max-width:800px;height:auto;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
+    </marker>
+    <style><![CDATA[
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
+      .title { font-size: 18px; font-weight: 600; }
+      .label { font-size: 14px; }
+      .small { font-size: 12px; fill: #666; }
+      .accent { fill: #cc0000; }
+      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
+      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
+      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
+      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 4 3; }
+    ]]></style>
+  </defs>
+  <text x="400.0" y="32" class="title" text-anchor="middle">Artifacts attached to a signed image</text>
+  <rect x="280" y="90" width="240" height="90" rx="6" class="box-accent"/>
+  <text x="400.0" y="131.0" text-anchor="middle" class="label">OCI image manifest</text>
+  <text x="400.0" y="149.0" text-anchor="middle" class="small">(addressable by digest)</text>
+  <rect x="40" y="250" width="200" height="90" rx="6" class="box"/>
+  <text x="140.0" y="291.0" text-anchor="middle" class="label">Cosign signature</text>
+  <text x="140.0" y="309.0" text-anchor="middle" class="small">tamper detection</text>
+  <rect x="300" y="250" width="200" height="90" rx="6" class="box"/>
+  <text x="400.0" y="291.0" text-anchor="middle" class="label">SBOM attestation</text>
+  <text x="400.0" y="309.0" text-anchor="middle" class="small">SPDX or CycloneDX, signed</text>
+  <rect x="560" y="250" width="200" height="90" rx="6" class="box"/>
+  <text x="660.0" y="291.0" text-anchor="middle" class="label">Provenance attestation</text>
+  <text x="660.0" y="309.0" text-anchor="middle" class="small">SLSA build origin, signed</text>
+  <line x1="330" y1="180" x2="140" y2="250" class="conn" marker-end="url(#arrow)"/>
+  <line x1="400" y1="180" x2="400" y2="250" class="conn" marker-end="url(#arrow)"/>
+  <line x1="470" y1="180" x2="660" y2="250" class="conn" marker-end="url(#arrow)"/>
+  <text x="400.0" y="390" class="small" text-anchor="middle">All three artifacts are stored alongside the manifest in the registry</text>
+  <text x="400.0" y="410" class="small" text-anchor="middle">and verifiable independently with cosign</text>
+</svg>

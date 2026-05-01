@@ -1,0 +1,15 @@
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a class="site-title" href="{{ '/' | prepend: site.baseurl }}">{{ site.title }}</a>
+    <nav class="site-nav">
+      <ul>
+        {% for item in site.data.navigation.main %}
+          {% assign item_url = item.url | prepend: site.baseurl %}
+          <li{% if page.url == item.url %} class="is-current"{% endif %}>
+            <a href="{{ item_url }}">{{ item.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

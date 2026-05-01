@@ -1,0 +1,29 @@
+ARG HB_REGISTRY=quay.io/hummingbird
+ARG RH_REGISTRY=registry.access.redhat.com
+
+# ── Stage 1: Compile wheels with the Hummingbird Python builder ─────────────
+FROM ${HB_REGISTRY}/python-311-builder:latest AS builder
+WORKDIR /build
+USER 1001
+
+COPY --chown=1001:1001 requirements.txt .
+
+# Compile wheels for everything in requirements.txt. This pulls in
+# any C-extension build dependencies present in the builder image.
+RUN pip wheel --no-cache-dir --wheel-dir /tmp/wheels -r requirements.txt
+
+# ── Stage 2: Runtime on Hummingbird Python ──────────────────────────────────
+FROM ${HB_REGISTRY}/python-311:latest
+WORKDIR /app
+
+COPY --from=builder /tmp/wheels /tmp/wheels
+RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels \
+        /tmp/wheels/*.whl \
+    && rm -rf /tmp/wheels
+
+COPY --chown=1001:1001 app/ ./app/
+
+USER 1001
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "app.main:app", \
+     "--host", "0.0.0.0", "--port", "8000"]
