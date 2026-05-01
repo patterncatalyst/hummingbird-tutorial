@@ -49,12 +49,14 @@ collections:
 # means Jekyll classifies them as pages, not as collection items.
 defaults:
   - scope:
-      path: "docs"
+      path: ""
+      type: docs
     values:
       layout: tutorial
       sectionid: docs
   - scope:
-      path: "plans"
+      path: ""
+      type: plans
     values:
       layout: plan
       sectionid: plans
