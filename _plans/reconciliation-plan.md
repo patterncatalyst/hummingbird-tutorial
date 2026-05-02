@@ -253,6 +253,17 @@ done
 
 ### G.2 — Build-and-run smoke tests (medium, ~15 min)
 
+> **Status as of 2026-05-01: ✅ all 11 of 11 rows verified.** Every
+> Containerfile in the tutorial has been built and run against live
+> Hummingbird images, with the runtime confirmed to respond
+> correctly over HTTP. The fixes that landed during testing are
+> recorded in the Notes column of each row and consolidated into
+> [§17 Distroless gotchas]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
+> as symptom → root cause → fix entries. The full G.1 catalog
+> verification loop has not yet been run end-to-end as a script
+> (the catalog facts in §A were verified individually during
+> tutorial development).
+
 Build each example end-to-end and confirm it runs. Doesn't validate
 the tutorial prose around it — just that the Containerfile produces
 a working image.
@@ -267,7 +278,8 @@ a working image.
 | **verified** 2026-05-01 | Go app responds | Build + run + curl confirmed end-to-end |
 | **verified** 2026-05-01 | `examples/ml-example` builds | Required additional fixes beyond python-example: `COPY libstdc++.so.6*` and `libgcc_s.so.1*` for NumPy's compiled extensions; `libgomp.so.1*` for the OpenMP backend that's delay-loaded at compute time. Symptom of missing libgomp was a silent SIGSEGV in the worker manifesting as "Connection reset by peer" with no traceback |
 | **verified** 2026-05-01 | ML app responds | Build + run + curl confirmed end-to-end. NumPy `np.eye(3).sum() = 3.0` returns over the wire |
-| **FAIL → fixed** 2026-05-01 | `examples/node-example` builds | First test failed: `npm error code EACCES, syscall open, path /build/package-lock.json` — same root cause as the Go and Python builders (UID 1001 needs `HOME` set, plus npm's WORKDIR write needs the user to own it). Fixed by adding `USER 1001`, `ENV HOME=/build`, `ENV NPM_CONFIG_CACHE=/build/.npm` to the builder stage. Second test failed: runtime stage `COPY /build/node_modules` errored — the example had no dependencies, so `npm install` produced no `node_modules/` directory to copy. Fixed by adding `pino` (a real, small structured-logger dep) to package.json so the multi-stage example actually demonstrates dependency flow. Re-run needed |
+| **verified** 2026-05-01 | `examples/node-example` builds | First test failed: `npm error code EACCES, syscall open, path /build/package-lock.json` — same root cause as the Go and Python builders (UID 1001 needs `HOME` set, plus npm's WORKDIR write needs the user to own it). Fixed by adding `USER 1001`, `ENV HOME=/build`, `ENV NPM_CONFIG_CACHE=/build/.npm` to the builder stage. Second test failed: runtime stage `COPY /build/node_modules` errored — the example had no dependencies, so `npm install` produced no `node_modules/` directory to copy. Fixed by adding `pino` (a real, small structured-logger dep) to package.json so the multi-stage example actually demonstrates dependency flow. Now passes |
+| **verified** 2026-05-01 | Node app responds | Returns `{"status":"ok","runtime":"hummingbird-nodejs","nodeVersion":"v20.20.2"}` — confirms Hummingbird Node 20.20 in the runtime |
 | **verified** 2026-05-01 | `examples/compose-stack` brings up | First test failed: db exited with `Error: Database is uninitialized and superuser password is not specified` — Hummingbird's `postgresql:18` uses upstream Postgres env var names (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`), not sclorg names (`POSTGRESQL_USER`, etc.). Fixed by switching env var names in `compose.yaml`. Now passes |
 | **verified** 2026-05-01 | Compose stack web tier reachable | `curl localhost:3000` returns expected JSON. End-to-end three-service stack: db (Hummingbird postgresql:18) → web (Hummingbird nodejs:20, depends_on db healthy) → otel (third-party docker.io/otel/opentelemetry-collector-contrib) |
 | **verified** 2026-05-01 | Compose stack DB queryable | `psql -U app -d appdb -c 'select 42'` returns 42 from inside the db container |
