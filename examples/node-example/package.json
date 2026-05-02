@@ -6,5 +6,8 @@
   "scripts": {
     "start": "node server.js"
   },
+  "dependencies": {
+    "pino": "^9.5.0"
+  },
   "license": "Apache-2.0"
 }

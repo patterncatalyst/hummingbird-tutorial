@@ -38,9 +38,8 @@ podman build \
 
 | File                  | Why                                                  |
 | --------------------- | ---------------------------------------------------- |
-| `server.js`           | Single-file HTTP server, returns a JSON heartbeat    |
-| `package.json`        | No real deps; small enough to read in one screen     |
-| `package-lock.json`   | Empty lockfile so `npm ci` has something to lock     |
+| `server.js`           | Single-file HTTP server using pino for logging       |
+| `package.json`        | One real dep (pino) — gives the multi-stage build something to demonstrate |
 | `Containerfile`       | Two-stage: Hummingbird Node builder → Node runtime   |
 
 ## Image-name caveat
