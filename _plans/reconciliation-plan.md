@@ -263,6 +263,10 @@ done
 > verification loop has not yet been run end-to-end as a script
 > (the catalog facts in §A were verified individually during
 > tutorial development).
+>
+> The state is **reproducible**: `bash scripts/test-all-examples.sh`
+> from the repo root re-runs every test in ~48s with cached images
+> (~5 min cold). See `scripts/README.md` for the per-test scripts.
 
 Build each example end-to-end and confirm it runs. Doesn't validate
 the tutorial prose around it — just that the Containerfile produces
