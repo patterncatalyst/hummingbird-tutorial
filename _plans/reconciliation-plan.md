@@ -1,6 +1,6 @@
 ---
 title: Reconciliation plan
-description: What in this tutorial is verified, what is in flight, and what needs validation against a live Fedora 43 or macOS environment.
+description: What in this tutorial is verified on Fedora 43, what is in flight, and what needs validation against macOS.
 ---
 
 This document tracks the **gap between what the tutorial claims and
@@ -9,6 +9,11 @@ authoritative list of things to check, fix, or expand before the
 tutorial is declared production-ready. Every section that contains
 unverified content has a "Reconciliation note" callout linking
 back here.
+
+**Platform coverage so far:** all six runnable examples have been
+verified on Fedora 43 (rsedor's working machine, May 2026).
+macOS replication is the highest-priority remaining task — see
+section G.3.
 
 The plan has four columns:
 
@@ -19,9 +24,13 @@ The plan has four columns:
 
 ## Conventions
 
-- A `verified` row has been run end-to-end on **both** Fedora 43
-  and macOS by at least one contributor, with the exact commands
-  shown in the tutorial.
+- A `verified` row has been run end-to-end with the platform
+  named in the Notes column, using the exact commands shown
+  in the tutorial.
+- A row marked `verified (Fedora 43)` has been run on Fedora 43
+  but not yet replicated on macOS.
+- A row marked `verified (Fedora 43 + macOS)` has been run on
+  both platforms — the strongest assurance.
 - An `in flight` row is being actively worked on; the assigned
   contributor is named where known.
 - An `unverified` row is a claim taken from source material that
@@ -29,10 +38,12 @@ The plan has four columns:
 - An `out of scope` row is something we deliberately decided not
   to verify in this iteration; the reason is given.
 
-A row moves from `unverified` to `verified` only after both
-platforms have been exercised. If something works on Fedora but
-not macOS (or vice versa), it stays `in flight` with a note about
-which platform passed.
+**Cross-platform parity is the goal.** Every example, command, and
+prereq instruction in the tutorial is intended to work identically
+on Fedora 43 and macOS (with Podman Desktop on macOS). As of the
+May 2026 testing campaign, all six runnable examples pass
+end-to-end on Fedora 43; the macOS pass is pending and tracked
+explicitly in section G.3.
 
 ## A. Image catalog and naming
 
@@ -64,7 +75,7 @@ cadences.
 | Status | What | Where | How to verify |
 |---|---|---|---|
 | verified | Podman 5.x is available in Fedora 43 default repos | §1 | `dnf info podman` on a fresh Fedora 43 VM |
-| unverified | Podman Compose available as `podman-compose` in Fedora 43 repos at the version §7 needs | §1, §7 | Run §7's compose stack end-to-end on a fresh Fedora 43 |
+| verified (Fedora 43) | Podman Compose available as `podman-compose` in Fedora 43 repos at the version §7 needs | §1, §7 | `dnf install podman-compose` works; §7's compose stack runs end-to-end on Fedora 43 (G.2 row 2026-05-01) |
 | unverified | `brew install --cask podman-desktop` brings the Podman CLI alongside it on macOS | §1 | Fresh macOS install; confirm `podman --version` works after the cask completes |
 | unverified | Podman Desktop tarball install path on Fedora produces a working desktop entry on Fedora 43's default desktop (GNOME) | §1 | Click-through test on Fedora 43 GNOME |
 | unverified | The Grype install script writes to `~/.local/bin` cleanly under both Fedora 43 and macOS | §1 | Confirm `grype --version` works after install on both |
@@ -186,23 +197,39 @@ don't accidentally "fix" them.
 A short list of "next things to do" once the items above start
 landing. Roughly priority-ordered.
 
-1. **Verify the image catalog (Section A above).** This unblocks
-   nearly everything else — without it, no Containerfile in the
-   tutorial is testable.
+**Done as of May 2026:**
+
+- ✅ **Image catalog verification (Section A).** Verified during
+  development of §A. All six runnable examples build and run
+  against the live catalog.
+- ✅ **Build out the `examples/` directory.** Six runnable
+  projects: Quarkus, Python, Go, ML, Node, compose-stack. All
+  pass `bash scripts/test-all-examples.sh` on Fedora 43.
+- ✅ **Stand up the §7 compose stack on Fedora.** Three-service
+  stack (db, web, otel) brings up cleanly; web responds, db
+  queryable.
+
+**Open, priority-ordered:**
+
+1. **macOS replication of all examples.** Run
+   `scripts/test-all-examples.sh` on macOS with Podman Desktop.
+   Highest leverage remaining work — flips the matrix from
+   "verified on Fedora 43" to "verified on both platforms".
 2. **Run §1 end-to-end on a fresh Fedora 43 VM.** The prerequisite
    doc has the largest blast radius on its own.
-3. **Run §1 end-to-end on a fresh macOS install.** Same reason.
-4. **Run §3 and §4 end-to-end.** These are the sections most
-   readers will actually do; they need to be bulletproof.
-5. **Re-create the 10 Excalidraw diagrams.** The current SVGs
-   are functional sketches.
-6. **Stand up the §7 compose stack on both platforms.** Lots of
-   Fedora-vs-macOS surface area.
-7. **Validate §9 (zstd:chunked) and §10 (chunkah)** against
+3. **Run §1 end-to-end on a fresh macOS install.** Same reason,
+   companion to (2).
+4. **Run §3 and §4 prose walkthroughs end-to-end.** Reading the
+   tutorial prose and following its instructions verbatim, on
+   both platforms. The example artifacts work; whether the
+   prose explanation matches command-by-command is the open
+   question.
+5. **Re-create the Excalidraw diagrams.** The current SVGs are
+   functional but utilitarian; cleaner versions would help the
+   tutorial feel more finished.
+6. **Validate §9 (zstd:chunked) and §10 (chunkah)** against
    current upstream tooling. If anything has changed materially,
    rewrite.
-8. **Build out the `examples/` directory** so each Containerfile
-   in the tutorial has a corresponding runnable project.
 
 ---
 
@@ -253,11 +280,13 @@ done
 
 ### G.2 — Build-and-run smoke tests (medium, ~15 min)
 
-> **Status as of 2026-05-01: ✅ all 11 of 11 rows verified.** Every
-> Containerfile in the tutorial has been built and run against live
-> Hummingbird images, with the runtime confirmed to respond
-> correctly over HTTP. The fixes that landed during testing are
-> recorded in the Notes column of each row and consolidated into
+> **Status as of 2026-05-01: ✅ 11 of 11 verified on Fedora 43;
+> macOS pass pending.** Every Containerfile in the tutorial has
+> been built and run against live Hummingbird images on a Fedora
+> 43 host (rsedor's working machine), with the runtime confirmed
+> to respond correctly over HTTP. The fixes that landed during
+> testing are recorded in the Notes column of each row and
+> consolidated into
 > [§17 Distroless gotchas]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
 > as symptom → root cause → fix entries. The full G.1 catalog
 > verification loop has not yet been run end-to-end as a script
@@ -267,6 +296,13 @@ done
 > The state is **reproducible**: `bash scripts/test-all-examples.sh`
 > from the repo root re-runs every test in ~48s with cached images
 > (~5 min cold). See `scripts/README.md` for the per-test scripts.
+>
+> **macOS verification remains the highest-value next step.** All
+> six examples need to pass on macOS (Podman Desktop) before the
+> matrix can claim full cross-platform coverage. The Fedora work
+> took ~10 hours of debugging; the macOS run should be much
+> faster since the symptoms-and-fixes catalog in §17 already
+> exists. See G.3 row "macOS replication of all examples".
 
 Build each example end-to-end and confirm it runs. Doesn't validate
 the tutorial prose around it — just that the Containerfile produces
@@ -294,26 +330,35 @@ Run the tutorial sections end-to-end on a clean machine, record any
 prose that didn't match what happened. This is the gold-standard
 test; the §1 walkthrough alone catches most issues.
 
+> Note on Fedora 43 evidence so far: every entry in this table
+> below that has a §4 / §7 / §11 reference exists as a runnable
+> example under `examples/`, and those examples have all been
+> verified end-to-end on Fedora 43 (see G.2). What G.3 still
+> tests is whether the **tutorial prose** that walks readers
+> through those sections matches the example's actual behavior
+> command-by-command — not whether the artifact runs.
+
 | Status | What | Where to run |
 |---|---|---|
 | not yet run | §1 prerequisites — full install on fresh Fedora 43 VM | Clean VM |
 | not yet run | §1 prerequisites — full install on fresh macOS | Clean macOS install or VM |
 | not yet run | §3 podman basics — pull, run, sidecar pattern | Either platform after §1 passes |
-| not yet run | §4 multi-stage — Quarkus example | Either platform |
-| not yet run | §4 multi-stage — Python example | Either platform |
-| not yet run | §4 multi-stage — Go example | Either platform |
+| not yet run | §4 multi-stage — Quarkus example walkthrough | Either platform; example artifact verified on Fedora 43 |
+| not yet run | §4 multi-stage — Python example walkthrough | Either platform; example artifact verified on Fedora 43 |
+| not yet run | §4 multi-stage — Go example walkthrough | Either platform; example artifact verified on Fedora 43 |
 | not yet run | §5 SBOM and signing — generate and verify | Either platform |
 | not yet run | §6 CVE scanning — clean and dirty image | Either platform |
-| not yet run | §7 compose stack — full bring-up | Fedora primarily (SELinux surface) |
+| not yet run | §7 compose stack — full bring-up walkthrough | Fedora primarily (SELinux surface); artifact verified on Fedora 43 |
 | not yet run | §8 debugging — sidecar pattern, in-image-builder | Either platform |
 | not yet run | §9 zstd:chunked — partial-pull verification | Fedora |
 | not yet run | §10 chunkah — split, recombine | Fedora |
-| not yet run | §11 real-world examples — at least one of the five | Either platform |
+| not yet run | §11 real-world examples — at least one of the five | Either platform; ML and Compose artifacts verified on Fedora 43 |
 | not yet run | §12 custom SBOM — full augment-merge-sign cycle | Either platform |
 | not yet run | §13 Trusted Libraries — pip install with provenance verify | Either platform; needs Red Hat account |
 | not yet run | §14 RPM install — staged install + COPY rootfs | Either platform |
 | not yet run | §15 Renovate — config validates against a real repo | Wherever |
 | not yet run | §16 pruning — every command runs cleanly | Either platform |
+| not yet run | **macOS replication of all examples** — run `scripts/test-all-examples.sh` on macOS with Podman Desktop | macOS; expected to surface SELinux/`:Z` no-op behavior, file-share permission differences, and any IPv4/IPv6 binding issues |
 
 ### G.4 — How to record results
 
