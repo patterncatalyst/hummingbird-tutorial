@@ -2,7 +2,7 @@
 title: What is Project Hummingbird
 order: 2
 description: The conceptual grounding before we start running commands.
-duration: 10 minutes
+duration: 15 minutes
 ---
 
 This is the only section of the tutorial without commands. Read it
@@ -39,11 +39,17 @@ against any of those packages, the platform team's job is to
 backport a fix and rebuild — sometimes weeks after the upstream
 fix exists.
 
-Hummingbird inverts that loop. Each image is constructed from a
-small dependency graph drawn from the Fedora → RHEL pipeline.
+Hummingbird inverts that loop. Hummingbird is its own distroless
+distribution — a minimal userspace assembled from components that
+flow through the Red Hat trust chain, but published as a distinct
+image base rather than as a stripped variant of RHEL or UBI. The
+project originated from the Fedora → RHEL pipeline that supplies
+its components, and has matured into a separate Hummingbird image
+base with its own build, release, and rebuild cadence.
+
 When an upstream fix lands, the image is rebuilt clean from the
-new packages instead of being patched in place. Combined with the
-small dependency graph, this means:
+new components instead of being patched in place. Combined with
+the small dependency graph, this means:
 
 - Rebuilds are fast, so fixes propagate quickly.
 - The rebuilt image carries no historical CVE legacy.
@@ -78,14 +84,23 @@ than take it on faith.
    alt="Diagram showing the Red Hat container ecosystem: Fedora as upstream, RHEL/UBI as the stable base, Hummingbird as the minimal runtime catalog, and OpenShift as the platform layer"
    caption="Figure 2.1 — Hummingbird's place in the Red Hat container ecosystem" %}
 
-The four layers from upstream to deployment:
+Hummingbird and UBI are **sibling image distributions**, not stacked
+layers. Both inherit components from the same Red Hat package pipeline,
+but they assemble those components into different shapes for different
+deployment needs:
 
-| Layer                  | Role                                                       |
-|------------------------|------------------------------------------------------------|
-| Fedora                 | Upstream component source, fast-moving                     |
-| RHEL / UBI             | Stable enterprise base images, broad compatibility         |
-| Project Hummingbird    | Minimal hardened runtime images, near-zero-CVE             |
-| OpenShift / Kubernetes | Platform that runs whatever you build on the layers above  |
+| Layer / image base       | Role                                                                  |
+|--------------------------|-----------------------------------------------------------------------|
+| Fedora                   | Upstream component source, fast-moving                                |
+| Red Hat package pipeline | Components stabilized, signed, made available to image builds         |
+| RHEL / UBI               | Full enterprise base — broad package set, RPM tooling, shell, dnf    |
+| Project Hummingbird      | Distroless image base — minimal userspace, near-zero CVE              |
+| OpenShift / Kubernetes   | Platform layer that runs images of either kind                        |
+
+The first two rows describe the **shared component pipeline** that
+both image bases pull from. The next two rows are the image bases
+themselves — distinct distributions that happen to share a trust
+chain.
 
 Hummingbird does not replace UBI. The two are complementary:
 
@@ -131,22 +146,88 @@ PID and network namespace.
 
 ## Build lineage and trust chain
 
-Every Hummingbird image is built from packages that flow through
-the same trust chain as the rest of the Red Hat platform:
+Every Hummingbird image inherits the same trust chain as the rest
+of the Red Hat container ecosystem, while remaining its own
+distribution rather than a derivative of any other image:
 
 1. Components originate in the Fedora ecosystem.
-2. They are stabilised and packaged for RHEL.
-3. The minimal-image build pipeline assembles them into Hummingbird
-   images, with build provenance recorded as an attestation.
+2. They are stabilised through the Red Hat package pipeline — the
+   same pipeline that supplies the packages used by RHEL and UBI.
+3. The Hummingbird image-build pipeline draws components from that
+   pipeline and assembles them into Hummingbird's own minimal
+   image base, with build provenance recorded as an attestation.
+   The resulting image is a distroless Hummingbird OS — not a
+   trimmed-down RHEL or UBI image.
 4. Each image is signed using Sigstore-compatible signatures,
    verifiable with Cosign.
 5. SBOMs are attached as OCI artifacts on the same manifest.
 
-This means that if your platform already has a signature-verification
-policy for `registry.access.redhat.com`, extending it to
-`quay.io/hummingbird` is straightforward. Section 5 of the tutorial
-walks through verifying a Hummingbird image's signature and
-inspecting its SBOM.
+The shared trust chain means that if your platform already has a
+signature-verification policy for `registry.access.redhat.com`,
+extending it to `quay.io/hummingbird` is straightforward.
+Section 5 of the tutorial walks through verifying a Hummingbird
+image's signature and inspecting its SBOM.
+
+## Three concepts that make the trust chain meaningful
+
+Hummingbird's claims about provenance, signing, and SBOMs are
+backed by three concrete things worth naming so you can find more
+about them on your own.
+
+### Distroless
+
+**Distroless** is the design philosophy: an image that contains
+the application's runtime and *only* what that runtime depends on
+— no shell, no package manager, no diagnostic tools, no compiler.
+The term comes from the broader OCI ecosystem; what Hummingbird
+calls "near-zero CVE" is in large part a consequence of being
+distroless.
+
+Distroless is not the same as "small." Plenty of small images ship
+a busybox shell or apk; those are minimalist but not distroless.
+A distroless image is one where the attack surface has been
+deliberately reduced to the language runtime and its libraries —
+nothing else.
+
+Distroless changes how you operate the image. You cannot `exec`
+into a Hummingbird container to look around; you attach a debug
+sidecar in a separate image that has those tools. Section 8 of
+this tutorial covers that pattern in detail.
+
+### Hermetic builds
+
+A **hermetic build** is one that runs with no network access and
+only the inputs that have been explicitly declared and signed in
+advance. No `curl | sh` from the internet during compilation. No
+"latest" pulls of build dependencies. Every byte that goes into
+the resulting image comes from a known, attested source.
+
+Hermetic builds are what make an SBOM meaningful. An SBOM
+generated against a non-hermetic build can only describe what
+*claims* to be in the image; an SBOM generated against a hermetic
+build describes what's *provably* in the image, traceable back to
+signed sources. Hummingbird's images are built hermetically, which
+is why their SBOMs are trustworthy enough to be the foundation of
+section 5's signing and verification flow.
+
+### Konflux
+
+**Konflux** is the open-source secure software supply chain
+platform that produces Hummingbird images. It runs the hermetic
+builds, generates the SBOMs, attaches the provenance attestations,
+and signs the artifacts. From the consumer side — anyone pulling
+a Hummingbird image — Konflux is invisible: you see a signed OCI
+image with attached SBOM and attestation manifests. From the
+producer side, Konflux is the machinery that gives those manifests
+their trustworthiness.
+
+You don't need to interact with Konflux directly to use
+Hummingbird. The reason it's worth naming is that **the same
+platform is available for your own builds**. If you want the same
+provenance and SBOM properties for your application images that
+Hummingbird has for its base images, building on Konflux is the
+way to get there. That's a follow-on topic outside this tutorial's
+scope, but it's the natural next step after section 5.
 
 ## Why this tutorial focuses on Podman
 

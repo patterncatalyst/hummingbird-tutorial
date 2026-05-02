@@ -5,7 +5,8 @@ description: A debugging-and-prevention reference for the rough edges that surfa
 duration: 30 minutes
 ---
 
-This section exists because Hummingbird's distroless minimalism — the
+This section exists because Hummingbird's
+[distroless]({{ "/docs/02-introduction/#distroless" | prepend: site.baseurl }}) minimalism — the
 property that makes it a great runtime for security-conscious workloads —
 also magnifies every implicit assumption baked into the wider container
 ecosystem. A tool that "just works" on UBI or Alpine because some package
