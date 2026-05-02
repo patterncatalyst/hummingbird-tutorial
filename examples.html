@@ -19,10 +19,12 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
 
 <section class="section">
   <div class="container">
-    <h2 class="section-heading">Primary examples</h2>
+    <h2 class="section-heading">Containerized examples</h2>
     <p class="section-sub">
-      For the audience this tutorial is aimed at — JVM, Python, and Go
-      backends. Listed in the order most readers will care.
+      Six runnable projects covering the multi-stage build patterns
+      taught in §4 and the multi-container compose pattern from §7.
+      Each one is verified to build and run end-to-end against the
+      live Hummingbird image catalog as of May 2026.
     </p>
 
     <div class="cards">
@@ -30,15 +32,16 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
       <a class="card"
          href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/quarkus-example"
          rel="noopener">
-        <div class="card__eyebrow">Java · <strong>Quarkus 3.15 LTS</strong></div>
+        <div class="card__eyebrow">Java · <strong>Quarkus 3.33 LTS</strong></div>
         <h3 class="card__title">Quarkus, JVM mode</h3>
         <p class="card__desc">
-          Two-stage build: <code>openjdk:21-builder</code> compiles a Quarkus
-          fast-jar; <code>openjdk:21-runtime</code> serves it. Single REST
-          endpoint, no native-image complexity.
+          Mixed-vendor multi-stage: UBI <code>openjdk-21</code> builder
+          (has Maven) compiles a Quarkus fast-jar; Hummingbird
+          <code>openjdk:21-runtime</code> (JRE-only) serves it. Single
+          REST endpoint, no native-image complexity.
         </p>
         <div class="card__meta">
-          <span>§4 Example D</span>
+          <span>§4 Example A</span>
           <span>Source ↗</span>
         </div>
       </a>
@@ -65,12 +68,28 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <div class="card__eyebrow">Go · <strong>static binary</strong></div>
         <h3 class="card__title">Go on Hummingbird Go runtime</h3>
         <p class="card__desc">
-          The smallest of the four. <code>CGO_ENABLED=0</code> static binary
-          on the Hummingbird <code>go:1.26</code> runtime — typically around
-          30 MB total.
+          The smallest of the bunch. <code>CGO_ENABLED=0</code> static
+          binary on the Hummingbird <code>go:1.26</code> runtime —
+          typically around 30 MB total.
         </p>
         <div class="card__meta">
           <span>§4 Example C</span>
+          <span>Source ↗</span>
+        </div>
+      </a>
+
+      <a class="card"
+         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/node-example"
+         rel="noopener">
+        <div class="card__eyebrow">Node.js · <strong>stdlib + pino</strong></div>
+        <h3 class="card__title">Node.js HTTP service</h3>
+        <p class="card__desc">
+          Trivial HTTP server with structured logging via pino,
+          showing the npm install → COPY node_modules pattern across
+          <code>nodejs:20-builder</code> and <code>nodejs:20</code>.
+        </p>
+        <div class="card__meta">
+          <span>§4 Appendix</span>
           <span>Source ↗</span>
         </div>
       </a>
@@ -82,9 +101,10 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <h3 class="card__title">ML inference variant</h3>
         <p class="card__desc">
           Same wheel-build pattern as the Python example, but with a
-          NumPy dependency that compiles native code. Add
-          <code>transformers</code> + <code>torch</code> when you're ready
-          for a real ML build.
+          NumPy dependency that compiles native code. Demonstrates the
+          shared-library COPY pattern (libstdc++, libgcc_s, libgomp)
+          for distroless runtimes — the technique scales to
+          <code>transformers</code> + <code>torch</code> when ready.
         </p>
         <div class="card__meta">
           <span>§11 Scenario 2</span>
@@ -108,35 +128,6 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         </div>
       </a>
 
-    </div>
-  </div>
-</section>
-
-<section class="section" style="background: var(--bg-soft);">
-  <div class="container">
-    <h2 class="section-heading">Secondary example</h2>
-    <p class="section-sub">
-      The Node example exists because §4 introduces the multi-stage
-      pattern against it as a stripped-down reference. If you're not
-      shipping Node services, skim it for the pattern and skip on.
-    </p>
-
-    <div class="cards">
-      <a class="card"
-         href="https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/node-example"
-         rel="noopener">
-        <div class="card__eyebrow">Node.js · <strong>Express-style</strong></div>
-        <h3 class="card__title">Node.js</h3>
-        <p class="card__desc">
-          Trivial HTTP server demonstrating the two-stage pattern:
-          <code>nodejs:20-builder</code> for <code>npm ci</code>,
-          <code>nodejs:20</code> for the runtime.
-        </p>
-        <div class="card__meta">
-          <span>§4 Example A</span>
-          <span>Source ↗</span>
-        </div>
-      </a>
     </div>
   </div>
 </section>
