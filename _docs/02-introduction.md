@@ -14,10 +14,17 @@ contextually rather than as magic.
 
 Project Hummingbird is Red Hat's catalog of **minimal, hardened
 container images** with a goal of zero known vulnerabilities at
-release time. Announced in November 2025, it ships through Red Hat's
-trusted build pipeline and inherits the same provenance, signing,
-and SBOM infrastructure that backs the rest of the Red Hat container
-ecosystem.
+release time. The official product name is **Red Hat Hardened
+Images (RHHI)**; "Project Hummingbird" is the project name the
+community and this tutorial use, and the two refer to the same
+catalog.
+
+Announced in November 2025, it ships through Red Hat's trusted
+build pipeline and inherits the same provenance, signing, and SBOM
+infrastructure that backs the rest of the Red Hat container
+ecosystem. The catalog is **available at no cost** with support
+included for users running Red Hat Enterprise Linux or OpenShift
+Container Platform.
 
 The catalog covers three broad categories:
 
@@ -27,8 +34,8 @@ The catalog covers three broad categories:
 - **Web servers and proxies** — Nginx, Caddy.
 
 These are the components most commonly requested by Red Hat
-customers, packaged as OCI images that are very small, contain only
-what is needed to run the application, and are continuously
+customers, packaged as OCI images that are very small, contain
+only what is needed to run the application, and are continuously
 rebuilt as upstream fixes appear.
 
 ## The core idea: rebuild, don't patch
@@ -128,7 +135,8 @@ The deliberate omissions matter as much as the inclusions.
 
 **A Hummingbird image typically does not contain:**
 
-- A shell. Yes, really — `podman exec ... /bin/sh` will fail.
+- A shell. `podman exec ... /bin/sh` will fail in most cases —
+  see the variant note below for the exceptions.
 - A package manager (`dnf`, `microdnf`, `apt`, `apk`).
 - Common diagnostic tools (`curl`, `ps`, `top`, `netstat`).
 - A compiler or build toolchain.
@@ -143,6 +151,33 @@ detail in [section 8]({{ "/docs/08-debugging/" | prepend: site.baseurl }}),
 but the short version is: instead of `exec`-ing into the
 container with a shell, you attach a debug sidecar with the same
 PID and network namespace.
+
+## Image variants: default, builder, FIPS
+
+Each Hummingbird image is published in three variants, identified
+by tag suffix:
+
+| Variant     | Tag suffix         | What it adds over default                        | When to use it                                   |
+|-------------|--------------------|--------------------------------------------------|--------------------------------------------------|
+| **Default** | `:<version>`       | (the distroless baseline)                        | Production runtime — final stage of every build  |
+| **Builder** | `:<version>-builder` | Package manager and shell                       | Builder stage of multi-stage builds              |
+| **FIPS**    | `:<version>-fips`, `:<version>-fips-builder` | FIPS-validated cryptographic modules; FIPS algorithms enforced by default | Environments requiring FIPS-validated cryptography |
+
+**A note on shells in default images.** Most default images
+genuinely have no shell — that's the distroless guarantee. A few
+specific images do include one because the runtime ecosystem
+expects it: **Golang, Core Runtime, and the full OpenJDK** ship
+with a shell in their default variants. The JRE-only OpenJDK
+variant (`openjdk:21-runtime`) and most others do not. If your
+build pattern depends on shell-free runtime, pin to a specific
+variant rather than assuming distroless across the board.
+
+**FIPS variants exist for every image.** If your environment
+requires FIPS-validated cryptography (US federal workloads,
+some regulated industries), add `-fips` to the tag and the same
+example works. The tutorial doesn't use FIPS by default so the
+examples stay readable, but every command is FIPS-compatible
+with the suffix added.
 
 ## Build lineage and trust chain
 
@@ -228,6 +263,94 @@ provenance and SBOM properties for your application images that
 Hummingbird has for its base images, building on Konflux is the
 way to get there. That's a follow-on topic outside this tutorial's
 scope, but it's the natural next step after section 5.
+
+## What "hardened" means concretely
+
+{% include excalidraw.html
+   file="02-introduction-hardening-stack"
+   alt="Four-layer pyramid showing the hardening stack: Source (SLSA 3 provenance, continuous upstream tracking, CVE monitoring), Packages (PIE/RELRO, stack canaries, dependency minimization), Images (distroless, non-root, reproducible), Benchmarks & scanning (CIS, STIG, OpenSCAP profiles)"
+   caption="Figure 2.2 — The Hummingbird hardening stack" %}
+
+Hardening is applied at four layers, each building on the one
+below. None of the layers individually is novel; the value is in
+applying all four to every image in the catalog by default.
+
+### Source — ever-fresh remediations
+
+Every component is tracked against its upstream source, with
+continuous CVE monitoring and remediation. The build environment
+was originally designed to **SLSA level 4** requirements — when
+that level was retired from the SLSA framework, the project moved
+to claiming **SLSA 3**, which is now the highest level the
+framework defines. This is the layer that turns "we say we did the
+right thing" into "we have a signed attestation that we did the
+right thing."
+
+### Packages — hardened compiler options
+
+Components are compiled with the full RHEL hardening flag set:
+**Position-Independent Executables (PIE)** and **RELRO** for
+load-time and link-time hardening, **stack protectors** for
+canaries against stack-smashing, **`FORTIFY_SOURCE=3`** for
+compatibility checks on C and C++ string and memory operations.
+Binary checks via `annobin` and `annocheck` confirm the flags
+are actually present in the resulting ELF binaries — not just
+documented in the build configuration.
+
+Dependency minimization is applied at the package layer too:
+`install_weak_deps=False` is set for every package install, so
+recommended-but-not-required dependencies don't get pulled in
+silently. The catalog ships the dependencies that are actually
+used, not the ones that happened to be packaged together.
+
+### Images — distroless, non-root, reproducible
+
+The image-assembly layer applies the patterns described in this
+section: distroless userspace, non-root default user (UID 1001),
+hermetically built, signed manifests, attached SBOMs,
+reproducible across rebuilds with the same inputs. This is where
+the security of the lower layers becomes a property of the
+artifact you actually pull from a registry.
+
+### Benchmarks and scanning — CIS, STIG, OpenSCAP
+
+Each image is verified against published security benchmarks —
+**CIS** baselines, **STIG** profiles for federal workloads,
+**OpenSCAP** scans against multiple compliance profiles. These
+checks are part of the release gate, not a one-off audit. An
+image that fails its benchmark scan doesn't ship.
+
+The compounding effect of the four layers is what makes "near
+zero CVE" defensible at release time, not just a marketing claim.
+
+## How Hummingbird compares with UBI
+
+UBI (Universal Base Image) and Hummingbird are both Red Hat
+container image bases, with overlapping audiences and quite
+different shapes. They're worth comparing directly because most
+real platforms end up using both.
+
+| Feature           | UBI                                      | Hummingbird (RHHI)                                    |
+|-------------------|------------------------------------------|-------------------------------------------------------|
+| Primary focus     | Flexible base with full RHEL userspace   | Purpose-built minimal attack surface                  |
+| Use case          | Apps that need RHEL life cycle and breadth | Hardened components; reduce CVE management toil      |
+| Update cadence    | Standard RHEL errata and life cycle      | Continuous and rolling                                |
+| Image size        | Standard RPM install                     | Distroless build from a minimal base                  |
+| Life cycle        | Predictable 10-year                      | Upstream releases and life cycle                      |
+| Support           | Full when run on RHEL or OpenShift       | Full, included with RHEL or OpenShift                 |
+| Redistribution    | Allowed                                  | Allowed                                               |
+| Cost              | Free                                     | Free                                                  |
+
+The two complement rather than compete. UBI is the right choice
+when you need a familiar RHEL userspace, broad package
+availability, or `dnf install` at runtime. Hummingbird is the
+right choice when you want the smallest, hardest-to-attack
+runtime — typically the deploy stage of a multi-stage build.
+Section 17 of this tutorial expands on the decision criteria with
+specific failure modes; the
+[reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
+records every place in the tutorial where one or the other is
+the deliberate choice.
 
 ## Why this tutorial focuses on Podman
 

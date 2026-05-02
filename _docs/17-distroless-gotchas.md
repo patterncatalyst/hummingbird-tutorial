@@ -38,10 +38,17 @@ error running container: from /usr/bin/crun creating container for [/bin/sh -c .
 executable file `/bin/sh` not found: No such file or directory
 ```
 
-**Root cause:** Hummingbird runtime images are distroless. There is no
-`/bin/sh`, no shell of any kind. Buildah's `RUN` instruction defaults to
-`/bin/sh -c <command>`, which fails the moment you try to use `RUN` in a
-runtime stage.
+**Root cause:** Most Hummingbird runtime images are distroless —
+no `/bin/sh`, no shell of any kind. Buildah's `RUN` instruction
+defaults to `/bin/sh -c <command>`, which fails the moment you try
+to use `RUN` in a runtime stage that has no shell.
+
+A few specific images do ship with a shell (Golang, Core Runtime,
+full OpenJDK — see [§2's image variants section]({{ "/docs/02-introduction/#image-variants-default-builder-fips" | prepend: site.baseurl }})),
+but the safe assumption is that runtime stages are shell-free.
+Treating the rule as universal makes Containerfiles portable
+across the catalog without having to track which images are
+exceptions.
 
 **Fix:** Move everything that needs a shell into the builder stage. The
 runtime stage takes only `COPY` instructions. Any setup (installing

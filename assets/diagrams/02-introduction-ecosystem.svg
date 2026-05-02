@@ -1,40 +1,79 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" style="max-width:800px;height:auto;">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="Diagram showing Hummingbird and UBI as sibling image distributions drawing from the shared Red Hat package pipeline">
+  <title>Hummingbird's place in the Red Hat container ecosystem</title>
+  <desc>Top-down hierarchy: Fedora as upstream component source feeds the Red Hat package pipeline. The pipeline supplies two sibling image distributions in parallel: RHEL/UBI (full enterprise userspace) and Project Hummingbird (distroless image base). Both are runnable on the OpenShift/Kubernetes platform layer.</desc>
+
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    <style>
+      .box-source  { fill: #f5e6e6; stroke: #6b0000; stroke-width: 1.5; }
+      .box-pipe    { fill: #e8e8e8; stroke: #4a4a4a; stroke-width: 1.5; }
+      .box-ubi     { fill: #f5e6e6; stroke: #6b0000; stroke-width: 1.5; }
+      .box-hb      { fill: #a30000; stroke: #6b0000; stroke-width: 1.5; }
+      .box-platform{ fill: #e8e8e8; stroke: #4a4a4a; stroke-width: 1.5; }
+
+      .title       { fill: #1a1a1a; font-family: 'Red Hat Display', system-ui, sans-serif; font-weight: 700; font-size: 16px; }
+      .title-light { fill: #ffffff; font-family: 'Red Hat Display', system-ui, sans-serif; font-weight: 700; font-size: 16px; }
+      .sub         { fill: #555555; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 12px; }
+      .sub-light   { fill: #f4d4d4; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 12px; }
+      .label       { fill: #888888; font-family: 'Red Hat Mono', monospace; font-size: 11px; font-style: italic; }
+      .arrow       { fill: none; stroke: #4a4a4a; stroke-width: 2; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#4a4a4a" />
     </marker>
-    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#cc0000"/>
-    </marker>
-    <style><![CDATA[
-      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #1a1a1a; }
-      .title { font-size: 18px; font-weight: 600; }
-      .label { font-size: 14px; }
-      .small { font-size: 12px; fill: #666; }
-      .accent { fill: #cc0000; }
-      .box { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
-      .box-accent { fill: #fff5f5; stroke: #cc0000; stroke-width: 1.5; }
-      .box-muted { fill: #f7f7f7; stroke: #999999; stroke-width: 1; }
-      .conn { stroke: #1a1a1a; stroke-width: 1.5; fill: none; }
-      .conn-red { stroke: #cc0000; stroke-width: 1.5; fill: none; }
-      .dashed { stroke-dasharray: 4 3; }
-    ]]></style>
   </defs>
-  <text x="400.0" y="32" class="title" text-anchor="middle">Hummingbird's place in the Red Hat ecosystem</text>
-  <rect x="120" y="85" width="560" height="60" rx="6" class="box-muted"/>
-  <text x="400.0" y="111.0" text-anchor="middle" class="label">Fedora</text>
-  <text x="400.0" y="129.0" text-anchor="middle" class="small">Upstream component source</text>
-  <rect x="120" y="170" width="560" height="60" rx="6" class="box"/>
-  <text x="400.0" y="196.0" text-anchor="middle" class="label">RHEL / UBI</text>
-  <text x="400.0" y="214.0" text-anchor="middle" class="small">Stable enterprise base images</text>
-  <rect x="120" y="255" width="560" height="60" rx="6" class="box-accent"/>
-  <text x="400.0" y="281.0" text-anchor="middle" class="label">Project Hummingbird</text>
-  <text x="400.0" y="299.0" text-anchor="middle" class="small">Minimal hardened runtime images</text>
-  <rect x="120" y="340" width="560" height="60" rx="6" class="box"/>
-  <text x="400.0" y="366.0" text-anchor="middle" class="label">OpenShift / Kubernetes</text>
-  <text x="400.0" y="384.0" text-anchor="middle" class="small">Platform layer</text>
-  <line x1="400" y1="148" x2="400" y2="170" class="conn" marker-end="url(#arrow)"/>
-  <line x1="400" y1="233" x2="400" y2="255" class="conn" marker-end="url(#arrow)"/>
-  <line x1="400" y1="318" x2="400" y2="340" class="conn" marker-end="url(#arrow)"/>
-  <text x="400.0" y="420" class="small" text-anchor="middle">Each layer is built from the one above and is independently versionable</text>
+
+  <!-- Row 1 — Fedora -->
+  <rect class="box-source" x="240" y="20" width="240" height="60" rx="6" />
+  <text class="title" x="360" y="46" text-anchor="middle">Fedora</text>
+  <text class="sub"   x="360" y="66" text-anchor="middle">Upstream component source</text>
+  <text class="label" x="500" y="56">upstream</text>
+
+  <!-- Arrow Fedora → pipeline -->
+  <path class="arrow" d="M 360 80 L 360 110" />
+
+  <!-- Row 2 — Red Hat package pipeline -->
+  <rect class="box-pipe" x="180" y="110" width="360" height="60" rx="6" />
+  <text class="title" x="360" y="136" text-anchor="middle">Red Hat package pipeline</text>
+  <text class="sub"   x="360" y="156" text-anchor="middle">Components stabilized, signed, provenance tracked</text>
+  <text class="label" x="558" y="146">shared</text>
+
+  <!-- Y-fork from pipeline to siblings -->
+  <path class="arrow" d="M 360 170 L 360 195 L 200 195 L 200 220" />
+  <path class="arrow" d="M 360 170 L 360 195 L 520 195 L 520 220" />
+
+  <!-- Row 3 — Sibling distributions -->
+  <rect class="box-ubi" x="60" y="220" width="280" height="100" rx="6" />
+  <text class="title" x="200" y="250" text-anchor="middle">RHEL / UBI</text>
+  <text class="sub"   x="200" y="274" text-anchor="middle">Full enterprise base image</text>
+  <text class="sub"   x="200" y="294" text-anchor="middle">Broad package set, RPM tooling, shell, dnf</text>
+  <text class="sub"   x="200" y="312" text-anchor="middle" style="font-style: italic;">Predictable 10-year life cycle</text>
+
+  <rect class="box-hb" x="380" y="220" width="280" height="100" rx="6" />
+  <text class="title-light" x="520" y="250" text-anchor="middle">Project Hummingbird</text>
+  <text class="sub-light"   x="520" y="274" text-anchor="middle">Distroless image base (RHHI)</text>
+  <text class="sub-light"   x="520" y="294" text-anchor="middle">Minimal userspace, near-zero CVE</text>
+  <text class="sub-light"   x="520" y="312" text-anchor="middle" style="font-style: italic;">Continuous, rolling rebuild</text>
+
+  <!-- Sibling-relationship label between them -->
+  <text x="360" y="280" text-anchor="middle"
+        style="fill:#666; font-family: 'Red Hat Text', system-ui, sans-serif; font-size: 11px; font-style: italic;">
+    sibling
+  </text>
+  <text x="360" y="294" text-anchor="middle"
+        style="fill:#666; font-family: 'Red Hat Text', system-ui, sans-serif; font-size: 11px; font-style: italic;">
+    distributions
+  </text>
+
+  <text class="label" x="675" y="270">image bases</text>
+
+  <!-- Both siblings flow into platform -->
+  <path class="arrow" d="M 200 320 L 200 360 L 360 360 L 360 380" />
+  <path class="arrow" d="M 520 320 L 520 360 L 360 360 L 360 380" />
+
+  <!-- Row 4 — OpenShift / Kubernetes -->
+  <rect class="box-platform" x="200" y="380" width="320" height="60" rx="6" />
+  <text class="title" x="360" y="406" text-anchor="middle">OpenShift / Kubernetes</text>
+  <text class="sub"   x="360" y="426" text-anchor="middle">Runs images of either kind</text>
+  <text class="label" x="540" y="416">platform</text>
 </svg>

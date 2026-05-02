@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-label="Four-layer pyramid showing the hardening stack: Source, Packages, Images, Benchmarks &amp; scanning">
+  <title>Hummingbird hardening stack</title>
+  <desc>A four-layer pyramid. From bottom to top: Source (SLSA 3 provenance, continuous upstream tracking, CVE monitoring); Packages — Hardened compiler options (PIE/RELRO, stack canaries, dependency minimization); Images (distroless, non-root, reproducible); Benchmarks &amp; scanning (CIS, STIG, OpenSCAP profiles).</desc>
+
+  <defs>
+    <style>
+      .layer       { fill: #a30000; stroke: #6b0000; stroke-width: 1.5; }
+      .layer-light { fill: #c00000; stroke: #6b0000; stroke-width: 1.5; }
+      .title       { fill: #ffffff; font-family: 'Red Hat Display', system-ui, sans-serif; font-weight: 700; font-size: 18px; }
+      .subtitle    { fill: #f4d4d4; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 13px; }
+    </style>
+  </defs>
+
+  <!-- Layer 4 (top) — Benchmarks & scanning -->
+  <g>
+    <rect class="layer-light" x="200" y="40"  width="340" height="72" rx="4" />
+    <text class="title"    x="220" y="68">Benchmarks &amp; scanning</text>
+    <text class="subtitle" x="220" y="92">CIS, STIG, OpenSCAP profiles</text>
+  </g>
+
+  <!-- Layer 3 — Images -->
+  <g>
+    <rect class="layer"    x="160" y="130" width="420" height="72" rx="4" />
+    <text class="title"    x="180" y="158">Images</text>
+    <text class="subtitle" x="180" y="182">Distroless, non-root, reproducible</text>
+  </g>
+
+  <!-- Layer 2 — Packages -->
+  <g>
+    <rect class="layer-light" x="120" y="220" width="500" height="72" rx="4" />
+    <text class="title"    x="140" y="248">Packages — Hardened compiler options</text>
+    <text class="subtitle" x="140" y="272">PIE/RELRO, stack canaries, FORTIFY_SOURCE=3, dep minimization</text>
+  </g>
+
+  <!-- Layer 1 (bottom) — Source -->
+  <g>
+    <rect class="layer"    x="80"  y="310" width="580" height="72" rx="4" />
+    <text class="title"    x="100" y="338">Source — Ever-fresh remediations</text>
+    <text class="subtitle" x="100" y="362">SLSA 3 provenance, continuous upstream tracking, CVE monitoring</text>
+  </g>
+
+  <!-- Foundation caption -->
+  <text x="360" y="410" text-anchor="middle"
+        style="fill:#666; font-family: 'Red Hat Text', system-ui, sans-serif; font-size: 12px; font-style: italic;">
+    Each layer builds on the one below. Every Hummingbird image gets all four by default.
+  </text>
+</svg>
