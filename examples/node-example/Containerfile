@@ -7,7 +7,15 @@ ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
 FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
+USER 1001
 WORKDIR /build
+
+# npm uses ~/.npm for the cache and writes package-lock.json into the
+# working directory. The Hummingbird builder doesn't set HOME for UID
+# 1001 and the WORKDIR is owned by root, so npm fails with
+# "EACCES permission denied". Set HOME and the npm cache to /build.
+# See _docs/17-distroless-gotchas.md for the full pattern.
+ENV HOME=/build NPM_CONFIG_CACHE=/build/.npm
 
 COPY --chown=1001:1001 package*.json ./
 RUN npm install --omit=dev --no-audit --no-fund

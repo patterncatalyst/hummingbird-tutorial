@@ -581,7 +581,14 @@ ARG RH_REGISTRY=registry.access.redhat.com
 
 # ── Stage 1: Build with the Hummingbird Node builder ────────────────────────
 FROM ${HB_REGISTRY}/nodejs:20-builder AS builder
+USER 1001
 WORKDIR /build
+
+# npm uses ~/.npm for the cache and writes package-lock.json into the
+# working directory. The Hummingbird builder doesn't set HOME for UID
+# 1001, so npm fails with EACCES permission denied. Set HOME and the
+# npm cache to /build.
+ENV HOME=/build NPM_CONFIG_CACHE=/build/.npm
 
 # Cache deps separately from source. If package*.json don't change,
 # the install layer is reused on the next build.
