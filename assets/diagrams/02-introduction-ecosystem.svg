@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="Diagram showing Hummingbird and UBI as sibling image distributions drawing from the shared Red Hat package pipeline">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 500" role="img" aria-label="Diagram showing Hummingbird and UBI as sibling image distributions drawing from the shared Red Hat package pipeline">
   <title>Hummingbird's place in the Red Hat container ecosystem</title>
-  <desc>Top-down hierarchy: Fedora as upstream component source feeds the Red Hat package pipeline. The pipeline supplies two sibling image distributions in parallel: RHEL/UBI (full enterprise userspace) and Project Hummingbird (distroless image base). Both are runnable on the OpenShift/Kubernetes platform layer.</desc>
+  <desc>Top-down: Fedora as upstream component source feeds the Red Hat package pipeline. The pipeline supplies two sibling image distributions in parallel: RHEL/UBI (full enterprise userspace) and Project Hummingbird (distroless image base). Both run on OpenShift/Kubernetes.</desc>
 
   <defs>
     <style>
@@ -15,7 +15,7 @@
       .title-light { fill: #ffffff; font-family: 'Red Hat Display', system-ui, sans-serif; font-weight: 700; font-size: 16px; }
       .sub         { fill: #555555; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 12px; }
       .sub-light   { fill: #f4d4d4; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 12px; }
-      .label       { fill: #888888; font-family: 'Red Hat Mono', monospace; font-size: 11px; font-style: italic; }
+      .sibling-lbl { fill: #888888; font-family: 'Red Hat Text', system-ui, sans-serif; font-weight: 400; font-size: 13px; font-style: italic; }
       .arrow       { fill: none; stroke: #4a4a4a; stroke-width: 2; marker-end: url(#arrowhead); }
     </style>
     <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
@@ -24,56 +24,58 @@
   </defs>
 
   <!-- Row 1 — Fedora -->
-  <rect class="box-source" x="240" y="20" width="240" height="60" rx="6" />
-  <text class="title" x="360" y="46" text-anchor="middle">Fedora</text>
-  <text class="sub"   x="360" y="66" text-anchor="middle">Upstream component source</text>
-  <text class="label" x="500" y="56">upstream</text>
+  <rect class="box-source" x="290" y="20" width="240" height="60" rx="6" />
+  <text class="title" x="410" y="46" text-anchor="middle">Fedora</text>
+  <text class="sub"   x="410" y="66" text-anchor="middle">Upstream component source</text>
 
   <!-- Arrow Fedora → pipeline -->
-  <path class="arrow" d="M 360 80 L 360 110" />
+  <line class="arrow" x1="410" y1="80" x2="410" y2="105" />
 
   <!-- Row 2 — Red Hat package pipeline -->
-  <rect class="box-pipe" x="180" y="110" width="360" height="60" rx="6" />
-  <text class="title" x="360" y="136" text-anchor="middle">Red Hat package pipeline</text>
-  <text class="sub"   x="360" y="156" text-anchor="middle">Components stabilized, signed, provenance tracked</text>
-  <text class="label" x="558" y="146">shared</text>
+  <rect class="box-pipe" x="210" y="105" width="400" height="60" rx="6" />
+  <text class="title" x="410" y="131" text-anchor="middle">Red Hat package pipeline</text>
+  <text class="sub"   x="410" y="151" text-anchor="middle">Components stabilized, signed, provenance tracked</text>
 
-  <!-- Y-fork from pipeline to siblings -->
-  <path class="arrow" d="M 360 170 L 360 195 L 200 195 L 200 220" />
-  <path class="arrow" d="M 360 170 L 360 195 L 520 195 L 520 220" />
+  <!-- Y-fork from pipeline to siblings — split point at y=190, single trunk down to that point -->
+  <line class="arrow"
+        x1="410" y1="165" x2="410" y2="190"
+        style="marker-end: none;" />
+  <!-- Horizontal connector at y=190 -->
+  <line x1="200" y1="190" x2="620" y2="190"
+        style="fill: none; stroke: #4a4a4a; stroke-width: 2;" />
+  <!-- Arrow down to UBI -->
+  <line class="arrow" x1="200" y1="190" x2="200" y2="240" />
+  <!-- Arrow down to Hummingbird -->
+  <line class="arrow" x1="620" y1="190" x2="620" y2="240" />
 
   <!-- Row 3 — Sibling distributions -->
-  <rect class="box-ubi" x="60" y="220" width="280" height="100" rx="6" />
-  <text class="title" x="200" y="250" text-anchor="middle">RHEL / UBI</text>
-  <text class="sub"   x="200" y="274" text-anchor="middle">Full enterprise base image</text>
-  <text class="sub"   x="200" y="294" text-anchor="middle">Broad package set, RPM tooling, shell, dnf</text>
-  <text class="sub"   x="200" y="312" text-anchor="middle" style="font-style: italic;">Predictable 10-year life cycle</text>
+  <rect class="box-ubi" x="40" y="240" width="320" height="110" rx="6" />
+  <text class="title" x="200" y="270" text-anchor="middle">RHEL / UBI</text>
+  <text class="sub"   x="200" y="296" text-anchor="middle">Full enterprise base image</text>
+  <text class="sub"   x="200" y="316" text-anchor="middle">Broad package set, RPM tooling, shell, dnf</text>
+  <text class="sub"   x="200" y="336" text-anchor="middle" style="font-style: italic;">Predictable 10-year life cycle</text>
 
-  <rect class="box-hb" x="380" y="220" width="280" height="100" rx="6" />
-  <text class="title-light" x="520" y="250" text-anchor="middle">Project Hummingbird</text>
-  <text class="sub-light"   x="520" y="274" text-anchor="middle">Distroless image base (RHHI)</text>
-  <text class="sub-light"   x="520" y="294" text-anchor="middle">Minimal userspace, near-zero CVE</text>
-  <text class="sub-light"   x="520" y="312" text-anchor="middle" style="font-style: italic;">Continuous, rolling rebuild</text>
+  <rect class="box-hb" x="460" y="240" width="320" height="110" rx="6" />
+  <text class="title-light" x="620" y="270" text-anchor="middle">Project Hummingbird</text>
+  <text class="sub-light"   x="620" y="296" text-anchor="middle">Distroless image base (RHHI)</text>
+  <text class="sub-light"   x="620" y="316" text-anchor="middle">Minimal userspace, near-zero CVE</text>
+  <text class="sub-light"   x="620" y="336" text-anchor="middle" style="font-style: italic;">Continuous, rolling rebuild</text>
 
-  <!-- Sibling-relationship label between them -->
-  <text x="360" y="280" text-anchor="middle"
-        style="fill:#666; font-family: 'Red Hat Text', system-ui, sans-serif; font-size: 11px; font-style: italic;">
-    sibling
-  </text>
-  <text x="360" y="294" text-anchor="middle"
-        style="fill:#666; font-family: 'Red Hat Text', system-ui, sans-serif; font-size: 11px; font-style: italic;">
-    distributions
-  </text>
+  <!-- Sibling-relationship caption — single line in the wide gap, plenty of room -->
+  <text class="sibling-lbl" x="410" y="290" text-anchor="middle">sibling</text>
+  <text class="sibling-lbl" x="410" y="310" text-anchor="middle">distributions</text>
 
-  <text class="label" x="675" y="270">image bases</text>
-
-  <!-- Both siblings flow into platform -->
-  <path class="arrow" d="M 200 320 L 200 360 L 360 360 L 360 380" />
-  <path class="arrow" d="M 520 320 L 520 360 L 360 360 L 360 380" />
+  <!-- Arrows from siblings down to platform -->
+  <line class="arrow" x1="200" y1="350" x2="200" y2="380" style="marker-end: none;" />
+  <line class="arrow" x1="620" y1="350" x2="620" y2="380" style="marker-end: none;" />
+  <!-- Horizontal merge bar at y=380 -->
+  <line x1="200" y1="380" x2="620" y2="380"
+        style="fill: none; stroke: #4a4a4a; stroke-width: 2;" />
+  <!-- Single trunk arrow down to platform -->
+  <line class="arrow" x1="410" y1="380" x2="410" y2="410" />
 
   <!-- Row 4 — OpenShift / Kubernetes -->
-  <rect class="box-platform" x="200" y="380" width="320" height="60" rx="6" />
-  <text class="title" x="360" y="406" text-anchor="middle">OpenShift / Kubernetes</text>
-  <text class="sub"   x="360" y="426" text-anchor="middle">Runs images of either kind</text>
-  <text class="label" x="540" y="416">platform</text>
+  <rect class="box-platform" x="250" y="410" width="320" height="60" rx="6" />
+  <text class="title" x="410" y="436" text-anchor="middle">OpenShift / Kubernetes</text>
+  <text class="sub"   x="410" y="456" text-anchor="middle">Runs images of either kind</text>
 </svg>
