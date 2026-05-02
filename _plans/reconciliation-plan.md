@@ -172,7 +172,7 @@ don't accidentally "fix" them.
 
 | Decision | Rationale |
 |---|---|
-| No comparison to Docker, Chainguard, Kubernetes alternatives | Tutorial is about how to use Hummingbird, not how it stacks up |
+| No comparison with other distroless image projects or container ecosystems | Tutorial is about how to use Hummingbird, not how it stacks up against alternatives |
 | No Antora/Asciidoc; plain Jekyll markdown | Owner directive |
 | No Tekton or GitHub Actions content in the main tutorial | Belongs in a separate pipelines tutorial |
 | Air-gapped Satellite mirroring is parameterised but not walked through | Scope; the build args make it possible without making it the focus |

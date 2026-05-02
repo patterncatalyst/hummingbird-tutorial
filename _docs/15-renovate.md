@@ -22,19 +22,18 @@ that matches how often you want to ship.
 
 ## Why this matters more for Hummingbird than for stock images
 
-A stock `python:3.11` image on Docker Hub gets new builds when
-the maintainers feel like it — sometimes weekly, sometimes
-quarterly. Hummingbird rebuilds on every upstream RHEL CVE patch.
-That cadence makes the difference between zero CVEs and zero
+A stock `python:3.11` image on a typical public registry gets new
+builds when the maintainers feel like it — sometimes weekly,
+sometimes quarterly. Hummingbird rebuilds on every upstream RHEL CVE
+patch. That cadence makes the difference between zero CVEs and zero
 CVEs *for now* — and also means the base image you used last
 week may already have a successor.
 
 ## Setting up Renovate
 
-If your repo is on GitHub, the easiest path is the hosted
-[Mend Renovate](https://github.com/marketplace/renovate) GitHub
-App. Install it on your repo; it'll auto-create a config PR
-on first run.
+If your repo is on GitHub, the easiest path is the
+[hosted Renovate GitHub App](https://github.com/marketplace/renovate).
+Install it on your repo; it'll auto-create a config PR on first run.
 
 For self-hosted, the same `renovate.json` works against the CLI:
 
