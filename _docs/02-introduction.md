@@ -368,7 +368,7 @@ results.
 
 Together they give you the full Hummingbird toolchain on a laptop
 without needing to provision a cluster. The same commands work
-unchanged on Fedora 43 and macOS once Podman Desktop is set up.
+unchanged on Fedora 44 and macOS once Podman Desktop is set up.
 
 ## Where to go next
 

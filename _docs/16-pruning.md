@@ -28,7 +28,7 @@ podman images --format '{% raw %}{{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.Created
   | sort -k2 -h -r | head -20
 ```
 
-A typical mid-tutorial state on Fedora 43:
+A typical mid-tutorial state on Fedora 44:
 
 ```
 TYPE            TOTAL  ACTIVE  SIZE     RECLAIMABLE

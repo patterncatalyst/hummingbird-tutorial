@@ -2,7 +2,7 @@
 title: Hummingbird Tutorial
 description: >-
   A follow-along, cut-and-paste tutorial for Red Hat Project Hummingbird
-  using Podman, Podman Compose, and Podman Desktop on Fedora 43 or macOS.
+  using Podman, Podman Compose, and Podman Desktop on Fedora 44 or macOS.
 author: Hummingbird Tutorial Contributors
 
 # Set this to your GitHub username/org once the repo is pushed; the
@@ -14,7 +14,7 @@ github_username: patterncatalyst
 # Set baseurl to match the repository name when published on GitHub Pages.
 # Override locally with: bundle exec jekyll serve --baseurl ""
 baseurl: "/hummingbird-tutorial"
-url: "https://patterncatalyst.github.io"
+url: "https://example.github.io"
 
 # ── Build settings ────────────────────────────────────────────────────────────
 markdown: kramdown
@@ -31,11 +31,6 @@ kramdown:
 # `docs` is the tutorial body. `plans` is project-management material
 # (reconciliation plan, progress tracking) — included in the build so it
 # can be cross-linked, but not advertised in the main nav.
-#
-# NOTE: the actual tutorial files live at `docs/*.md` (no underscore prefix),
-# so they are read by Jekyll as regular pages, not as proper collection
-# items. The `defaults` block below applies the tutorial layout to them
-# via path scope, which works regardless of collection membership.
 collections:
   docs:
     output: true
@@ -44,9 +39,6 @@ collections:
     output: true
     permalink: /plans/:name/
 
-# Layout defaults. We scope by path rather than by collection type because
-# our files live under docs/ and plans/ (not _docs/ and _plans/), which
-# means Jekyll classifies them as pages, not as collection items.
 defaults:
   - scope:
       path: ""
@@ -78,4 +70,4 @@ exclude:
   - scripts
   # examples/ holds runnable code that is referenced from the docs but is
   # not part of the rendered site. Comment this out if you want it published.
-  - examples/
+  - examples

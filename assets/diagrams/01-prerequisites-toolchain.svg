@@ -22,7 +22,7 @@
   </defs>
   <text x="450.0" y="32" class="title" text-anchor="middle">Local toolchain and the registries it talks to</text>
   <rect x="40" y="60" width="500" height="380" rx="10" class="box-muted"/>
-  <text x="60" y="84" class="small" text-anchor="start">Your machine (Fedora 43 or macOS)</text>
+  <text x="60" y="84" class="small" text-anchor="start">Your machine (Fedora 44 or macOS)</text>
   <rect x="70" y="110" width="130" height="50" rx="6" class="box"/>
   <text x="135.0" y="131.0" text-anchor="middle" class="label">podman</text>
   <text x="135.0" y="149.0" text-anchor="middle" class="small">build / run / pull</text>

@@ -8,7 +8,7 @@ duration: 30 to 45 minutes
 This page gets your machine ready. Work through it once, in order.
 The rest of the tutorial assumes everything here is in place.
 
-There are two parallel tracks below: **Fedora 43** and **macOS**.
+There are two parallel tracks below: **Fedora 44** and **macOS**.
 Pick whichever matches your machine and skip the other one. A small
 number of steps later in the tutorial differ between the two
 platforms; those are flagged inline where they appear.
@@ -37,16 +37,16 @@ version, not the patch level.
    alt="Diagram showing the relationship between Podman, Buildah, Skopeo, Cosign, Syft, Grype, and the registries they interact with"
    caption="Figure 1.1 — The local toolchain and the registries it talks to" %}
 
-## Track A: Fedora 43
+## Track A: Fedora 44
 
-Fedora 43 ships Podman 5.x in the standard repositories, so almost
+Fedora 44 ships Podman 5.x in the standard repositories, so almost
 everything in this section comes from `dnf`. No third-party repos
 are required for the core toolchain.
 
 ### A.1 — System update and core container tools
 
 ```bash
-# Refresh metadata and apply updates first. Fedora 43 moves fast and
+# Refresh metadata and apply updates first. Fedora 44 moves fast and
 # you do not want to start the tutorial on stale package state.
 sudo dnf update -y --refresh
 
@@ -72,14 +72,23 @@ skopeo --version
 podman-compose --version
 ```
 
-Expected: Podman reports 5.x, Buildah and Skopeo report a recent
-version. If Podman reports 4.x, you are on an older Fedora release
-and some commands later in the tutorial will not match — upgrade
-the host before continuing.
+Expected: Podman reports 5.x or 6.x, Buildah and Skopeo report a
+recent version. If Podman reports 4.x, you are on an older Fedora
+release and some commands later in the tutorial will not match —
+upgrade the host before continuing.
+
+> **A note on Podman 6.** Fedora 44 ships Podman 5.8.x as of release.
+> Podman 6.0 was proposed for Fedora 44 but did not land in time;
+> expect it in Fedora 45 or later. The breaking changes that matter
+> for this tutorial are the removal of `slirp4netns` (replaced by
+> `pasta`, which is already the default) and the removal of the
+> BoltDB backend (replaced by SQLite, default since Podman 4.8).
+> Neither change affects any command in this tutorial — we use the
+> defaults throughout.
 
 ### A.2 — Rootless Podman configuration
 
-Fedora 43 enables cgroups v2 and rootless support out of the box,
+Fedora 44 enables cgroups v2 and rootless support out of the box,
 but a few things still need explicit setup the first time you use
 Podman as a non-root user.
 
@@ -299,7 +308,7 @@ podman info | head -20
 > containers always run as a Linux process — the rootless flag here
 > controls whether they run as the VM's `root` user or as a
 > non-root user. We default to non-root so the experience matches
-> what we'll do on Fedora 43.
+> what we'll do on Fedora 44.
 
 ### B.4 — Update the Grype database
 
@@ -322,7 +331,7 @@ jq '.auths | keys' ~/.config/containers/auth.json
 
 ## Common to both platforms: shared environment
 
-Everything from here down applies to both Fedora 43 and macOS.
+Everything from here down applies to both Fedora 44 and macOS.
 
 ### Environment variables you'll reference repeatedly
 

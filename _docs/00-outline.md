@@ -18,7 +18,7 @@ be **read and executed in order** — each one builds on the state your
 machine is in when you finish the previous one. The follow-up
 sections (12 through 16) can be read in any order after the core,
 based on what you actually need. There is no separate
-lab environment: your Fedora 43 workstation or macOS laptop is the
+lab environment: your Fedora 44 workstation or macOS laptop is the
 lab from start to finish.
 
 Within a section, the structure is consistent:
@@ -27,7 +27,7 @@ Within a section, the structure is consistent:
 2. **What you'll learn** — a one-paragraph summary in plain language.
 3. **The diagram** — an Excalidraw figure showing the moving parts.
 4. **Step-by-step commands** — every command is meant to be copied
-   and pasted. Where the command differs between Fedora 43 and
+   and pasted. Where the command differs between Fedora 44 and
    macOS, both variants are shown side by side under collapsible
    headings.
 5. **What to verify** — a short checklist so you can confirm the
@@ -39,7 +39,7 @@ Within a section, the structure is consistent:
 
 ### 1. [Prerequisites]({{ "/docs/01-prerequisites/" | prepend: site.baseurl }})
 
-Install the tooling you'll need on Fedora 43 or macOS: Podman 5.x,
+Install the tooling you'll need on Fedora 44 or macOS: Podman 5.x,
 Podman Compose, Podman Desktop, plus the supporting tools `cosign`,
 `syft`, `grype`, `skopeo`, and `jq`. Configure rootless storage,
 the Podman socket, and credentials for `registry.access.redhat.com`
@@ -99,7 +99,7 @@ stops feeling like a constraint and starts feeling like a habit.
 ### 9. [Layer optimisation with zstd:chunked]({{ "/docs/09-zstd-chunked/" | prepend: site.baseurl }})
 
 Build images that pull faster on subsequent updates by using the
-`zstd:chunked` compression format. Covers Fedora 43's specific
+`zstd:chunked` compression format. Covers Fedora 44's specific
 configuration, dual-format manifest pushes for compatibility,
 and how to verify the partial-pull savings.
 

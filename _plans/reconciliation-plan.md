@@ -1,6 +1,6 @@
 ---
 title: Reconciliation plan
-description: What in this tutorial is verified on Fedora 43, what is in flight, and what needs validation against macOS.
+description: What in this tutorial is verified on Fedora 43/44, what is in flight, and what needs validation against macOS.
 ---
 
 This document tracks the **gap between what the tutorial claims and
@@ -11,9 +11,10 @@ unverified content has a "Reconciliation note" callout linking
 back here.
 
 **Platform coverage so far:** all six runnable examples have been
-verified on Fedora 43 (rsedor's working machine, May 2026).
-macOS replication is the highest-priority remaining task — see
-section G.3.
+verified on Fedora 43 (May 2026, the original testing campaign)
+and re-confirmed working on Fedora 44 (May 2026 follow-up test
+after the upstream upgrade). macOS replication is the
+highest-priority remaining task — see section G.3.
 
 The plan has four columns:
 
@@ -29,8 +30,10 @@ The plan has four columns:
   in the tutorial.
 - A row marked `verified (Fedora 43)` has been run on Fedora 43
   but not yet replicated on macOS.
-- A row marked `verified (Fedora 43 + macOS)` has been run on
-  both platforms — the strongest assurance.
+- A row marked `verified (Fedora 43/44)` has been run on both
+  Fedora 43 (original campaign) and Fedora 44 (follow-up test).
+- A row marked `verified (Fedora 43/44 + macOS)` has been run on
+  both Fedora versions and macOS — the strongest assurance.
 - An `in flight` row is being actively worked on; the assigned
   contributor is named where known.
 - An `unverified` row is a claim taken from source material that
@@ -40,10 +43,11 @@ The plan has four columns:
 
 **Cross-platform parity is the goal.** Every example, command, and
 prereq instruction in the tutorial is intended to work identically
-on Fedora 43 and macOS (with Podman Desktop on macOS). As of the
-May 2026 testing campaign, all six runnable examples pass
-end-to-end on Fedora 43; the macOS pass is pending and tracked
-explicitly in section G.3.
+on Fedora (43 or 44) and macOS (with Podman Desktop on macOS). As
+of the May 2026 testing campaign, all six runnable examples pass
+end-to-end on Fedora 43; the same suite was re-run on Fedora 44
+after Fedora's April 2026 upgrade and continues to pass. The macOS
+pass is pending and tracked explicitly in section G.3.
 
 ## A. Image catalog and naming
 
@@ -74,11 +78,11 @@ cadences.
 
 | Status | What | Where | How to verify |
 |---|---|---|---|
-| verified | Podman 5.x is available in Fedora 43 default repos | §1 | `dnf info podman` on a fresh Fedora 43 VM |
-| verified (Fedora 43) | Podman Compose available as `podman-compose` in Fedora 43 repos at the version §7 needs | §1, §7 | `dnf install podman-compose` works; §7's compose stack runs end-to-end on Fedora 43 (G.2 row 2026-05-01) |
+| verified | Podman 5.x is available in Fedora 43 and 44 default repos | §1 | `dnf info podman` on Fedora 43 (May 2026) and confirmed on Fedora 44 (May 2026 follow-up) — Podman 5.8.x in F44 |
+| verified (Fedora 43/44) | Podman Compose available as `podman-compose` in Fedora repos at the version §7 needs | §1, §7 | `dnf install podman-compose` works; §7's compose stack runs end-to-end on Fedora 43 (G.2 row 2026-05-01) and re-confirmed on Fedora 44 (May 2026 follow-up) |
 | unverified | `brew install --cask podman-desktop` brings the Podman CLI alongside it on macOS | §1 | Fresh macOS install; confirm `podman --version` works after the cask completes |
-| unverified | Podman Desktop tarball install path on Fedora produces a working desktop entry on Fedora 43's default desktop (GNOME) | §1 | Click-through test on Fedora 43 GNOME |
-| unverified | The Grype install script writes to `~/.local/bin` cleanly under both Fedora 43 and macOS | §1 | Confirm `grype --version` works after install on both |
+| unverified | Podman Desktop tarball install path on Fedora produces a working desktop entry on Fedora's default desktop (GNOME) | §1 | Click-through test on Fedora 44 GNOME |
+| unverified | The Grype install script writes to `~/.local/bin` cleanly under both Fedora and macOS | §1 | Confirm `grype --version` works after install on both Fedora 44 and current macOS |
 
 ## C. Section-specific items
 
@@ -126,10 +130,10 @@ cadences.
 
 | Status | What | How to verify |
 |---|---|---|
-| verified | The `--pid=container:` and `--network=container:` flags work for the sidecar pattern under rootless Podman 5.x | Demonstrated on Fedora 43 |
+| verified | The `--pid=container:` and `--network=container:` flags work for the sidecar pattern under rootless Podman 5.x | Demonstrated on Fedora 43 and Fedora 44 |
 | unverified | `--volumes-from` works rootless without surprises on a Hummingbird container | Try against §3's Nginx with a mounted volume |
 | in flight | The stronger sidecar variant — `--cap-add=SYS_PTRACE`, `--security-opt label=disable`, `--user 0` — actually permits `strace -p 1` against the target container's PID 1 on rootless Podman | Run the variant from §8, install strace, attach. If `Operation not permitted` still surfaces, document the additional `userns` or rootful escape required |
-| in flight | The in-image debug pattern (mount code into builder image, install debug tools via `dnf`) works against `registry.access.redhat.com/hi/python:latest-builder` end-to-end | Run the §8 worked example for Python with pdb on Fedora 43 and macOS |
+| in flight | The in-image debug pattern (mount code into builder image, install debug tools via `dnf`) works against `registry.access.redhat.com/hi/python:latest-builder` end-to-end | Run the §8 worked example for Python with pdb on Fedora 44 and macOS |
 | unverified | The Java equivalent (`hi/openjdk-21:latest-builder` + `jdb`) works; specifically, that `jdb` is in `$PATH` in the builder image | Run §8's Java worked example |
 | unverified | The Go equivalent works — `go install` of delve, then `dlv debug` against mounted source | Run §8's Go worked example |
 | unverified | `kubectl debug --image=... --target=...` against a Hummingbird-based pod actually shares the right namespaces with `--target` | Stand up a single-pod cluster (Kind/Minikube), apply `kubectl debug` from §8 |
@@ -204,18 +208,20 @@ landing. Roughly priority-ordered.
   against the live catalog.
 - ✅ **Build out the `examples/` directory.** Six runnable
   projects: Quarkus, Python, Go, ML, Node, compose-stack. All
-  pass `bash scripts/test-all-examples.sh` on Fedora 43.
+  pass `bash scripts/test-all-examples.sh` on Fedora 43, and the
+  same suite was re-run successfully on Fedora 44 after Fedora's
+  April 2026 release.
 - ✅ **Stand up the §7 compose stack on Fedora.** Three-service
   stack (db, web, otel) brings up cleanly; web responds, db
-  queryable.
+  queryable. Confirmed on both Fedora 43 and Fedora 44.
 
 **Open, priority-ordered:**
 
 1. **macOS replication of all examples.** Run
    `scripts/test-all-examples.sh` on macOS with Podman Desktop.
    Highest leverage remaining work — flips the matrix from
-   "verified on Fedora 43" to "verified on both platforms".
-2. **Run §1 end-to-end on a fresh Fedora 43 VM.** The prerequisite
+   "verified on Fedora 43/44" to "verified on both platforms".
+2. **Run §1 end-to-end on a fresh Fedora 44 VM.** The prerequisite
    doc has the largest blast radius on its own.
 3. **Run §1 end-to-end on a fresh macOS install.** Same reason,
    companion to (2).
@@ -281,12 +287,16 @@ done
 ### G.2 — Build-and-run smoke tests (medium, ~15 min)
 
 > **Status as of 2026-05-01: ✅ 11 of 11 verified on Fedora 43;
-> macOS pass pending.** Every Containerfile in the tutorial has
-> been built and run against live Hummingbird images on a Fedora
-> 43 host (rsedor's working machine), with the runtime confirmed
-> to respond correctly over HTTP. The fixes that landed during
-> testing are recorded in the Notes column of each row and
-> consolidated into
+> re-confirmed on Fedora 44; macOS pass pending.** Every
+> Containerfile in the tutorial was originally built and run
+> against live Hummingbird images on a Fedora 43 host
+> (May 2026 testing campaign), with the runtime confirmed to
+> respond correctly over HTTP. The same suite was re-run on
+> Fedora 44 after Fedora's April 2026 release and continues to
+> pass — empirical confirmation that the upgrade did not break
+> any of the patterns the tutorial teaches. The fixes that
+> landed during testing are recorded in the Notes column of
+> each row and consolidated into
 > [§17 Distroless gotchas]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
 > as symptom → root cause → fix entries. The full G.1 catalog
 > verification loop has not yet been run end-to-end as a script
@@ -330,29 +340,31 @@ Run the tutorial sections end-to-end on a clean machine, record any
 prose that didn't match what happened. This is the gold-standard
 test; the §1 walkthrough alone catches most issues.
 
-> Note on Fedora 43 evidence so far: every entry in this table
+> Note on Fedora 43/44 evidence so far: every entry in this table
 > below that has a §4 / §7 / §11 reference exists as a runnable
 > example under `examples/`, and those examples have all been
-> verified end-to-end on Fedora 43 (see G.2). What G.3 still
-> tests is whether the **tutorial prose** that walks readers
-> through those sections matches the example's actual behavior
-> command-by-command — not whether the artifact runs.
+> verified end-to-end on Fedora 43 (May 2026 testing campaign)
+> and re-confirmed on Fedora 44 (May 2026 follow-up after the
+> Fedora upgrade) — see G.2. What G.3 still tests is whether the
+> **tutorial prose** that walks readers through those sections
+> matches the example's actual behavior command-by-command — not
+> whether the artifact runs.
 
 | Status | What | Where to run |
 |---|---|---|
-| not yet run | §1 prerequisites — full install on fresh Fedora 43 VM | Clean VM |
+| not yet run | §1 prerequisites — full install on fresh Fedora 44 VM | Clean VM |
 | not yet run | §1 prerequisites — full install on fresh macOS | Clean macOS install or VM |
 | not yet run | §3 podman basics — pull, run, sidecar pattern | Either platform after §1 passes |
-| not yet run | §4 multi-stage — Quarkus example walkthrough | Either platform; example artifact verified on Fedora 43 |
-| not yet run | §4 multi-stage — Python example walkthrough | Either platform; example artifact verified on Fedora 43 |
-| not yet run | §4 multi-stage — Go example walkthrough | Either platform; example artifact verified on Fedora 43 |
+| not yet run | §4 multi-stage — Quarkus example walkthrough | Either platform; example artifact verified on Fedora 43/44 |
+| not yet run | §4 multi-stage — Python example walkthrough | Either platform; example artifact verified on Fedora 43/44 |
+| not yet run | §4 multi-stage — Go example walkthrough | Either platform; example artifact verified on Fedora 43/44 |
 | not yet run | §5 SBOM and signing — generate and verify | Either platform |
 | not yet run | §6 CVE scanning — clean and dirty image | Either platform |
-| not yet run | §7 compose stack — full bring-up walkthrough | Fedora primarily (SELinux surface); artifact verified on Fedora 43 |
+| not yet run | §7 compose stack — full bring-up walkthrough | Fedora primarily (SELinux surface); artifact verified on Fedora 43/44 |
 | not yet run | §8 debugging — sidecar pattern, in-image-builder | Either platform |
 | not yet run | §9 zstd:chunked — partial-pull verification | Fedora |
 | not yet run | §10 chunkah — split, recombine | Fedora |
-| not yet run | §11 real-world examples — at least one of the five | Either platform; ML and Compose artifacts verified on Fedora 43 |
+| not yet run | §11 real-world examples — at least one of the five | Either platform; ML and Compose artifacts verified on Fedora 43/44 |
 | not yet run | §12 custom SBOM — full augment-merge-sign cycle | Either platform |
 | not yet run | §13 Trusted Libraries — pip install with provenance verify | Either platform; needs Red Hat account |
 | not yet run | §14 RPM install — staged install + COPY rootfs | Either platform |

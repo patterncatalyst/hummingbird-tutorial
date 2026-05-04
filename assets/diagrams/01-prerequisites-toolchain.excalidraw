@@ -63,11 +63,11 @@
       "locked": false,
       "fontSize": 16,
       "fontFamily": 1,
-      "text": "Recreate as an Excalidraw drawing:\n\nLeft container (your laptop, on Fedora 43 or macOS):\n  - Top row: podman, buildah, skopeo\n  - Middle row: cosign, syft, grype\n  - Bottom row: podman-compose, Podman Desktop, jq\n\nRight container (registries):\n  - registry.access.redhat.com (UBI builder images)\n  - quay.io/hummingbird (Hummingbird runtime images, accent in red)\n  - Optional internal mirror (dashed, for air-gapped)\n\nArrows from the laptop tools to the registries showing pull/push.\n",
+      "text": "Recreate as an Excalidraw drawing:\n\nLeft container (your laptop, on Fedora 44 or macOS):\n  - Top row: podman, buildah, skopeo\n  - Middle row: cosign, syft, grype\n  - Bottom row: podman-compose, Podman Desktop, jq\n\nRight container (registries):\n  - registry.access.redhat.com (UBI builder images)\n  - quay.io/hummingbird (Hummingbird runtime images, accent in red)\n  - Optional internal mirror (dashed, for air-gapped)\n\nArrows from the laptop tools to the registries showing pull/push.\n",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Recreate as an Excalidraw drawing:\n\nLeft container (your laptop, on Fedora 43 or macOS):\n  - Top row: podman, buildah, skopeo\n  - Middle row: cosign, syft, grype\n  - Bottom row: podman-compose, Podman Desktop, jq\n\nRight container (registries):\n  - registry.access.redhat.com (UBI builder images)\n  - quay.io/hummingbird (Hummingbird runtime images, accent in red)\n  - Optional internal mirror (dashed, for air-gapped)\n\nArrows from the laptop tools to the registries showing pull/push.\n",
+      "originalText": "Recreate as an Excalidraw drawing:\n\nLeft container (your laptop, on Fedora 44 or macOS):\n  - Top row: podman, buildah, skopeo\n  - Middle row: cosign, syft, grype\n  - Bottom row: podman-compose, Podman Desktop, jq\n\nRight container (registries):\n  - registry.access.redhat.com (UBI builder images)\n  - quay.io/hummingbird (Hummingbird runtime images, accent in red)\n  - Optional internal mirror (dashed, for air-gapped)\n\nArrows from the laptop tools to the registries showing pull/push.\n",
       "lineHeight": 1.3,
       "baseline": 14
     }

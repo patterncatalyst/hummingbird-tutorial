@@ -6,7 +6,7 @@ Podman, Podman Compose, and Podman Desktop.
 
 The tutorial is published as a Jekyll site under `docs/` and is intended
 to be read in order, top to bottom. Every command shown is meant to be
-copied directly into a terminal on a Fedora 43 workstation or a macOS
+copied directly into a terminal on a Fedora 44 workstation or a macOS
 machine with iTerm2 / Terminal. There is no separate "lab environment"
 to provision — your laptop is the lab.
 
@@ -23,7 +23,7 @@ The full prerequisite list — packages, tools, registry accounts, and
 configuration — lives in [`docs/01-prerequisites.md`](docs/01-prerequisites.md).
 At a glance:
 
-- Fedora 43 (bash or zsh) **or** macOS (Terminal or iTerm2)
+- Fedora 44 (bash or zsh) **or** macOS (Terminal or iTerm2)
 - Podman 5.x, Podman Compose, Podman Desktop
 - An account on `registry.access.redhat.com` and `quay.io`
 - A few supporting tools: `cosign`, `syft`, `grype`, `skopeo`, `jq`
@@ -50,7 +50,7 @@ The site will be available at `http://localhost:4000/hummingbird-tutorial/`.
 This repository is under active development. The
 [reconciliation plan](plans/reconciliation-plan.md) tracks what is
 written, what is in flight, and what remains to be verified against
-running Fedora 43 and macOS environments. If you find a command that
+running Fedora 44 and macOS environments. If you find a command that
 doesn't behave as documented, please open an issue and reference the
 relevant section number.
 
