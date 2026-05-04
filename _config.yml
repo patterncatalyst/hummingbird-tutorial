@@ -69,5 +69,8 @@ exclude:
   - .gitignore
   - scripts
   # examples/ holds runnable code that is referenced from the docs but is
-  # not part of the rendered site. Comment this out if you want it published.
-  - examples
+  # not part of the rendered site. The trailing slash is critical — without
+  # it, Jekyll's exclude matches both the examples/ directory AND the
+  # examples.html page that lists the cards, causing /examples/ on the
+  # live site to 404. Keep the slash.
+  - examples/
