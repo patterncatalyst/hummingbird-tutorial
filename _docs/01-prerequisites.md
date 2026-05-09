@@ -187,14 +187,30 @@ section 7 or later, switch to Option A.
 
 ### A.4 — Supporting security tools (Cosign, Syft, Grype)
 
+None of Cosign, Syft, or Grype are reliably packaged in Fedora's
+default repositories — Cosign was briefly available in older
+Fedora releases but is no longer in the F44 repos, and Syft and
+Grype have always been upstream-only. We install all three from
+their upstream releases.
+
 ```bash
-# Cosign is in the Fedora repos.
-sudo dnf install -y cosign
+# Cosign — install the upstream RPM into the system path. The
+# release tarball ships an x86_64 RPM directly; we fetch the
+# latest tag dynamically so this command keeps working as new
+# releases land.
+COSIGN_VERSION=$(curl -fsSL https://api.github.com/repos/sigstore/cosign/releases/latest \
+  | grep '"tag_name"' | cut -d '"' -f 4 | sed 's/^v//')
+curl -fsSL -o /tmp/cosign.rpm \
+  "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-${COSIGN_VERSION}-1.x86_64.rpm"
+sudo rpm -ivh /tmp/cosign.rpm
+rm /tmp/cosign.rpm
 cosign version
 
-# Syft and Grype are not in the Fedora repos. Use the upstream install
-# scripts and target ~/.local/bin so we do not need sudo and do not
-# pollute /usr/local.
+# Syft and Grype use upstream install scripts that target
+# ~/.local/bin, so they do not need sudo and do not pollute
+# /usr/local. Make sure ~/.local/bin is on your PATH (Fedora's
+# default ~/.bashrc includes it; if you use a custom shell config,
+# add it explicitly).
 curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
   | sh -s -- -b ~/.local/bin
 syft --version
@@ -208,6 +224,10 @@ grype --version
 # download.
 grype db update
 ```
+
+> **If you're on aarch64 (rare on Fedora workstations, common on
+> some servers and ARM laptops):** swap `x86_64` for `aarch64` in
+> the cosign URL above — Sigstore publishes RPMs for both.
 
 ### A.5 — Registry credentials
 

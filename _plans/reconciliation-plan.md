@@ -80,6 +80,7 @@ cadences.
 |---|---|---|---|
 | verified | Podman 5.x is available in Fedora 43 and 44 default repos | §1 | `dnf info podman` on Fedora 43 (May 2026) and confirmed on Fedora 44 (May 2026 follow-up) — Podman 5.8.x in F44 |
 | verified (Fedora 43/44) | Podman Compose available as `podman-compose` in Fedora repos at the version §7 needs | §1, §7 | `dnf install podman-compose` works; §7's compose stack runs end-to-end on Fedora 43 (G.2 row 2026-05-01) and re-confirmed on Fedora 44 (May 2026 follow-up) |
+| verified (Fedora 44) | Cosign is **not** in Fedora 44 default repos; install via upstream RPM from sigstore/cosign GitHub releases | §1 | `dnf install cosign` returns "no match for argument: cosign" on Fedora 44; tutorial §1.A.4 was updated 2026-05-04 to install the upstream RPM. Cosign was previously available in older Fedora releases (pre-44); the F44 packaging removal is the upstream-Fedora change, not a tutorial regression |
 | unverified | `brew install --cask podman-desktop` brings the Podman CLI alongside it on macOS | §1 | Fresh macOS install; confirm `podman --version` works after the cask completes |
 | unverified | Podman Desktop tarball install path on Fedora produces a working desktop entry on Fedora's default desktop (GNOME) | §1 | Click-through test on Fedora 44 GNOME |
 | unverified | The Grype install script writes to `~/.local/bin` cleanly under both Fedora and macOS | §1 | Confirm `grype --version` works after install on both Fedora 44 and current macOS |
