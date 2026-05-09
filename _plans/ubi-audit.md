@@ -25,7 +25,7 @@ for each.
 | **Keep — Hummingbird is wrong choice** | 4 | UBI is the right tool here; forcing Hummingbird would defeat the design |
 | **Keep — fall-back instructions** | 3 | Explicit fall-back guidance for when a Hummingbird builder doesn't yet exist; valuable, leave in |
 | **Keep — comparative content** | 5 | Hummingbird-vs-UBI explanations and ecosystem positioning; intentionally educational |
-| **Switch when image name is confirmed** | 1 | Smoke test in §1 uses `ubi9/ubi9-micro` — switch to a Hummingbird image once one with public-pull access is identified |
+| **Switch when image name is confirmed** | 1 | Smoke test in §1 uses `ubi9/ubi-micro` — switch to a Hummingbird image once one with public-pull access is identified |
 
 ## Per-reference detail
 
@@ -34,7 +34,7 @@ for each.
 | Line | Reference | Verdict | Notes |
 |---|---|---|---|
 | 212 | Comment about Red Hat registry being needed for UBI fall-backs | Keep — fall-back | Honest about why both registries are configured |
-| 382 | `podman run --rm "$RH_REGISTRY/ubi9/ubi9-micro:latest"` (smoke test) | **Switch** | Should pull from Hummingbird so step 1 already proves the Hummingbird registry works. Blocked on a stable Hummingbird image with public-pull access. Until then, keep UBI here so the smoke test always succeeds without auth |
+| 382 | `podman run --rm "$RH_REGISTRY/ubi9/ubi-micro:latest"` (smoke test) | **Switch** | Should pull from Hummingbird so step 1 already proves the Hummingbird registry works. Blocked on a stable Hummingbird image with public-pull access. Until then, keep UBI here so the smoke test always succeeds without auth |
 
 ### docs/02-introduction.md
 

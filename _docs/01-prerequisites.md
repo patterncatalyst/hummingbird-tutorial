@@ -440,11 +440,19 @@ jq --version       || echo "jq missing"
 
 echo
 echo "=== Registry auth ==="
-jq '.auths | keys' "$REGISTRY_AUTH_FILE"
+if [ -f "$REGISTRY_AUTH_FILE" ]; then
+  jq '.auths | keys' "$REGISTRY_AUTH_FILE"
+else
+  echo "(no auth.json yet — that is fine; quay.io/hummingbird is"
+  echo " publicly pullable. You only need credentials if you want"
+  echo " to push your own images, use registry.redhat.io for the"
+  echo " UBI builder examples in section 4, or follow section 13's"
+  echo " Trusted Libraries flow.)"
+fi
 
 echo
 echo "=== Rootless smoke test ==="
-podman run --rm "$RH_REGISTRY/ubi9/ubi9-micro:latest" \
+podman run --rm "$RH_REGISTRY/ubi9/ubi-micro:latest" \
   echo "Rootless container exited cleanly"
 ```
 
