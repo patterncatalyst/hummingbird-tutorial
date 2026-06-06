@@ -13,7 +13,7 @@ const {
   addStatusTable, addCaption, addCodeSlide, addDiagramSlide, addSectionDivider, addNotes,
 } = H;
 
-const OUT = "../hummingbird-overview-r01.2.pptx";
+const OUT = "../hummingbird-overview.pptx";
 const REV = "r01.2";
 
 const pres = newDeck();

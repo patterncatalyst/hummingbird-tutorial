@@ -6,20 +6,23 @@ and its command-line demos.
 
 ## The deck
 
-**`hummingbird-overview-r01.2.pptx`** — 33 slides, 16:9, with full speaker
-notes on every slide. Open it in PowerPoint, Keynote, or LibreOffice
-Impress.
+**`hummingbird-overview.pptx`** — 33 slides, 16:9, with full speaker notes
+on every slide. Open it in PowerPoint, Keynote, or LibreOffice Impress.
+
+The filename is intentionally **unversioned** — git history is the source of
+truth for revisions. The current revision is shown on the cover slide (the
+`REV` marker) and recorded in the changelog below.
 
 Structure: a large "What is Hummingbird" section, a diagram-led "Working
-with the images" tour (one stop per tutorial chapter), and a closing
-"demo walkthrough" mapping to the eight command-line demos. All 11 of the
+with the images" tour (one stop per tutorial chapter), and a closing demo
+walkthrough mapping to the eight command-line demos. All 11 of the
 tutorial's diagrams are embedded.
 
 ## Currency — reviewed against GA (May 12, 2026)
 
 Product claims were checked against Red Hat's GA materials
 (redhat.com/en/blog/red-hat-hardened-images, images.redhat.com,
-hummingbird-project.io). Highlights reflected in the deck:
+hummingbird-project.io). Highlights:
 
 - **Red Hat Hardened Images (RHHI)** is the GA product; **Project
   Hummingbird** is the upstream innovation engine. Catalog at
@@ -29,8 +32,8 @@ hummingbird-project.io). Highlights reflected in the deck:
 - 45+ images, 150+ variants (AMD64/Arm64). GA components include Python,
   Node.js, Go, Java, .NET, PostgreSQL, Valkey, Nginx, HAProxy.
 - SLSA 3 pipeline (Konflux); compliance verifiable via OpenSCAP.
-- **Default non-root user is UID 65532** (where technically possible). Note
-  the tutorial's *example* Containerfiles deliberately pin `USER 1001`.
+- **Default non-root user is UID 65532** (where technically possible). The
+  tutorial's *example* Containerfiles deliberately pin `USER 1001`.
 - Trusted Libraries: Tech Preview, Python-only, part of Red Hat Advanced
   Developer Suite.
 
@@ -42,7 +45,7 @@ before an external talk.
 ```bash
 cd presentations/src
 ./convert-diagrams.sh   # optional: regenerate PNGs from ../../assets/diagrams/*.svg
-./build.sh              # writes ../hummingbird-overview-r01.2.pptx (needs Node + pptxgenjs)
+./build.sh              # writes ../hummingbird-overview.pptx (needs Node + pptxgenjs)
 ```
 
 `src/` holds `deck.js` (one block per slide), the bundled `deck-helpers.js`,
@@ -50,15 +53,18 @@ brand `assets/`, and rendered diagram `png/`.
 
 ## Versioning
 
-Filename carries the revision. Bump the major for a new section, `.x` for a
-fix; update both the `OUT` constant and the on-cover `REV` in `src/deck.js`.
+The `.pptx` filename is stable (`hummingbird-overview.pptx`); revisions live
+in git history. On each change, bump the `REV` constant in `src/deck.js`
+(it prints on the cover) and add a changelog entry here.
 
 ### Changelog
 
 - **r01.2** — Corrected the default non-root user to **UID 65532** (was
-  1001) on the "what's in an image" and four-layers slides, and made the
-  multi-stage speaker note UID-agnostic. (The tutorial's example
-  Containerfiles still pin `USER 1001` by choice — that's unchanged.)
+  1001) on the "what's in an image" and four-layers slides; made the
+  multi-stage speaker note UID-agnostic. Also dropped the version from the
+  `.pptx` filename (git now carries the version; the cover `REV` and this
+  changelog track it). The tutorial's example Containerfiles still pin
+  `USER 1001` by choice.
 - **r01.1** — Reconciled to GA (May 12, 2026): launch/status, RHHI-vs-
   Hummingbird framing, catalog components (Valkey/HAProxy), cost/support,
   SLSA 3 wording, OpenSCAP. Fixed a builder bug that dropped detail lines
