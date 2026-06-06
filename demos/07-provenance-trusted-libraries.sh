@@ -32,19 +32,17 @@ run_soft "cosign verify-attestation --key \"$RH_COSIGN_KEY\" --insecure-ignore-t
   --type spdxjson \"$SIGNED\" \
   | jq -r '.payload|@base64d|fromjson | {predicateType, subject:(.subject[0].name // \"(see payload)\")}'"
 
-section "Step 3 — Full SLSA provenance: the documented upstream path"
-say "The SLSA *provenance* attestation on Hummingbird images is verified with \
-the project's build key, per Red Hat's 'Reproducible builds in Project \
-Hummingbird' guide. That key currently lives in the upstream GitLab project, \
-so this is the honest way to verify provenance today — it records WHERE and \
-HOW the image was built."
-run_soft "cd \"$TMP\" && curl -fsSL --max-time 10 -o hb-ci-key.pub \
-  https://gitlab.com/redhat/hummingbird/containers/-/raw/fc5c29670347ea2666ec2910a28880f76f5cdc4e/ci/key.pub && \
-  cosign verify-attestation --key hb-ci-key.pub --insecure-ignore-tlog \
-    --type slsaprovenance quay.io/hummingbird-hatchling/jq:latest \
+section "Step 3 — Verify the image's SLSA provenance"
+say "The second attestation in the tree above is the SLSA provenance — it \
+records WHERE and HOW the image was built. It verifies with the SAME public \
+Red Hat key, using --type slsaprovenance. This is the supported path from \
+Red Hat's 'Verifying Reproducibility' docs."
+run_soft "cosign verify-attestation --key \"$RH_COSIGN_KEY\" --insecure-ignore-tlog \
+  --type slsaprovenance \"$SIGNED\" \
   | jq -r '.payload|@base64d|fromjson | {predicateType, builder:(.predicate.builder.id // .predicate.runDetails.builder.id // \"(see predicate)\")}'"
-note "Per developers.redhat.com 'Reproducible builds in Project Hummingbird' —"
-printf '%b\n' "    ${YELLOW}  provenance key: gitlab.com/redhat/hummingbird/containers (ci/key.pub).${NC}"
+say "Feed that attestation to Red Hat's rebuild tool and you can reproduce \
+the image bit-for-bit — the strongest supply-chain check there is. See \
+'Reproducible builds in Project Hummingbird' on developers.redhat.com."
 
 section "Step 4 — The dependency-layer problem"
 say "'pip install pandas' downloads a wheel built by whoever uploaded it; \

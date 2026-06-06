@@ -33,7 +33,7 @@ fi
 # ── Registry shortcuts ──────────────────────────────────────────────────────
 # Same names the tutorial's prerequisites set, so an admin who has sourced
 # their rc already has these. Override any of them before launching a demo,
-# e.g.  HB_REGISTRY=quay.io/hummingbird-hatchling ./demos/run.sh 1
+# e.g.  HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh 1
 : "${HB_REGISTRY:=quay.io/hummingbird}"               # hardened images (no sub needed)
 : "${RH_REGISTRY:=registry.access.redhat.com}"        # UBI, toolbox
 : "${RHHI_REGISTRY:=registry.access.redhat.com/hi}"   # signed Red Hat path
