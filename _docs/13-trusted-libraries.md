@@ -25,6 +25,15 @@ every byte of your application — base layer, runtime layer,
 language packages, and your own code — is built and signed by an
 auditable pipeline.
 
+> **The index is gated.** Because Trusted Libraries is a Tech
+> Preview, the index at `packages.redhat.com/trusted-libraries`
+> requires authentication — you enroll in the preview and
+> configure pip/curl with your Red Hat credentials. An
+> *unauthenticated* request returns **HTTP 401**. Read that as
+> "not enrolled / not authenticated," **not** "package missing."
+> The commands below assume you're authenticated; without
+> credentials they will 401 rather than fail over to PyPI.
+
 ## What "trust at the dependency layer" actually means
 
 A typical `pip install pandas` does the following:
@@ -67,17 +76,23 @@ Two index URLs because Trusted Libraries doesn't yet cover all of
 PyPI. Pip tries Trusted Libraries first; if a package isn't there
 (your obscure data-processing dep, your private fork), it falls
 back to pypi.org. Audit your dependency list to see which fall
-into which bucket:
+into which bucket (this requires an authenticated session — see
+the gated-index note above; without credentials every line returns
+401 and prints `✗`, which means "couldn't check," not "not
+covered"):
 
 ```bash
 # Quick check: how many of your deps are in Trusted Libraries?
+# Run this against an authenticated session; a 401 means you're
+# not enrolled/authed, not that the package is absent.
 while read pkg; do
   url="https://packages.redhat.com/trusted-libraries/simple/${pkg}/"
-  if curl -fsSL --max-time 5 -o /dev/null "$url"; then
-    printf '✓ %s (trusted-libraries)\n' "$pkg"
-  else
-    printf '✗ %s (pypi.org only)\n' "$pkg"
-  fi
+  code=$(curl -fsS --max-time 5 -o /dev/null -w '%{http_code}' "$url" || true)
+  case "$code" in
+    200) printf '✓ %s (trusted-libraries)\n' "$pkg" ;;
+    401) printf '? %s (auth required — are you enrolled/logged in?)\n' "$pkg" ;;
+    *)   printf '✗ %s (pypi.org only)\n' "$pkg" ;;
+  esac
 done < <(pip freeze | sed 's/==.*//')
 ```
 
@@ -131,7 +146,8 @@ attestations to require) happens once in the builder.
 ## Verifying provenance for a Trusted Libraries package
 
 Each package on the index ships with an in-toto attestation. Pull
-and verify it before you install:
+and verify it before you install (these fetches use the same
+authenticated index session as above — unauthenticated they 401):
 
 ```bash
 # Get the package metadata, including the provenance URL.

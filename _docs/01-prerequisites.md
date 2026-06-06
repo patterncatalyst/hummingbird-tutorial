@@ -25,7 +25,7 @@ version, not the patch level.
 | Skopeo           | Copy and inspect images across registries        | `dnf` / Podman Desktop |
 | Podman Compose   | Multi-container apps from a `compose.yaml`       | `dnf` / `pip`          |
 | Podman Desktop   | GUI for everything above                         | tarball / Brew Cask    |
-| Cosign           | Sign images and attach attestations              | `dnf` / Brew           |
+| Cosign           | Sign images and attach attestations              | upstream RPM (§A.4)    |
 | Syft             | Generate SBOMs from images                       | install script         |
 | Grype            | Scan images for CVEs                             | install script         |
 | jq               | Parse JSON in shell scripts                      | `dnf` / Brew           |

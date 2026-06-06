@@ -164,21 +164,39 @@ flow to extract the SBOM that came pre-attached.
 # Pick any Hummingbird image — Nginx will do.
 HUMMINGBIRD_IMG="$HB_REGISTRY/nginx:1"
 
-# This will list the package names in the SBOM that shipped with
-# the image. Output is one package name per line.
+# Verify the Red Hat-signed SBOM attestation with Red Hat's public
+# key and list the package names. (Use the signed registry path,
+# registry.access.redhat.com/hi/, for verification — the
+# quay.io/hummingbird mirror is unsigned.)
 cosign verify-attestation \
+  --key "https://security.access.redhat.com/data/63405576.txt" \
+  --insecure-ignore-tlog \
   --type spdxjson \
   "$HUMMINGBIRD_IMG" \
   | jq -r '.payload | @base64d | fromjson | .predicate.packages[].name' \
   | head -20
 ```
 
-> **If `cosign verify-attestation` errors with a verification
-> failure**, your verifier needs the Red Hat root key or the
-> appropriate certificate identity. See the Hummingbird
-> documentation for the canonical verification command — it
-> changes as the project's signing infrastructure evolves and
-> we don't want to encode a stale invocation here.
+> **The exact key and verification flags can change** as the
+> project's signing infrastructure evolves — Red Hat publishes the
+> canonical command in the Hummingbird catalog docs
+> (`images.redhat.com`) and the "Verifying Reproducibility" guide.
+> The public key above is Red Hat's current image-signing key. If
+> verification errors, re-check the key/identity against those docs.
+
+These images also carry a signed **SLSA provenance** attestation
+(currently the `https://slsa.dev/provenance/v0.2` predicate). You
+can list every predicate type attached without guessing a `--type`:
+
+```bash
+cosign download attestation "$HUMMINGBIRD_IMG" \
+  | jq -rs '.[] | (.payload | @base64d | fromjson | .predicateType)' \
+  | sort -u
+```
+
+Note that `cosign verify-attestation --type slsaprovenance` targets
+the v1.0 predicate URI, so it will *not* match the v0.2 attestation
+on these images — enumerating the types as above avoids that trap.
 
 ## Step 7 — A `policy.json` that enforces signatures
 
