@@ -15,8 +15,8 @@ demo_intro "The base image gives you trust at the container layer. But your \
 app also runs whatever you pulled from PyPI — a public, unaudited index. \
 Provenance closes that gap: a SLSA attestation records WHERE and HOW an \
 artifact was built, signed so you can verify it. We'll first verify the \
-signed supply-chain metadata on a hardened image, see how SLSA provenance \
-is verified, then extend the same idea to Python packages with Trusted Libraries."
+signed supply-chain metadata on a hardened image and what it attests to, \
+then extend the same idea to Python packages with Trusted Libraries."
 
 section "Step 1 — What supply-chain metadata is attached?"
 say "Cosign can list everything hanging off an image's manifest — its \
@@ -26,23 +26,23 @@ run_soft "cosign tree \"$SIGNED\""
 
 section "Step 2 — Verify a signed attestation with the public Red Hat key"
 say "On the Red Hat catalog path, the published key verifies the SBOM \
-attestation — proof the bytes are vouched for, not merely present. (Provenance \
-on these images is verified a little differently; that's the next step.)"
+attestation — proof the bytes are vouched for, not merely present. (These \
+images also ship signed SLSA provenance; we'll list what's attached next.)"
 run_soft "cosign verify-attestation --key \"$RH_COSIGN_KEY\" --insecure-ignore-tlog \
   --type spdxjson \"$SIGNED\" \
   | jq -r '.payload|@base64d|fromjson | {predicateType, subject:(.subject[0].name // \"(see payload)\")}'"
 
-section "Step 3 — Verify the image's SLSA provenance"
-say "The second attestation in the tree above is the SLSA provenance — it \
-records WHERE and HOW the image was built. It verifies with the SAME public \
-Red Hat key, using --type slsaprovenance. This is the supported path from \
-Red Hat's 'Verifying Reproducibility' docs."
-run_soft "cosign verify-attestation --key \"$RH_COSIGN_KEY\" --insecure-ignore-tlog \
-  --type slsaprovenance \"$SIGNED\" \
-  | jq -r '.payload|@base64d|fromjson | {predicateType, builder:(.predicate.builder.id // .predicate.runDetails.builder.id // \"(see predicate)\")}'"
-say "Feed that attestation to Red Hat's rebuild tool and you can reproduce \
-the image bit-for-bit — the strongest supply-chain check there is. See \
-'Reproducible builds in Project Hummingbird' on developers.redhat.com."
+section "Step 3 — What's in the signed attestations"
+say "Ask the image what predicate types it actually carries (verified in \
+step 2 against the public key). This enumerates them straight from the \
+manifest rather than guessing a type that may not match."
+run_soft "cosign download attestation \"$SIGNED\" 2>/dev/null \
+  | jq -rs '.[] | (.payload|@base64d|fromjson|.predicateType)' | sort -u | sed 's/^/  predicate: /'"
+say "Beyond the SBOM, every Hummingbird image is built with signed SLSA \
+provenance and is reproducible bit-for-bit from it — the strongest supply- \
+chain check there is. The exact verify-and-rebuild recipe (it evolves, so \
+follow the source) is 'Verifying Reproducibility' at hummingbird-project.io \
+and 'Reproducible builds in Project Hummingbird' on developers.redhat.com."
 
 section "Step 4 — The dependency-layer problem"
 say "'pip install pandas' downloads a wheel built by whoever uploaded it; \
@@ -74,7 +74,7 @@ say "The upstream community form of all this is the Calunga project — same \
 architecture (curated index, SLSA-attested rebuilds). Limits today: \
 Python-only and Tech Preview, with npm and Java planned."
 
-demo_end "The image's signed metadata verifies with a public key; full SLSA \
-provenance verifies with the project build key (documented upstream); and the \
-same idea extends to your Python dependencies via Trusted Libraries. Last up: \
-the sharp edges you'll actually hit — distroless gotchas."
+demo_end "The image's signed metadata verifies with a public key, and the \
+image is reproducible bit-for-bit from its signed provenance; the same idea \
+extends to your Python dependencies via Trusted Libraries. Last up: the \
+sharp edges you'll actually hit — distroless gotchas."

@@ -87,12 +87,15 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
   than the stock image — that's chunkah (content-based splitting for cheap
   re-pulls), not bloat. Demo 3 says this; size, contents, package count
   (demo 5), and CVE count (demo 6) are the real signals.
-- **Signature and provenance both verify with the public key.** On the Red
-  Hat catalog path (`registry.access.redhat.com/hi/`), the published key
-  (`security.access.redhat.com/data/63405576.txt`) verifies both the SBOM
-  attestation (`--type spdxjson`) and the SLSA provenance
-  (`--type slsaprovenance`). The `quay.io/hummingbird/` mirror is the
-  *unsigned* copy — verify against `hi/`. Demo 7 shows both.
+- **Signatures and SBOM attestations verify with the public key.** On the
+  Red Hat catalog path (`registry.access.redhat.com/hi/`), the published key
+  (`security.access.redhat.com/data/63405576.txt`) verifies the image
+  signature and the SBOM attestation. The `quay.io/hummingbird/` mirror is
+  the *unsigned* copy — verify against `hi/`. SLSA provenance backs the
+  reproducible-build guarantee; the exact verify/rebuild recipe lives in
+  hummingbird-project.io "Verifying Reproducibility" (it changes, so follow
+  the source rather than hard-coding a predicate type). Demo 7, Step 3 just
+  enumerates the predicate types actually attached.
 - **cosign v3.** Demo 5's offline self-signing uses the v3 flags
   (`--use-signing-config=false --tlog-upload=false` + `--bundle` on both
   sign and verify). On cosign v2, drop `--use-signing-config=false`.
@@ -102,14 +105,20 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
 
 ## Changelog
 
-- **r01.3** — Dry-run fixes (demos 6 & 7): corrected the Grype severity
-  summary (`from_entries` needs `value`, not `count` — counts were all
-  `null`); demo 7 now verifies SLSA provenance with the public Red Hat key
-  on the `hi/` path (`--type slsaprovenance`), per Red Hat's "Verifying
-  Reproducibility" docs, instead of the unreachable upstream key / hatchling
-  image; replaced stale `hummingbird-hatchling` override examples with the
-  signed `hi/` path.
-- **r01.2** — Grype severity summary fix (superseded by r01.3's broader pass).
+- **r01.5** — Demo 7 polish: fixed a mangled closing line ("full SLSA"
+  fragment) and aligned Step 2's forward-reference with Step 3's enumerate.
+  Confirmed on a live run that Step 3 lists both predicate types
+  (`https://slsa.dev/provenance/v0.2` and `https://spdx.dev/Document`) — the
+  provenance is v0.2, which is why the older `--type slsaprovenance` (v1.0)
+  alias never matched.
+- **r01.4** — Demo 7, Step 3: on this catalog image, cosign surfaces only
+  SBOM-family predicates for `--type slsaprovenance`, so the step now
+  enumerates the attached predicate types via `cosign download attestation`
+  and frames SLSA provenance/reproducibility by pointing at the source docs,
+  rather than running a `--type slsaprovenance` query that errors on stage.
+- **r01.3** — Grype severity summary fix (`value` not `count`); dropped the
+  unreachable `hummingbird-hatchling` provenance path and stale override
+  examples.
 - **r01.1** — Fixes from a live dry run: demo 3 reframes layer count as
   chunkah (hardened has *more* layers, by design); demo 5's SBOM contrast is
   now apples-to-apples (hardened nginx vs stock nginx) and the offline
