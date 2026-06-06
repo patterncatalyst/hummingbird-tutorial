@@ -58,6 +58,11 @@ wifi — e.g. podman pull $HB_REGISTRY/curl:latest $HB_REGISTRY/nginx:1 \
 $HB_REGISTRY/python:3.13 $HB_REGISTRY/go:1.26 $HB_REGISTRY/postgresql:18 \
 $RH_REGISTRY/ubi9/toolbox:latest $FAT_IMAGE"
     echo
+    say "Also refresh the scanner DB ahead of time (Grype refuses a stale DB): \
+grype db update. Notes: demo 5's offline signing needs cosign v3 flags \
+(handled in-script); demo 7's Trusted Libraries index is gated and returns \
+HTTP 401 unless you're enrolled in the Tech Preview and authenticated."
+    echo
 }
 
 run_one() {  # $1 = 1-based index

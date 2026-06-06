@@ -80,17 +80,44 @@ HB_REGISTRY=quay.io/hummingbird-hatchling ./demos/run.sh all
 - **Self-cleaning.** Each demo removes the containers, images, and temp
   files it created when it exits, so re-runs are idempotent and your machine
   stays tidy.
-- **Demos 5 and 7** verify against the **signed** Red Hat path
-  (`registry.access.redhat.com/hi/`). The `quay.io/hummingbird` mirror is
-  unsigned by design, so cosign verification only succeeds against the Red
-  Hat path.
-- **Demo 7's Trusted Libraries** steps are Tech Preview and Python-only; the
-  package-provenance step is shown with graceful fallback since exact URLs
-  and keys may change.
+- **Refresh the scanner DB first.** Grype refuses to scan against a stale DB
+  (default max age 5 days). Run `grype db update` in your preflight; demo 6
+  also runs it automatically if the DB is invalid.
+- **Layer count is not a size signal.** Hardened images have *more* layers
+  than the stock image — that's chunkah (content-based splitting for cheap
+  re-pulls), not bloat. Demo 3 says this; size, contents, package count
+  (demo 5), and CVE count (demo 6) are the real signals.
+- **Signature vs provenance verification differ.** On the Red Hat catalog
+  path (`registry.access.redhat.com/hi/`), the public key verifies the SBOM
+  attestation. Full SLSA *provenance* on Hummingbird images is verified with
+  the project's build key from the upstream GitLab repo
+  (`gitlab.com/redhat/hummingbird/containers`, `ci/key.pub`) — see Red Hat's
+  "Reproducible builds in Project Hummingbird" guide. Demo 7 shows both.
+- **cosign v3.** Demo 5's offline self-signing uses the v3 flags
+  (`--use-signing-config=false --tlog-upload=false` + `--bundle` on both
+  sign and verify). On cosign v2, drop `--use-signing-config=false`.
+- **Trusted Libraries is gated.** The index is Tech Preview and
+  authenticated; an unauthenticated request returns HTTP 401 (that's
+  "not enrolled/authed", not "package missing"). Demo 7 reflects this.
+
+## Changelog
+
+- **r01.1** — Fixes from a live dry run: demo 3 reframes layer count as
+  chunkah (hardened has *more* layers, by design); demo 5's SBOM contrast is
+  now apples-to-apples (hardened nginx vs stock nginx) and the offline
+  cosign sign/verify uses the v3 `--bundle` flags; demo 6 refreshes a stale
+  Grype DB and builds the Go example itself if demo 4's image isn't present;
+  demo 7 verifies the SBOM attestation with the public key and SLSA
+  provenance with the upstream project key, and treats the Trusted Libraries
+  401 as auth-required rather than absence. Network curls gained timeouts.
+- **r01.0** — Initial eight demos + runner.
 
 ## Verification status
 
-**Unverified.** These scripts are syntax-checked (`bash -n`) but have not
-yet been run end-to-end against live registries on a Fedora 44 box. Run
-`./demos/run.sh check` first, then `./demos/run.sh all`, and adjust image
-tags if the catalog has moved.
+**Partially verified.** Syntax-checked, and the command strings were
+exercised through a dry run; the r01.1 changes came from a real run on
+Fedora 44. Still confirm image names/tags and the signed paths against
+`images.redhat.com` (and the upstream GitLab key for provenance) before an
+audience — run `./demos/run.sh check`, pre-pull, `grype db update`, then a
+full `./demos/run.sh all` rehearsal.
+

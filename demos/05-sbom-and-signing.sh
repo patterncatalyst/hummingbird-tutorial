@@ -7,6 +7,7 @@ demo_title 5 "SBOMs & signing — the artifacts attached to an image"
 require_tools podman syft cosign jq || exit 0
 
 IMG="$HB_REGISTRY/curl:latest"
+HBNGINX="$HB_REGISTRY/nginx:1"          # same software as the fat image, hardened
 SIGNED="$RHHI_REGISTRY/curl:latest"   # Red Hat path carries the signatures
 FAT="$FAT_IMAGE"
 demo_tmpdir >/dev/null; TMP="$DEMO_TMPDIR"
@@ -20,16 +21,20 @@ then sign and verify an artifact ourselves — all without a registry push."
 
 section "Step 1 — Generate an SBOM with Syft"
 say "SPDX-JSON is the right default — it's what cosign attaches and what \
-downstream tools expect. The headline number is the package count."
+downstream tools expect. The headline number is the package count; a \
+hardened CLI image's bill of materials is short enough to actually read."
 run "syft \"$IMG\" -o spdx-json=\"$TMP/curl.spdx.json\" -q"
 run "echo \"packages: \$(jq '.packages | length' \"$TMP/curl.spdx.json\")\""
 run "jq -r '.packages[0:6][] | \"  - \\(.name) \\(.versionInfo // \"\")\"' \"$TMP/curl.spdx.json\""
 
-section "Step 2 — Contrast with a non-minimal image's SBOM"
-say "Smaller image, smaller bill of materials, fewer things to track."
-run "syft \"$FAT\" -o spdx-json=\"$TMP/fat.spdx.json\" -q; \
-     echo \"hardened curl : \$(jq '.packages|length' \"$TMP/curl.spdx.json\") packages\"; \
-     echo \"stock nginx   : \$(jq '.packages|length' \"$TMP/fat.spdx.json\") packages\""
+section "Step 2 — Same software, two builds: hardened vs stock nginx"
+say "An apples-to-apples comparison needs the SAME software. Here is nginx \
+both ways — the hardened Hummingbird build and the general-purpose image — \
+by package count. (curl above just showed how short a hardened SBOM can be.)"
+run "syft \"$HBNGINX\" -o spdx-json=\"$TMP/hbnginx.spdx.json\" -q; \
+     syft \"$FAT\"     -o spdx-json=\"$TMP/fat.spdx.json\"    -q; \
+     echo \"hardened nginx : \$(jq '.packages|length' \"$TMP/hbnginx.spdx.json\") packages\"; \
+     echo \"stock nginx    : \$(jq '.packages|length' \"$TMP/fat.spdx.json\") packages\""
 
 section "Step 3 — Verify Red Hat's signature on the shipped image"
 say "Hummingbird images on the Red Hat path are signed with Red Hat's key. \
@@ -47,15 +52,20 @@ run_soft "cosign verify-attestation --key \"$RH_COSIGN_KEY\" --insecure-ignore-t
 
 section "Step 5 — Sign and verify something yourself (offline)"
 say "Signing an image is the same flow against a registry ref. To keep this \
-self-contained we'll sign a file: generate a key pair, sign, verify. \
-COSIGN_PASSWORD is set empty so nothing prompts on stage; we keep it all \
-local with no transparency-log upload."
+self-contained and offline we'll sign a file: generate a key pair, sign to a \
+bundle, verify the bundle. COSIGN_PASSWORD is empty so nothing prompts, and \
+we skip the transparency log entirely."
 run "cd \"$TMP\" && COSIGN_PASSWORD='' cosign generate-key-pair && ls cosign.*"
-run "cd \"$TMP\" && echo 'hello hardened world' > artifact.txt && \
-     COSIGN_PASSWORD='' cosign sign-blob --key cosign.key --tlog-upload=false --yes \
-       --output-signature artifact.sig artifact.txt && echo signed"
-run "cd \"$TMP\" && cosign verify-blob --key cosign.pub --insecure-ignore-tlog \
-       --signature artifact.sig artifact.txt"
+run_soft "cd \"$TMP\" && echo 'hello hardened world' > artifact.txt && \
+     COSIGN_PASSWORD='' cosign sign-blob --key cosign.key \
+       --use-signing-config=false --tlog-upload=false \
+       --bundle artifact.bundle --yes artifact.txt && echo signed"
+run_soft "cd \"$TMP\" && cosign verify-blob --key cosign.pub --insecure-ignore-tlog \
+       --bundle artifact.bundle artifact.txt"
+note "cosign v3 needs --use-signing-config=false alongside --tlog-upload=false to stay offline,"
+printf '%b\n' "    ${YELLOW}  and --bundle on BOTH sign and verify (the old --output-signature/--signature${NC}"
+printf '%b\n' "    ${YELLOW}  pair triggers an 'IEEE_P1363 encoded signature' error). On cosign v2, omit${NC}"
+printf '%b\n' "    ${YELLOW}  --use-signing-config=false.${NC}"
 say "In a real pipeline you'd 'cosign sign --key cosign.key \$IMAGE' against a \
 registry ref, then 'cosign attest --predicate sbom.json --type spdxjson' to \
 attach your own SBOM. See _docs/05-sbom-and-signing.md for the push-based flow."

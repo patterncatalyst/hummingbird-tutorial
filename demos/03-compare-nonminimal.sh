@@ -23,9 +23,15 @@ say "The hardened image carries only nginx and its direct dependencies. The \
 general-purpose image carries a whole userland it will probably never use."
 run "podman images --format 'table {{.Repository}}:{{.Tag}}\t{{.Size}}' | grep -E 'nginx' | grep -Ev 'NONE'"
 
-section "Step 3 — Layer count, side by side"
+section "Step 3 — Layer count — and why the hardened image has MORE"
+say "Counter-intuitive: the hardened image usually has MANY more layers than \
+the general-purpose one. That isn't bloat — it's chunkah, content-based \
+layer splitting. Hummingbird groups files into roughly one layer per \
+package instead of one per Containerfile line, so a single package update \
+invalidates only its own layer and clients re-pull just that slice."
 run "printf 'hardened  : '; skopeo inspect \"docker://$HB\"  | jq '.Layers | length'"
 run "printf 'stock     : '; skopeo inspect \"docker://$FAT\" | jq '.Layers | length'"
+watch "the hardened image with the HIGHER count. Layer count is a packaging choice, not a size or attack-surface measure — size (step 2) and contents (step 4) are the real signals; package and CVE counts come in demos 5 and 6."
 
 section "Step 4 — What's actually inside?"
 say "This is the part that lands with admins. The hardened image has no shell \
@@ -45,6 +51,6 @@ say "Every binary, library, and package in the stock image is attack surface \
 you now own and must patch. The hardened image removed the question by \
 removing the contents. Demo 6 turns this contents gap into a CVE count."
 
-demo_end "Same app, a fraction of the size and layers, and nothing in the \
-image you didn't ask for. Next: how you build YOUR app on top of these \
-images with a multi-stage build."
+demo_end "Same app, a fraction of the size, more (content-based) layers by \
+design, and nothing in the image you didn't ask for. Next: how you build \
+YOUR app on top of these images with a multi-stage build."
