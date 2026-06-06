@@ -14,7 +14,7 @@ const {
 } = H;
 
 const OUT = "../hummingbird-overview.pptx";
-const REV = "r01.2";
+const REV = "r01.3";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -405,6 +405,43 @@ divider("03", "The demo walkthrough", "Eight command-line demos, live.",
     ],
     "Bash scripts with a bash shebang — they run fine from a zsh prompt.");
   addNotes(s, "Driving it is simple. run.sh check is the first thing to run in a new room: it lists which tools are on PATH, prints the registry settings, and gives you a ready-made podman pull line so nothing stalls on the venue wifi. run.sh all is the guided walkthrough; run.sh <n> runs a single demo; and each NN-*.sh is independently executable. The scripts are bash with a bash shebang, so they run cleanly from the zsh prompt we present from. Registry overrides — for example pointing at the early-access org — are environment variables set before launching.");
+}
+
+/* ═══════════════ SECTION 4 — SUPPLY CHAIN SECURITY (CLOSE-OUT) ═══════════════ */
+divider("04", "Supply chain security", "Where a hardened base fits the bigger threat model.",
+  "This close-out borrows the canonical container supply-chain threat model from Liz Rice's Container Security (2nd edition, chapter 7) and reframes it for Podman, OpenShift, and RHEL. The goal for the audience: Hummingbird is, in large part, an answer to this model — it closes the hardest vectors by construction — while source/Containerfile integrity, host and platform hardening, and the admission gate stay the operator's job.");
+
+{
+  const s = S();
+  addDiagramSlide(s, "SUPPLY CHAIN · ATTACK VECTORS",
+    "The chain, and where it's attacked",
+    "18-supply-chain-security-attack-vectors",
+    "Figure 18.1 — Attack vectors (after Liz Rice, Container Security 2e, Fig 7-1) and the Hummingbird answer at each stage.");
+  addNotes(s, "The canonical container supply-chain threat model, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be candid about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
+}
+
+{
+  const s = S();
+  addDiagramSlide(s, "SUPPLY CHAIN · RUNTIME SURFACE",
+    "Defense in depth — and where the image helps",
+    "18-supply-chain-security-layers",
+    "Figure 18.2 — The layered runtime attack surface; the hardened image shrinks the image-and-app cluster, not the platform.");
+  addNotes(s, "The pipeline view was build-and-delivery; this is runtime — defense in depth. The hardened image shrinks the cluster of vectors aimed at the image and the app: a swapped image fails cosign verify; distroless removes the foot-guns (no shell, no package manager, non-root UID 65532); fewer packages mean fewer exploitable paths and very little for an intruder to use if they do land inside. What it does NOT fix sits outside the container — misconfigured host, insecure networking, container escape — and those are platform hardening: rootless Podman, SELinux, seccomp, OpenShift SCCs, network policy. The hardened image is one strong layer, not the whole onion.");
+}
+
+{
+  const s = S();
+  addContentTitle(s, "SUPPLY CHAIN · DIVISION OF LABOUR", "What Hummingbird closes — and what's still yours");
+  addStatusTable(s, [
+    { code: "Vulnerable base", name: "Hummingbird", purpose: "Near-zero-CVE hardened base, rebuilt continuously" },
+    { code: "Vulnerable deps", name: "Hummingbird + TL", purpose: "Distroless minimalism; Trusted Libraries for Python" },
+    { code: "Build integrity", name: "Hummingbird", purpose: "SLSA 3 hermetic Konflux build, signed provenance" },
+    { code: "Image authenticity", name: "Hummingbird", purpose: "cosign signature + SBOM + provenance on /hi" },
+    { code: "Source / file", name: "You", purpose: "Branch protection, signed commits, pin base by digest" },
+    { code: "Deploy / platform", name: "You", purpose: "OpenShift admission control; host & network hardening" },
+  ], { colW: [2.75, 2.85, 6.49], rowH: 0.62 });
+  addCaption(s, "Verify on pull (podman + cosign); enforce for every deploy with an OpenShift admission policy.");
+  addNotes(s, "The honest summary, and a good place to end an admin talk. Hummingbird owns the image — vulnerable base, vulnerable dependencies, build integrity, image authenticity — the part that's genuinely hard to do yourself and that you get for free. You own the edges — source and Containerfile integrity, platform hardening, and the admission gate that enforces verification for every deploy. The practical close: verify on pull with podman + cosign, and enforce it cluster-wide with an OpenShift admission policy so no one can route around the check — that's what closes the malicious-deployment-definition vector. A near-zero-CVE distroless base is the strongest single move on the supply chain precisely because it collapses the vectors that are hardest to defend one at a time.");
 }
 
 {
