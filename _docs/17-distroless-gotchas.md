@@ -79,11 +79,12 @@ EACCES: permission denied, mkdir '/.npm'
 [ERROR] Could not create local repository at /.m2/repository
 ```
 
-**Root cause:** Hummingbird builder images run as UID 1001 by default,
-but they don't set `HOME` for that user. Many build tools default to
+**Root cause:** These builder stages run as a non-root user (the examples
+here pin `USER 1001`; GA images default to UID 65532 where technically
+possible), and `HOME` isn't set for that user. Many build tools default to
 `$HOME/.cache`, `$HOME/.npm`, or `$HOME/.m2` for their working state.
 With `HOME` unset, those paths resolve to `/.cache`, `/.npm`, and `/.m2`
-at the filesystem root, where UID 1001 has no write permission.
+at the filesystem root, where a non-root user has no write permission.
 
 **Fix:** Set `HOME` to a directory the build user owns. `/build` is the
 conventional choice (used as `WORKDIR` in this tutorial's examples):

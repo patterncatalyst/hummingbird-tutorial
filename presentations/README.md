@@ -6,93 +6,67 @@ and its command-line demos.
 
 ## The deck
 
-**`hummingbird-overview-r01.1.pptx`** — 33 slides, 16:9, with full speaker
+**`hummingbird-overview-r01.2.pptx`** — 33 slides, 16:9, with full speaker
 notes on every slide. Open it in PowerPoint, Keynote, or LibreOffice
 Impress.
 
-Structure:
-
-- **What is Hummingbird** (the bulk) — the catalog, "rebuild don't patch",
-  what "near-zero CVE" honestly means, where it sits next to UBI, what's in
-  an image and what isn't, the image variants, the four-layer hardening
-  stack, the three named concepts, the UBI comparison, and why Podman.
-  Includes both §2 figures (ecosystem, hardening pyramid).
-- **Working with the images** — a diagram-led tour, one stop per tutorial
-  section: prerequisites, podman basics, the debug sidecar, the four
-  debugging layers, multi-stage builds, SBOMs & signing, CVE scanning,
-  Podman Compose, zstd:chunked, chunkah, trusted libraries, and gotchas.
-- **The demo walkthrough** — the eight command-line demos from `demos/`,
-  with how-they-run, two summary tables, and the commands to drive them.
-
-Every figure in the deck is one of the tutorial's own diagrams
-(`assets/diagrams/*.svg`), rendered to PNG — all 11 are embedded.
+Structure: a large "What is Hummingbird" section, a diagram-led "Working
+with the images" tour (one stop per tutorial chapter), and a closing
+"demo walkthrough" mapping to the eight command-line demos. All 11 of the
+tutorial's diagrams are embedded.
 
 ## Currency — reviewed against GA (May 12, 2026)
 
-The product went generally available at Red Hat Summit on **May 12, 2026**.
-The deck's product claims were reviewed against Red Hat's GA materials
-(redhat.com/en/blog/red-hat-hardened-images, images.redhat.com, the GA press
-release, and hummingbird-project.io). Key facts as reflected in r01.1:
+Product claims were checked against Red Hat's GA materials
+(redhat.com/en/blog/red-hat-hardened-images, images.redhat.com,
+hummingbird-project.io). Highlights reflected in the deck:
 
 - **Red Hat Hardened Images (RHHI)** is the GA product; **Project
-  Hummingbird** was the early-access program and continues as the upstream
-  innovation engine (community images at `quay.io/hummingbird`; GA catalog
-  at `images.redhat.com`).
-- **Free to use on any Linux distribution, Kubernetes, or container
-  engine** (vendor-neutral); optional **LTS images planned via
-  subscription**.
-- Catalog scale: **45+ images, 150+ variants**, including AMD64/Arm64 builds.
-- GA-named components: **Python, Node.js, Go, Java, .NET, PostgreSQL,
-  Valkey, Nginx, HAProxy**, and more.
-- Built on Red Hat's **SLSA 3 pipeline (Konflux)**; compliance verifiable
-  via **OpenSCAP**.
-- **Red Hat Trusted Libraries** remains **Tech Preview, Python-only** (npm
-  and Java planned), SLSA 3, now part of Red Hat Advanced Developer Suite.
+  Hummingbird** is the upstream innovation engine. Catalog at
+  `images.redhat.com`; community mirror at `quay.io/hummingbird` (unsigned);
+  signed images at `registry.access.redhat.com/hi/`.
+- Free on any Linux/Kubernetes/engine; optional LTS via subscription.
+- 45+ images, 150+ variants (AMD64/Arm64). GA components include Python,
+  Node.js, Go, Java, .NET, PostgreSQL, Valkey, Nginx, HAProxy.
+- SLSA 3 pipeline (Konflux); compliance verifiable via OpenSCAP.
+- **Default non-root user is UID 65532** (where technically possible). Note
+  the tutorial's *example* Containerfiles deliberately pin `USER 1001`.
+- Trusted Libraries: Tech Preview, Python-only, part of Red Hat Advanced
+  Developer Suite.
 
-Re-check the exact image names, tags, and registry/pull paths against
-`images.redhat.com` before presenting externally — those evolve.
+Re-check exact image names/tags/pull paths against `images.redhat.com`
+before an external talk.
 
 ## Rebuilding it
 
-The deck is generated from JavaScript (pptxgenjs), in the house style of
-the `lgtm-presentation` skill. Sources are under `src/`.
-
 ```bash
 cd presentations/src
-
-# (optional) regenerate the diagram PNGs from the tutorial's SVGs
-#   needs: soffice (LibreOffice), pdftoppm (poppler), convert (ImageMagick)
-./convert-diagrams.sh
-
-# build the .pptx (writes ../hummingbird-overview-r01.1.pptx)
-#   needs: Node.js + pptxgenjs  (npm install -g pptxgenjs)
-./build.sh
+./convert-diagrams.sh   # optional: regenerate PNGs from ../../assets/diagrams/*.svg
+./build.sh              # writes ../hummingbird-overview-r01.2.pptx (needs Node + pptxgenjs)
 ```
 
-`src/` contains `deck.js` (the builder — one block per slide), the bundled
-`deck-helpers.js`, the brand `assets/`, and the rendered diagram `png/`.
+`src/` holds `deck.js` (one block per slide), the bundled `deck-helpers.js`,
+brand `assets/`, and rendered diagram `png/`.
 
 ## Versioning
 
-Filename carries the revision: `hummingbird-overview-rNN.x.pptx`. Bump the
-major for a new section, `.x` for a fix; update both the `OUT` constant and
-the on-cover `REV` marker in `src/deck.js`.
+Filename carries the revision. Bump the major for a new section, `.x` for a
+fix; update both the `OUT` constant and the on-cover `REV` in `src/deck.js`.
 
 ### Changelog
 
-- **r01.1** — Reconciled to GA (May 12, 2026): corrected launch/status and
-  the RHHI-vs-Hummingbird relationship; updated catalog components
-  (Valkey/HAProxy in, MariaDB/Caddy out) and scale (45+/150+); changed the
-  cost/support framing to free-on-any-platform + planned LTS; aligned SLSA
-  wording to "SLSA 3 (Konflux)" and compliance to OpenSCAP; noted Trusted
-  Libraries is now part of Advanced Developer Suite. Also fixed a builder
-  bug where the detail line under headline bullets (hardening layers, the
-  three concepts, the overview) was being dropped.
+- **r01.2** — Corrected the default non-root user to **UID 65532** (was
+  1001) on the "what's in an image" and four-layers slides, and made the
+  multi-stage speaker note UID-agnostic. (The tutorial's example
+  Containerfiles still pin `USER 1001` by choice — that's unchanged.)
+- **r01.1** — Reconciled to GA (May 12, 2026): launch/status, RHHI-vs-
+  Hummingbird framing, catalog components (Valkey/HAProxy), cost/support,
+  SLSA 3 wording, OpenSCAP. Fixed a builder bug that dropped detail lines
+  under headline bullets.
 - **r01.0** — Initial deck (not released).
 
 ## Status
 
-**Reviewed.** The deck builds, has been eyeballed page-by-page, and its
-product claims were checked against Red Hat's GA materials. Image names,
-tags, and pull paths still warrant a quick re-check against
+**Reviewed.** Builds, eyeballed page-by-page, product claims checked against
+Red Hat GA materials. Confirm image names/tags/paths against
 `images.redhat.com` before an external talk.

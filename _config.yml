@@ -74,3 +74,9 @@ exclude:
   # examples.html page that lists the cards, causing /examples/ on the
   # live site to 404. Keep the slash.
   - examples/
+  # demos/ holds the runnable command-line presentation scripts. Like
+  # examples/, it is referenced from the docs but is not part of the
+  # rendered site, so exclude it (with the trailing slash, same reasoning
+  # as examples/ above) to keep the build output clean and avoid publishing
+  # the shell scripts as static files.
+  - demos/

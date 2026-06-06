@@ -13,8 +13,8 @@ const {
   addStatusTable, addCaption, addCodeSlide, addDiagramSlide, addSectionDivider, addNotes,
 } = H;
 
-const OUT = "../hummingbird-overview-r01.1.pptx";
-const REV = "r01.1";
+const OUT = "../hummingbird-overview-r01.2.pptx";
+const REV = "r01.2";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -137,7 +137,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
       { text: "Typically contains", options: { bullet: false, bold: true } },
       "The application runtime (JVM, Node, Python, or a shared-library set).",
       "Only the OS libraries that runtime depends on.",
-      "A non-root default user (commonly UID 1001).",
+      "A non-root default user (UID 65532 where technically possible).",
       "OCI manifest with SBOM + provenance attestations.",
     ],
     [
@@ -178,7 +178,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
   addBullets(s, bsub([
     { text: "Source — ever-fresh remediations", sub: "SLSA 3 provenance via Red Hat's Konflux pipeline; continuous upstream CVE tracking and automated rebuilds. A signed attestation, not a promise." },
     { text: "Packages — hardened compiler options", sub: "PIE, RELRO, stack protectors, FORTIFY_SOURCE=3; verified in the ELF with annobin/annocheck. Weak deps off (install_weak_deps=False)." },
-    { text: "Images — distroless, non-root, reproducible", sub: "Minimal userspace, UID 1001, hermetic builds, signed manifests, attached SBOMs, reproducible across rebuilds." },
+    { text: "Images — distroless, non-root, reproducible", sub: "Minimal userspace, UID 65532, hermetic builds, signed manifests, attached SBOMs, reproducible across rebuilds." },
     { text: "Benchmarks & scanning — verifiable compliance", sub: "Compliance-related configuration verifiable via OpenSCAP (e.g. CIS, STIG profiles), as part of the release gate. Fail the scan, don't ship." },
   ]), { fontSize: 14 });
   addNotes(s, "Source: every component is tracked to upstream with continuous remediation, and dependencies come from Red Hat's SLSA 3 build pipeline (Konflux) with signed provenance. The point is a signed attestation, not a claim. Packages: the full RHEL hardening flag set, and crucially they verify the flags are actually present in the binaries with annobin/annocheck — plus weak dependencies are disabled so nothing sneaks in. Images: the distroless, non-root, reproducible, signed assembly. Benchmarks: Red Hat states compliance-related configuration is verifiable via OpenSCAP (which scans against profiles such as CIS and STIG) as part of the release gate. The compounding effect across all four is what makes 'near-zero CVE' defensible at release.");
@@ -266,7 +266,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
     "Multi-stage builds: builder image in, runtime image out",
     "04-multi-stage-builds-pattern",
     "Figure 4.1 — Compile in a -builder image; COPY --from copies just the artifact onto a minimal runtime.");
-  addNotes(s, "This is the canonical Hummingbird workflow. Stage one uses a -builder image — the language plus compiler and package manager — to build the app. Stage two copies only the resulting artifact onto a minimal runtime image. Your production image inherits the small, hardened surface while the build still gets a full toolchain. Two rules surface immediately: only COPY in the runtime stage (no RUN — there's no shell), and set HOME in the builder so UID 1001 has somewhere to write. The Go example builds a static binary end to end in the demos.");
+  addNotes(s, "This is the canonical Hummingbird workflow. Stage one uses a -builder image — the language plus compiler and package manager — to build the app. Stage two copies only the resulting artifact onto a minimal runtime image. Your production image inherits the small, hardened surface while the build still gets a full toolchain. Two rules surface immediately: only COPY in the runtime stage (no RUN — there's no shell), and set HOME in the builder so the non-root build user has somewhere to write. The Go example builds a static binary end to end in the demos.");
 }
 
 {

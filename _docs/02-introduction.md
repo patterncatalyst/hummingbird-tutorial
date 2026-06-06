@@ -19,19 +19,20 @@ Images (RHHI)**; "Project Hummingbird" is the project name the
 community and this tutorial use, and the two refer to the same
 catalog.
 
-Announced in November 2025, it ships through Red Hat's trusted
-build pipeline and inherits the same provenance, signing, and SBOM
-infrastructure that backs the rest of the Red Hat container
-ecosystem. The catalog is **available at no cost** with support
-included for users running Red Hat Enterprise Linux or OpenShift
-Container Platform.
+Generally available since May 12, 2026 (announced at Red Hat Summit
+after an early-access run as Project Hummingbird), it ships through
+Red Hat's trusted build pipeline and inherits the same provenance,
+signing, and SBOM infrastructure that backs the rest of the Red Hat
+container ecosystem. The catalog is **free to use** on any Linux
+distribution, Kubernetes, or container engine; optional long-term-support
+(LTS) images are planned via a subscription.
 
 The catalog covers three broad categories:
 
 - **Languages and runtimes** — .NET, Go, Java (multiple JDK lines),
   Node.js, Python, and others.
-- **Databases** — MariaDB, PostgreSQL.
-- **Web servers and proxies** — Nginx, Caddy.
+- **Databases** — PostgreSQL, Valkey.
+- **Web servers and proxies** — Nginx, HAProxy.
 
 These are the components most commonly requested by Red Hat
 customers, packaged as OCI images that are very small, contain
@@ -129,7 +130,7 @@ The deliberate omissions matter as much as the inclusions.
 - The application runtime (a JVM, Node, Python, or a shared
   library set for compiled languages).
 - The minimal set of OS libraries that runtime depends on.
-- A non-root default user (commonly UID 1001).
+- A non-root default user (UID 65532 where technically possible).
 - An OCI-compliant manifest with full SBOM metadata and build
   provenance attestations.
 
@@ -278,13 +279,11 @@ applying all four to every image in the catalog by default.
 ### Source — ever-fresh remediations
 
 Every component is tracked against its upstream source, with
-continuous CVE monitoring and remediation. The build environment
-was originally designed to **SLSA level 4** requirements — when
-that level was retired from the SLSA framework, the project moved
-to claiming **SLSA 3**, which is now the highest level the
-framework defines. This is the layer that turns "we say we did the
-right thing" into "we have a signed attestation that we did the
-right thing."
+continuous CVE monitoring and remediation. Dependencies come from
+Red Hat's **SLSA 3** build pipeline (Konflux), maintaining a
+verifiable chain of trust from source to artifact. This is the layer
+that turns "we say we did the right thing" into "we have a signed
+attestation that we did the right thing."
 
 ### Packages — hardened compiler options
 
@@ -306,7 +305,7 @@ used, not the ones that happened to be packaged together.
 ### Images — distroless, non-root, reproducible
 
 The image-assembly layer applies the patterns described in this
-section: distroless userspace, non-root default user (UID 1001),
+section: distroless userspace, non-root default user (UID 65532),
 hermetically built, signed manifests, attached SBOMs,
 reproducible across rebuilds with the same inputs. This is where
 the security of the lower layers becomes a property of the
@@ -337,7 +336,7 @@ real platforms end up using both.
 | Update cadence    | Standard RHEL errata and life cycle      | Continuous and rolling                                |
 | Image size        | Standard RPM install                     | Distroless build from a minimal base                  |
 | Life cycle        | Predictable 10-year                      | Upstream releases and life cycle                      |
-| Support           | Full when run on RHEL or OpenShift       | Full, included with RHEL or OpenShift                 |
+| Support           | Full when run on RHEL or OpenShift       | Free to use anywhere; LTS planned (subscription)      |
 | Redistribution    | Allowed                                  | Allowed                                               |
 | Cost              | Free                                     | Free                                                  |
 

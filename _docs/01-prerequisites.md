@@ -417,11 +417,14 @@ exec $SHELL -l
 > with `HB_REGISTRY=registry.access.redhat.com/hi`.
 >
 > The source material for this tutorial referenced
-> `quay.io/hummingbird-hatchling` (the early-access organization,
-> "hatchling" meaning pre-GA). If you're working against the
-> early-access org rather than the GA one, set
-> `HB_REGISTRY=quay.io/hummingbird-hatchling` and the rest of the
-> examples will adapt automatically.
+> `quay.io/hummingbird-hatchling` (a pre-GA "hatchling" early-access
+> org). That org is no longer publicly available — use
+> `quay.io/hummingbird` (the unsigned mirror of the Red Hat supported
+> images) or the signed `registry.access.redhat.com/hi` instead. Other
+> organizations exist for specific needs: `quay.io/hummingbird-community`
+> (community-supported images such as MinIO), `quay.io/hummingbird-rawhide`
+> (Fedora Rawhide packages), and `quay.io/hummingbird-ci` (build
+> infrastructure images).
 
 ### Smoke test
 

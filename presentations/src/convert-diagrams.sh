@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Regenerate png/<name>.png from the tutorial's ../../assets/diagrams/*.svg.
-# Pipeline: LibreOffice SVG->PDF (handles CSS-in-SVG), pdftoppm @200dpi, then
-# ImageMagick flatten-white + trim. Requires: soffice, pdftoppm, convert.
 set -euo pipefail
 cd "$(dirname "$0")"
 SVGDIR="../../assets/diagrams"
