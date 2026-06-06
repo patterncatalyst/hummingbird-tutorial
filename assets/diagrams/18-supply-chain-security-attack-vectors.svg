@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 520" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="28" width="940" height="120" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="48" font-size="12" font-weight="700" fill="#888">ATTACK VECTORS  (after Liz Rice, Container Security 2e, Fig 7-1)</text>
+<text x="32" y="48" font-size="12" font-weight="700" fill="#888">ATTACK VECTORS</text>
 <rect x="20" y="332" width="940" height="172" rx="12" fill="#fff8ef" stroke="#ddd"/>
 <text x="32" y="352" font-size="12" font-weight="700" fill="#888">HOW HUMMINGBIRD + THE RED HAT SUPPLY CHAIN ANSWER THEM</text>
 <rect x="30" y="190" width="150" height="70" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>

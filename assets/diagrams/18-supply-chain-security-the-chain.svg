@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 430" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="18" width="940" height="394" rx="12" fill="#fafafa" stroke="#ddd"/>
+<rect x="30" y="185" width="140" height="64" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="100.0" y="215.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Source code</text>
+<text x="100.0" y="232.0" font-size="11.5" fill="#555555" text-anchor="middle">developer</text>
+<rect x="215" y="185" width="140" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="285.0" y="215.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Code repo</text>
+<text x="285.0" y="232.0" font-size="11.5" fill="#555555" text-anchor="middle">+ Containerfile</text>
+<rect x="405" y="185" width="150" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="480.0" y="222.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">CI build</text>
+<rect x="605" y="185" width="150" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="680.0" y="222.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Registry</text>
+<rect x="805" y="185" width="145" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="877.5" y="222.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Deployment</text>
+<path d="M170,217.0 L215,217.0" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M355,217.0 L405,217.0" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M555,217.0 L605,217.0" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M755,217.0 L805,217.0" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M100,150 L100,185" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M480,132 L480,185" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M770,150 L770,217.0" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M285,300 L285,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M455,338 L455,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M680,300 L680,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<path d="M877,300 L877,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="490" y="30" font-size="14" fill="#888" text-anchor="middle" font-weight="700">The container supply chain — and where it gets attacked</text>
+<text x="100" y="92" font-size="12" fill="#555555" text-anchor="middle">Tamper with source code</text>
+<text x="480" y="55" font-size="12" fill="#555555" text-anchor="middle">Vulnerable base images</text>
+<text x="480" y="78" font-size="12" fill="#555555" text-anchor="middle">Vulnerable dependencies</text>
+<text x="480" y="101" font-size="12" fill="#555555" text-anchor="middle">Modify images during build</text>
+<text x="770" y="92" font-size="12" fill="#555555" text-anchor="middle">Intercept image pull requests</text>
+<text x="285" y="318" font-size="12" fill="#555555" text-anchor="middle">Tamper with Containerfile</text>
+<text x="455" y="356" font-size="12" fill="#555555" text-anchor="middle">Attack deployment via build machine</text>
+<text x="680" y="318" font-size="12" fill="#555555" text-anchor="middle">Tamper with stored images</text>
+<text x="877" y="318" font-size="12" fill="#555555" text-anchor="middle">Malicious deployment definition</text>
+</svg>

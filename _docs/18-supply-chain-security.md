@@ -34,11 +34,11 @@ packages — and then built, stored, and deployed. Each hand-off is
 a place an attacker can interfere.
 
 {% include excalidraw.html
-   file="18-supply-chain-security-attack-vectors"
-   alt="Pipeline from source code through a Konflux/Buildah build to a signed registry and an OpenShift deployment, with attack vectors labelled above each stage and the Hummingbird mitigations labelled below"
-   caption="Figure 18.1 — Supply-chain attack vectors (after Liz Rice, Container Security 2e, Fig 7-1), and how Hummingbird and the Red Hat supply chain answer them" %}
+   file="18-supply-chain-security-the-chain"
+   alt="A left-to-right pipeline — source code, code repo with a Containerfile, CI build, registry, deployment — with the classic supply-chain attack vectors labelled above and below each stage"
+   caption="Figure 18.1 — The container supply chain, and where it gets attacked" %}
 
-Reading the top row left to right, the classic vectors are:
+Reading left to right, the classic vectors are:
 
 - **Tampered source** — someone modifies the application source
   before it is built.
@@ -66,8 +66,17 @@ vectors are closed before you write a line of policy.
 
 ## Where Hummingbird changes the picture
 
-The bottom row of Figure 18.1 is the Hummingbird answer. Each
-mitigation was built and demonstrated earlier in this tutorial:
+Figure 18.2 overlays the Hummingbird answer on that same chain:
+the attack vectors run along the top, and the mitigation at each
+stage runs along the bottom.
+
+{% include excalidraw.html
+   file="18-supply-chain-security-attack-vectors"
+   alt="The same supply-chain pipeline, reframed for Buildah and Konflux, a signed Red Hat registry path, and OpenShift, with the attack vectors along the top and the Hummingbird mitigation at each stage along the bottom"
+   caption="Figure 18.2 — Attack vectors and the Hummingbird answer at each stage, on Podman/Konflux/OpenShift" %}
+
+Each mitigation along the bottom row was built and demonstrated
+earlier in this tutorial:
 
 | Attack vector | What closes it | Covered in |
 |---|---|---|
@@ -105,7 +114,7 @@ inside a stack of boundaries, and an attacker can target any layer.
 {% include excalidraw.html
    file="18-supply-chain-security-layers"
    alt="Nested boxes from the physical machine through network, VM, RHEL host OS, the Podman/CRI-O runtime and OpenShift orchestrator, down to the container network, the container, the hardened image and the application, with attack vectors labelled at each layer"
-   caption="Figure 18.2 — The layered runtime attack surface (after Liz Rice, Container Security 2e), and where the hardened image shrinks it" %}
+   caption="Figure 18.3 — The layered runtime attack surface (after Liz Rice, Container Security 2e), and where the hardened image shrinks it" %}
 
 The hardened image directly shrinks the cluster of vectors aimed at
 the image and what runs in it:

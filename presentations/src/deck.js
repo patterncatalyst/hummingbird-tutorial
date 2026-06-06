@@ -14,7 +14,7 @@ const {
 } = H;
 
 const OUT = "../hummingbird-overview.pptx";
-const REV = "r01.3";
+const REV = "r01.4";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -413,11 +413,20 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
 
 {
   const s = S();
-  addDiagramSlide(s, "SUPPLY CHAIN · ATTACK VECTORS",
-    "The chain, and where it's attacked",
+  addDiagramSlide(s, "SUPPLY CHAIN · THE PROBLEM",
+    "Where the supply chain gets attacked",
+    "18-supply-chain-security-the-chain",
+    "Figure 18.1 — The container supply chain, and where it gets attacked.");
+  addNotes(s, "Set the stage with the generic picture first — this is the standard container supply-chain threat model, terminology-neutral, before any Hummingbird framing. A container image is assembled from a chain of inputs — source, the build file, a base image, packages — then built, stored, and deployed, and every hand-off is a place to interfere: tamper with source or the Containerfile, a vulnerable base or dependency, build-time tampering or a compromised build host, a swapped image in the registry, an intercepted pull, or a malicious deployment definition. Hold this picture; the next slide overlays the answer.");
+}
+
+{
+  const s = S();
+  addDiagramSlide(s, "SUPPLY CHAIN · THE ANSWER",
+    "The same chain, with the Hummingbird answer",
     "18-supply-chain-security-attack-vectors",
-    "Figure 18.1 — Attack vectors (after Liz Rice, Container Security 2e, Fig 7-1) and the Hummingbird answer at each stage.");
-  addNotes(s, "The canonical container supply-chain threat model, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be candid about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
+    "Figure 18.2 — Attack vectors and the Hummingbird answer at each stage, on Podman/Konflux/OpenShift.");
+  addNotes(s, "Same chain, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be candid about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
 }
 
 {
@@ -425,7 +434,7 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
   addDiagramSlide(s, "SUPPLY CHAIN · RUNTIME SURFACE",
     "Defense in depth — and where the image helps",
     "18-supply-chain-security-layers",
-    "Figure 18.2 — The layered runtime attack surface; the hardened image shrinks the image-and-app cluster, not the platform.");
+    "Figure 18.3 — The layered runtime attack surface; the hardened image shrinks the image-and-app cluster, not the platform.");
   addNotes(s, "The pipeline view was build-and-delivery; this is runtime — defense in depth. The hardened image shrinks the cluster of vectors aimed at the image and the app: a swapped image fails cosign verify; distroless removes the foot-guns (no shell, no package manager, non-root UID 65532); fewer packages mean fewer exploitable paths and very little for an intruder to use if they do land inside. What it does NOT fix sits outside the container — misconfigured host, insecure networking, container escape — and those are platform hardening: rootless Podman, SELinux, seccomp, OpenShift SCCs, network policy. The hardened image is one strong layer, not the whole onion.");
 }
 
