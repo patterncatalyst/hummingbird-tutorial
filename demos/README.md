@@ -105,6 +105,11 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
 
 ## Changelog
 
+- **r01.6** — Version bump only, to give the demo 7 fixes a fresh,
+  unambiguous filename (the `r01.5` label had been reused). No code change
+  since r01.5. Demo 8 confirmed correct as-is: Gotcha A's `RUN` build is an
+  intentional `run_fail` — the `/bin/sh not found` error is the lesson, and
+  the "✓ …failed exactly as expected" line confirms it.
 - **r01.5** — Demo 7 polish: fixed a mangled closing line ("full SLSA"
   fragment) and aligned Step 2's forward-reference with Step 3's enumerate.
   Confirmed on a live run that Step 3 lists both predicate types
