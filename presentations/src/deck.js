@@ -14,7 +14,7 @@ const {
 } = H;
 
 const OUT = "../hummingbird-overview.pptx";
-const REV = "r01.5";
+const REV = "r01.6";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -53,6 +53,19 @@ function bsub(items) {
   s.addText(REV, { x: 11.85, y: 5.85, w: 0.95, h: 0.30, fontFace: FONT.mono, fontSize: 11, color: COLOR.caption, align: "right", valign: "middle" });
   try { s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.10, y: 6.80, w: 1.55, h: 0.37 }); } catch (e) {}
   addNotes(s, "This deck is a walkthrough of Project Hummingbird — Red Hat's catalog of hardened, near-zero-CVE container images, officially Red Hat Hardened Images (RHHI). The bulk of it answers 'what is it and why does it exist'; the back half tours how you actually work with the images, and it closes with a set of live command-line demos. The audience is admins and platform engineers. Everything runs locally on Podman on a laptop — no cluster, no managed cloud required.");
+}
+
+/* ════════════════════════════════ AGENDA ═══════════════════════════════ */
+{
+  const s = S();
+  addContentTitle(s, "AGENDA", "What we'll cover");
+  addBullets(s, bsub([
+    { text: "01 · What is Project Hummingbird?", sub: "The catalog, the one idea that drives it — rebuild instead of patch — what \u201cnear-zero CVE\u201d really means, where it sits next to UBI, and the trust chain." },
+    { text: "02 · Working with the images", sub: "A diagram-led tour: pulling and inspecting, the debug-sidecar pattern, multi-stage builds, SBOMs and signing, CVE scanning, compose, efficient layers, trusted libraries, and the distroless gotchas." },
+    { text: "03 · The demo walkthrough", sub: "Eight live command-line demos, start to finish, entirely on Podman." },
+    { text: "04 · Supply chain security", sub: "The supply-chain threat model, the Hummingbird answer at each stage, and the layered runtime attack surface." },
+  ]), { fontSize: 15 });
+  addNotes(s, "Quick map of the next 40-odd slides. The first part is conceptual — what the catalog is and why it exists — because once that lands, the commands read as obvious. The second part is the hands-on tour, one stop per topic led by its diagram. Then we go to the terminal for eight live demos. We close on supply chain security: the generic threat model, how a hardened base answers it, and the runtime attack surface. The whole thing runs locally on Podman — no cluster required.");
 }
 
 /* ═══════════════════ SECTION 1 — WHAT IS HUMMINGBIRD ════════════════════ */
@@ -464,6 +477,27 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     { text: "Docs & demos: github.com/patterncatalyst/hummingbird-tutorial \u00b7 patterncatalyst.github.io/hummingbird-tutorial", options: { bullet: false }, muted: true },
   ], { fontSize: 15 });
   addNotes(s, "Recap the arc and point to where to go deeper. One idea drives everything — rebuild instead of patch — and it gives you distroless, near-zero-CVE images on a trust chain you may already rely on. The entire workflow fits on a laptop with Podman. The strongest closing note for an admin audience: near-zero CVE isn't something to take on faith — it's one Grype command away from being your own measurement, and the work that remains is the tractable part, keeping your own dependencies current. And it's not all-or-nothing: use Hummingbird where minimalism wins and UBI where breadth does. Everything in this deck — the workflow, runnable examples, and the demos — lives in the project repo and site.");
+}
+
+/* ═══════════════════════════════ THANK YOU ═════════════════════════════ */
+{
+  const s = pres.addSlide();
+  pageNum += 1;
+  s.background = { color: COLOR.white };
+  try { s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: 7.5 }); } catch (e) {}
+  s.addText("RED HAT HARDENED IMAGES · RHHI", { x: 6.00, y: 1.98, w: 6.90, h: 0.34,
+    fontFace: FONT.title, fontSize: 14, bold: true, color: COLOR.red, charSpacing: 6, align: "left", valign: "middle" });
+  s.addText("Thank you", { x: 5.95, y: 2.42, w: 6.95, h: 1.30,
+    fontFace: FONT.title, fontSize: 54, bold: true, color: COLOR.ink, align: "left", valign: "top" });
+  s.addText("Pull an image, scan it, verify it — the whole workflow runs locally on Podman. The slides, runnable examples, and the eight demos are all linked below.",
+    { x: 6.00, y: 3.85, w: 6.80, h: 1.10, fontFace: FONT.body, fontSize: 17, italic: true, color: COLOR.caption, align: "left", valign: "top" });
+  s.addText([
+    { text: "github.com/patterncatalyst/hummingbird-tutorial", options: { breakLine: true, color: COLOR.ink } },
+    { text: "images.redhat.com  ·  the GA catalog and canonical image names", options: { color: COLOR.caption } },
+  ], { x: 6.00, y: 5.05, w: 6.80, h: 0.80, fontFace: FONT.mono, fontSize: 12, align: "left", valign: "top", lineSpacingMultiple: 1.3 });
+  s.addText(REV, { x: 11.85, y: 5.85, w: 0.95, h: 0.30, fontFace: FONT.mono, fontSize: 11, color: COLOR.caption, align: "right", valign: "middle" });
+  try { s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.10, y: 6.80, w: 1.55, h: 0.37 }); } catch (e) {}
+  addNotes(s, "Close, then open the floor. The single line to leave them with: near-zero CVE isn't a slogan to take on faith — it's one Grype command away from being their own measurement, and the workflow they just saw runs entirely on Podman on a laptop. Point them at the repo for the runnable examples and the eight demos, and at images.redhat.com for the GA catalog and the canonical image names and pull paths.");
 }
 
 pres.writeFile({ fileName: OUT })
