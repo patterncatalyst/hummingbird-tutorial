@@ -1,5 +1,5 @@
 // deck.js — Project Hummingbird (Red Hat Hardened Images) overview deck.
-// Built with the lgtm-presentation skill. Diagrams are the tutorial's own
+// Built with the lgtm-presentation skill. Diagrams are the project's own
 // figures, converted SVG -> PNG into ./png.
 //
 // Build:  export NODE_PATH=$(npm root -g) && node deck.js
@@ -14,7 +14,7 @@ const {
 } = H;
 
 const OUT = "../hummingbird-overview.pptx";
-const REV = "r01.4";
+const REV = "r01.5";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -57,7 +57,7 @@ function bsub(items) {
 
 /* ═══════════════════ SECTION 1 — WHAT IS HUMMINGBIRD ════════════════════ */
 divider("01", "What is Project Hummingbird?", "The conceptual grounding before any commands.",
-  "This is the part to get right before touching a terminal. We'll cover what the catalog is, the one idea that drives the whole design — rebuild instead of patch — what 'near-zero CVE' honestly means, where Hummingbird sits next to UBI, what's deliberately left out of an image, the image variants, what 'hardened' means concretely, and the three named concepts behind the trust chain. Once this lands, the commands later read as obvious rather than magic.");
+  "This is the part to get right before touching a terminal. We'll cover what the catalog is, the one idea that drives the whole design — rebuild instead of patch — what 'near-zero CVE' really means, where Hummingbird sits next to UBI, what's deliberately left out of an image, the image variants, what 'hardened' means concretely, and the three named concepts behind the trust chain. Once this lands, the commands later read as obvious rather than magic.");
 
 {
   const s = S();
@@ -89,14 +89,14 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
   const s = S();
   addContentTitle(s, "WHAT IS HUMMINGBIRD · THE CLAIM", "What \u201cnear-zero CVE\u201d really means");
   addBullets(s, [
-    "Around 160 new CVEs are disclosed daily — an image that scans clean at 9 a.m. can have a CVE by 5 p.m. A literal, permanent zero is not achievable, and the honest phrase is \u201cnear-zero\u201d.",
+    "Around 160 new CVEs are disclosed daily — an image that scans clean at 9 a.m. can have a CVE by 5 p.m. A literal, permanent zero is not achievable, and the accurate phrase is \u201cnear-zero\u201d.",
     { text: "What Hummingbird actually holds:", options: { bullet: false, bold: true } },
     { text: "Zero CVE at the moment of publication — every image is rebuilt and re-scanned.", },
     { text: "Continuous rebuild on upstream fixes — staying close to the moving zero line.", },
     { text: "Functionality testing as part of the rebuild — fixes don't silently break the image.", },
   ], { fontSize: 16 });
   addCaption(s, "We scan a Hummingbird image ourselves later — \u201cnear-zero\u201d is a measurement, not a slogan.");
-  addNotes(s, "Be candid here — it earns trust. 'Zero CVE' is the marketing; 'near-zero CVE' is the engineering truth, and the difference is just honesty about how vulnerability disclosure works. The zero line moves every day. What you can actually guarantee is: clean at publication, continuous rebuilds that chase the line, and functional testing so a security rebuild doesn't break your workload. In the CVE-scanning demo the audience watches Grype put real numbers behind this against a hardened image versus a general-purpose one.");
+  addNotes(s, "Worth stating plainly — it earns trust. 'Zero CVE' is the marketing; 'near-zero CVE' is the engineering reality, and the difference is just how vulnerability disclosure works. The zero line moves every day. What you can actually guarantee is: clean at publication, continuous rebuilds that chase the line, and functional testing so a security rebuild doesn't break your workload. In the CVE-scanning demo the audience watches Grype put real numbers behind this against a hardened image versus a general-purpose one.");
 }
 
 {
@@ -126,7 +126,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
       "Compiled binary, a JAR, or a Node bundle.",
       { text: "Continuous, rolling rebuilds.", muted: true },
     ]);
-  addNotes(s, "Hummingbird does not replace UBI; most real platforms use both. The mental model: UBI when you need a familiar RHEL userspace and the ability to install packages — typically builder stages and middleware. Hummingbird when you want the smallest possible attack surface — typically the deploy stage that ships a compiled artifact. The Quarkus example in the tutorial literally does both: it builds on UBI (which ships Maven) and deploys on a hardened JRE. Mixing per-stage is the common, correct shape.");
+  addNotes(s, "Hummingbird does not replace UBI; most real platforms use both. The mental model: UBI when you need a familiar RHEL userspace and the ability to install packages — typically builder stages and middleware. Hummingbird when you want the smallest possible attack surface — typically the deploy stage that ships a compiled artifact. The Quarkus example does both: it builds on UBI (which ships Maven) and deploys on a hardened JRE. Mixing per-stage is the common, correct shape.");
 }
 
 {
@@ -160,7 +160,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
     { code: "FIPS", name: ":<version>-fips[-builder]", purpose: "FIPS-validated cryptography for regulated environments." },
   ], { colW: [1.80, 3.40, 6.89], rowH: 0.74 });
   addCaption(s, "Also AMD64 and Arm64 architecture builds (45+ images, 150+ variants). Most defaults have no shell \u2014 Golang, Core Runtime, and full OpenJDK keep one.");
-  addNotes(s, "Every image ships in variants identified by tag suffix, plus per-architecture builds (AMD64 and Arm64) — which is how 45+ images become 150+ variants. Default aims to balance distroless principles with compatibility with existing upstream images; it's the production runtime. Builder retains the hardening but adds a package manager and shell so you can customize builds. FIPS adds validated cryptography for regulated environments. One honest nuance carried from the tutorial: 'no shell' is the safe assumption, not a universal guarantee — a few default images (Golang, Core Runtime, the full OpenJDK) include a shell because their ecosystems expect it. If your build pattern relies on shell-free runtime, pin the specific variant rather than assuming. Confirm exact tags against the catalog at images.redhat.com.");
+  addNotes(s, "Every image ships in variants identified by tag suffix, plus per-architecture builds (AMD64 and Arm64) — which is how 45+ images become 150+ variants. Default aims to balance distroless principles with compatibility with existing upstream images; it's the production runtime. Builder retains the hardening but adds a package manager and shell so you can customize builds. FIPS adds validated cryptography for regulated environments. One nuance worth carrying over: 'no shell' is the safe assumption, not a universal guarantee — a few default images (Golang, Core Runtime, the full OpenJDK) include a shell because their ecosystems expect it. If your build pattern relies on shell-free runtime, pin the specific variant rather than assuming. Confirm exact tags against the catalog at images.redhat.com.");
 }
 
 {
@@ -206,7 +206,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
     { code: "Life cycle", name: "Predictable 10-year", purpose: "Tracks upstream releases" },
     { code: "Support / cost", name: "Full on RHEL/OCP · free", purpose: "Free to use anywhere · LTS planned (subscription)" },
   ], { colW: [2.70, 4.30, 5.09], rowH: 0.62 });
-  addNotes(s, "Most platforms end up with both, so compare them honestly. UBI is the flexible, broad, predictable RHEL base with a 10-year life cycle. Hummingbird is the minimal, rolling, purpose-built hardened base. Both are free; the GA difference to state correctly is that Hardened Images are free to use on any Linux distro, Kubernetes, or container engine — vendor-neutral — with optional LTS images planned via subscription, rather than support being tied to a RHEL/OpenShift subscription. The decision rule repeats: UBI when you need RHEL breadth or dnf at runtime; Hummingbird when you want the smallest, hardest-to-attack runtime — usually the deploy stage. The gotchas section gives concrete failure modes for when the minimal runtime is the wrong tool.");
+  addNotes(s, "Most platforms end up with both, so compare them on the merits. UBI is the flexible, broad, predictable RHEL base with a 10-year life cycle. Hummingbird is the minimal, rolling, purpose-built hardened base. Both are free; the GA difference to state correctly is that Hardened Images are free to use on any Linux distro, Kubernetes, or container engine — vendor-neutral — with optional LTS images planned via subscription, rather than support being tied to a RHEL/OpenShift subscription. The decision rule repeats: UBI when you need RHEL breadth or dnf at runtime; Hummingbird when you want the smallest, hardest-to-attack runtime — usually the deploy stage. The gotchas section gives concrete failure modes for when the minimal runtime is the wrong tool.");
 }
 
 {
@@ -221,30 +221,30 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
 }
 
 /* ═════════════════ SECTION 2 — WORKING WITH THE IMAGES ══════════════════ */
-divider("02", "Working with the images", "A diagram-led tour of the tutorial sections.",
-  "Now the hands-on arc, kept brief — one stop per tutorial section, led by its diagram. Prerequisites and the registry model; pulling and inspecting; the debug-sidecar pattern and the broader debugging strategy; multi-stage builds; SBOMs and signing; CVE scanning; multi-service compose; the two layer-efficiency features; trusted libraries and provenance; and the distroless gotchas. Each of these has a full chapter and a runnable example in the tutorial.");
+divider("02", "Working with the images", "A diagram-led tour of the workflow.",
+  "Now the hands-on arc, kept brief — one stop per topic, led by its diagram. Prerequisites and the registry model; pulling and inspecting; the debug-sidecar pattern and the broader debugging strategy; multi-stage builds; SBOMs and signing; CVE scanning; multi-service compose; the two layer-efficiency features; trusted libraries and provenance; and the distroless gotchas. Each has a runnable example.");
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · PREREQUISITES",
+  addDiagramSlide(s, "WORKING WITH IMAGES · PREREQUISITES",
     "Prerequisites: the toolchain and the registry model",
     "01-prerequisites-toolchain",
     "Figure 1.1 — Podman, Skopeo, Syft, Grype, and Cosign over a single shared registry-auth file.");
-  addNotes(s, "The setup chapter pins the environment: Podman and Skopeo for images, Syft for SBOMs, Grype for scanning, Cosign for signatures — all sharing one registry-auth file. It also establishes the registry shortcuts the tutorial uses: HB_REGISTRY=quay.io/hummingbird is the Project Hummingbird community org on Quay, RH_REGISTRY=registry.access.redhat.com is UBI and the toolbox, and the signed Red Hat path is used for verification. Note for GA: the Red Hat Hardened Images catalog now lives at images.redhat.com — browse there for the canonical image names and pull paths, and confirm them before a talk. One Fedora-44 note from the field: install Cosign from the upstream RPM, not dnf, which is currently broken there.");
+  addNotes(s, "Setup pins the environment: Podman and Skopeo for images, Syft for SBOMs, Grype for scanning, Cosign for signatures — all sharing one registry-auth file. It also establishes the registry shortcuts used here: HB_REGISTRY=quay.io/hummingbird is the Project Hummingbird community org on Quay, RH_REGISTRY=registry.access.redhat.com is UBI and the toolbox, and the signed Red Hat path is used for verification. Note for GA: the Red Hat Hardened Images catalog now lives at images.redhat.com — browse there for the canonical image names and pull paths, and confirm them before a talk. One Fedora-44 note from the field: install Cosign from the upstream RPM, not dnf, which is currently broken there.");
 }
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · PODMAN BASICS",
+  addDiagramSlide(s, "WORKING WITH IMAGES · PODMAN BASICS",
     "Pull and inspect — and meet the no-shell behavior",
     "03-podman-basics-pull-flow",
     "Figure 3.1 — podman pull resolves layers from the registry into local containers-storage, indexed by digest.");
-  addNotes(s, "The first hands-on chapter: pull an image, then read its manifest two ways — locally with podman inspect, remotely with skopeo inspect (no pull needed) — looking at the layer count and the provenance labels. Then the moment that surprises everyone from general-purpose bases: podman exec into a shell fails, because there is no shell. The image isn't broken — the application is the entrypoint. That single behavior reframes how you operate these images, and it sets up the debugging section.");
+  addNotes(s, "The first hands-on topic: pull an image, then read its manifest two ways — locally with podman inspect, remotely with skopeo inspect (no pull needed) — looking at the layer count and the provenance labels. Then the moment that surprises everyone from general-purpose bases: podman exec into a shell fails, because there is no shell. The image isn't broken — the application is the entrypoint. That single behavior reframes how you operate these images, and it sets up the debugging section.");
 }
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · DEBUGGING",
+  addDiagramSlide(s, "WORKING WITH IMAGES · DEBUGGING",
     "The debug-sidecar pattern",
     "03-podman-basics-debug-sidecar",
     "Figure 3.2 — A toolbox container shares the target's PID and network namespaces; the target is untouched.");
@@ -253,7 +253,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · DEBUGGING",
+  addDiagramSlide(s, "WORKING WITH IMAGES · DEBUGGING",
     "A four-layer debugging strategy",
     "08-debugging-layers",
     "Figure 8.1 — From cheap to invasive: logs, inspect, ephemeral sidecar, then cluster-side debug.");
@@ -262,7 +262,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · MULTI-STAGE BUILDS",
+  addDiagramSlide(s, "WORKING WITH IMAGES · MULTI-STAGE BUILDS",
     "Multi-stage builds: builder image in, runtime image out",
     "04-multi-stage-builds-pattern",
     "Figure 4.1 — Compile in a -builder image; COPY --from copies just the artifact onto a minimal runtime.");
@@ -271,7 +271,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · SBOM & SIGNING",
+  addDiagramSlide(s, "WORKING WITH IMAGES · SBOM & SIGNING",
     "Three artifacts travel with the image",
     "05-sbom-and-signing-artifacts",
     "Figure 5.1 — Signature, SBOM attestation, and SLSA provenance — all on the same manifest, by digest.");
@@ -280,19 +280,19 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addContentTitle(s, "TUTORIAL · CVE SCANNING", "\u201cNear-zero CVE\u201d, measured");
+  addContentTitle(s, "WORKING WITH IMAGES · CVE SCANNING", "\u201cNear-zero CVE\u201d, measured");
   addBullets(s, [
     "Grype reads the image's package list, matches each against a vulnerability database, and reports by severity — with the caveat that a match isn't proof of an exploitable path, and the database moves daily.",
     "Scan a hardened image and a general-purpose image side by side: the hardened one is near-zero; the general-purpose one is typically tens to hundreds.",
     "Your own derived image shows what your app adds on top — the base stays clean, so the work shrinks to keeping your direct dependencies patched.",
     { text: "grype <image> --fail-on high gates a CI build automatically.", options: { bullet: false } },
   ], { fontSize: 16 });
-  addNotes(s, "This is where the claim becomes a number you can reproduce. Grype turns the small package list into a CVE count. Two honest caveats up front: a match is a reported CVE against a present package version, not proof it's reachable; and the database updates daily, so comparisons are only fair against the same DB. The side-by-side — hardened versus general-purpose — is the payoff, and scanning your own derived image reframes the job: the base is clean, so all that's left is keeping your direct dependencies patched. --fail-on high is the CI gate.");
+  addNotes(s, "This is where the claim becomes a number you can reproduce. Grype turns the small package list into a CVE count. Two caveats up front: a match is a reported CVE against a present package version, not proof it's reachable; and the database updates daily, so comparisons are only fair against the same DB. The side-by-side — hardened versus general-purpose — is the payoff, and scanning your own derived image reframes the job: the base is clean, so all that's left is keeping your direct dependencies patched. --fail-on high is the CI gate.");
 }
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · PODMAN COMPOSE",
+  addDiagramSlide(s, "WORKING WITH IMAGES · PODMAN COMPOSE",
     "Multi-service apps with Podman Compose",
     "07-podman-compose-stack",
     "Figure 7.1 — A hardened web service, a database, and an OpenTelemetry collector, wired with compose.");
@@ -301,16 +301,16 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · EFFICIENT LAYERS",
+  addDiagramSlide(s, "WORKING WITH IMAGES · EFFICIENT LAYERS",
     "zstd:chunked — pull only the bytes that changed",
     "09-zstd-chunked-layer-format",
     "Figure 9.1 — zstd:chunked makes layers seekable, so clients fetch only changed chunks.");
-  addNotes(s, "Two tutorial sections cover why re-pulls are cheap. zstd:chunked is the modern OCI layer format that makes a layer seekable: the client can fetch just the chunks that changed instead of the whole layer. Combined with Hummingbird's frequent clean rebuilds, this keeps the bandwidth cost of staying current low — which matters when 'rebuild, don't patch' means images change often.");
+  addNotes(s, "Two features cover why re-pulls are cheap. zstd:chunked is the modern OCI layer format that makes a layer seekable: the client can fetch just the chunks that changed instead of the whole layer. Combined with Hummingbird's frequent clean rebuilds, this keeps the bandwidth cost of staying current low — which matters when 'rebuild, don't patch' means images change often.");
 }
 
 {
   const s = S();
-  addDiagramSlide(s, "TUTORIAL · EFFICIENT LAYERS",
+  addDiagramSlide(s, "WORKING WITH IMAGES · EFFICIENT LAYERS",
     "chunkah — content-based layer splitting",
     "10-chunkah-layer-split",
     "Figure 10.1 — Layers grouped by package, so a package update invalidates only its own layer.");
@@ -319,7 +319,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addContentTitle(s, "TUTORIAL · TRUSTED LIBRARIES", "Provenance, extended to your dependencies");
+  addContentTitle(s, "WORKING WITH IMAGES · TRUSTED LIBRARIES", "Provenance, extended to your dependencies");
   addBullets(s, [
     "The base image gives trust at the container layer; your app still runs whatever you pulled from PyPI — a public, unaudited index.",
     "Red Hat Trusted Libraries is a pip-compatible index of curated Python packages, rebuilt from source in Red Hat's Konflux pipeline with SLSA Level 3 provenance and signed attestations (via Red Hat Trusted Artifact Signer).",
@@ -331,7 +331,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
 
 {
   const s = S();
-  addContentTitle(s, "TUTORIAL · GOTCHAS", "Distroless gotchas — assumptions made visible");
+  addContentTitle(s, "WORKING WITH IMAGES · GOTCHAS", "Distroless gotchas — assumptions made visible");
   addTwoColBullets(s,
     [
       { text: "Build & runtime", options: { bullet: false, bold: true } },
@@ -346,7 +346,7 @@ divider("02", "Working with the images", "A diagram-led tour of the tutorial sec
       "Past ~5 COPYed libraries? Switch to UBI.",
     ]);
   addCaption(s, "None are bugs — each is the absence of something you didn't know you relied on.");
-  addNotes(s, "The gotchas chapter is the most practical in the tutorial, and the closing demo trips each wire on purpose. The framing to land: none of these are defects — they're implicit assumptions from the wider ecosystem becoming visible against a minimal runtime. RUN needs a shell, so do shell work in the builder. Tools want HOME; set it. The bare 'python' alias is gone; use python3. Hummingbird's Postgres uses upstream env names. localhost resolves to IPv6 first, so test against 127.0.0.1. And when your COPYed-library list gets long, that's the signal to use UBI — Hummingbird isn't a moral position, it's a tool for the right workloads.");
+  addNotes(s, "The gotchas topic is the most practical part, and the closing demo trips each wire on purpose. The framing to land: none of these are defects — they're implicit assumptions from the wider ecosystem becoming visible against a minimal runtime. RUN needs a shell, so do shell work in the builder. Tools want HOME; set it. The bare 'python' alias is gone; use python3. Hummingbird's Postgres uses upstream env names. localhost resolves to IPv6 first, so test against 127.0.0.1. And when your COPYed-library list gets long, that's the signal to use UBI — Hummingbird isn't a moral position, it's a tool for the right workloads.");
 }
 
 /* ═══════════════════ SECTION 3 — THE DEMO WALKTHROUGH ═══════════════════ */
@@ -426,7 +426,7 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     "The same chain, with the Hummingbird answer",
     "18-supply-chain-security-attack-vectors",
     "Figure 18.2 — Attack vectors and the Hummingbird answer at each stage, on Podman/Konflux/OpenShift.");
-  addNotes(s, "Same chain, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be candid about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
+  addNotes(s, "Same chain, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be clear about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
 }
 
 {
@@ -450,7 +450,7 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     { code: "Deploy / platform", name: "You", purpose: "OpenShift admission control; host & network hardening" },
   ], { colW: [2.75, 2.85, 6.49], rowH: 0.62 });
   addCaption(s, "Verify on pull (podman + cosign); enforce for every deploy with an OpenShift admission policy.");
-  addNotes(s, "The honest summary, and a good place to end an admin talk. Hummingbird owns the image — vulnerable base, vulnerable dependencies, build integrity, image authenticity — the part that's genuinely hard to do yourself and that you get for free. You own the edges — source and Containerfile integrity, platform hardening, and the admission gate that enforces verification for every deploy. The practical close: verify on pull with podman + cosign, and enforce it cluster-wide with an OpenShift admission policy so no one can route around the check — that's what closes the malicious-deployment-definition vector. A near-zero-CVE distroless base is the strongest single move on the supply chain precisely because it collapses the vectors that are hardest to defend one at a time.");
+  addNotes(s, "The summary to land, and a good place to end an admin talk. Hummingbird owns the image — vulnerable base, vulnerable dependencies, build integrity, image authenticity — the part that's genuinely hard to do yourself and that you get for free. You own the edges — source and Containerfile integrity, platform hardening, and the admission gate that enforces verification for every deploy. The practical close: verify on pull with podman + cosign, and enforce it cluster-wide with an OpenShift admission policy so no one can route around the check — that's what closes the malicious-deployment-definition vector. A near-zero-CVE distroless base is the strongest single move on the supply chain precisely because it collapses the vectors that are hardest to defend one at a time.");
 }
 
 {
@@ -461,9 +461,9 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     "The whole workflow runs locally on Podman — pull, inspect, build multi-stage, SBOM, sign, scan, verify provenance.",
     "\u201cNear-zero CVE\u201d is a scan away from being your own measurement; the job that remains is keeping your dependencies patched.",
     "Match the runtime to the workload: Hummingbird where minimalism helps, UBI where breadth does.",
-    { text: "Tutorial & demos: github.com/patterncatalyst/hummingbird-tutorial \u00b7 patterncatalyst.github.io/hummingbird-tutorial", options: { bullet: false }, muted: true },
+    { text: "Docs & demos: github.com/patterncatalyst/hummingbird-tutorial \u00b7 patterncatalyst.github.io/hummingbird-tutorial", options: { bullet: false }, muted: true },
   ], { fontSize: 15 });
-  addNotes(s, "Recap the arc and point to where to go deeper. One idea drives everything — rebuild instead of patch — and it gives you distroless, near-zero-CVE images on a trust chain you may already rely on. The entire workflow fits on a laptop with Podman. The strongest closing note for an admin audience: near-zero CVE isn't something to take on faith — it's one Grype command away from being your own measurement, and the work that remains is the tractable part, keeping your own dependencies current. And it's not all-or-nothing: use Hummingbird where minimalism wins and UBI where breadth does. Everything in this deck — chapters, runnable examples, and the demos — lives in the tutorial repo and site.");
+  addNotes(s, "Recap the arc and point to where to go deeper. One idea drives everything — rebuild instead of patch — and it gives you distroless, near-zero-CVE images on a trust chain you may already rely on. The entire workflow fits on a laptop with Podman. The strongest closing note for an admin audience: near-zero CVE isn't something to take on faith — it's one Grype command away from being your own measurement, and the work that remains is the tractable part, keeping your own dependencies current. And it's not all-or-nothing: use Hummingbird where minimalism wins and UBI where breadth does. Everything in this deck — the workflow, runnable examples, and the demos — lives in the project repo and site.");
 }
 
 pres.writeFile({ fileName: OUT })

@@ -1,8 +1,7 @@
 # Presentations
 
 A Red Hat-branded slide deck introducing Project Hummingbird / Red Hat
-Hardened Images to an audience of admins, built to pair with this tutorial
-and its command-line demos.
+Hardened Images to an audience of admins.
 
 ## The deck
 
@@ -14,11 +13,9 @@ truth for revisions. The current revision is shown on the cover slide (the
 `REV` marker) and recorded in the changelog below.
 
 Structure: a "What is Hummingbird" section, a diagram-led "Working with the
-images" tour (one stop per tutorial chapter), a "demo walkthrough" mapping to
-the eight command-line demos, and a **"Supply chain security" close-out** that
-sets up the generic supply-chain threat model, overlays the Hummingbird
-answer, and ends on the runtime attack surface. All of the tutorial's diagrams
-are embedded.
+images" tour, a "demo walkthrough" mapping to the eight command-line demos,
+and a "Supply chain security" close-out that sets up the generic supply-chain
+threat model, overlays the answer, and ends on the runtime attack surface.
 
 ## Currency — reviewed against GA (May 12, 2026)
 
@@ -27,8 +24,8 @@ Product claims were checked against Red Hat's GA materials
 hummingbird-project.io). Highlights: RHHI is the GA product, Project
 Hummingbird the upstream engine; free on any Linux/Kubernetes/engine with
 optional LTS; 45+ images / 150+ variants; SLSA 3 (Konflux); compliance via
-OpenSCAP; default non-root user UID 65532 (examples pin USER 1001 by choice);
-Trusted Libraries Tech Preview, Python-only.
+OpenSCAP; default non-root user UID 65532 (the example Containerfiles pin
+USER 1001 by choice); Trusted Libraries Tech Preview, Python-only.
 
 ## Rebuilding it
 
@@ -49,19 +46,19 @@ changelog entry here.
 
 ### Changelog
 
-- **r01.4** — Supply-chain close-out reworked into a problem → answer arc.
-  Added a generic "set the stage" diagram (Figure 18.1, the container supply
-  chain and its attack vectors), renumbered the existing attacks+mitigations
-  diagram to Figure 18.2 and the runtime-surface diagram to Figure 18.3, and
-  removed the third-party attribution from Figure 18.1/18.2. 37 → 38 slides.
-- **r01.3** — Added the closing Supply chain security section (divider, two
-  diagram slides, a division-of-labour table). 33 → 37 slides.
-- **r01.2** — Corrected the default non-root user to UID 65532 (was 1001);
-  made the multi-stage note UID-agnostic; switched to a stable unversioned
-  `.pptx` filename.
-- **r01.1** — Reconciled to GA (May 12, 2026): launch/status, RHHI-vs-
-  Hummingbird framing, catalog components (Valkey/HAProxy), cost/support,
-  SLSA 3 wording, OpenSCAP. Fixed a builder bug that dropped detail lines.
+- **r01.5** — Editorial pass: removed framing that positioned the deck as a
+  companion to the tutorial (eyebrows, subtitles, and notes now describe the
+  workflow on its own terms), and removed hedging words ("honestly", "be
+  candid", "engineering truth", etc.) that implied the surrounding claims
+  were otherwise less than straight. No structural or factual changes.
+- **r01.4** — Supply-chain close-out reworked into a problem → answer arc:
+  added a generic "set the stage" diagram (Figure 18.1), renumbered the
+  attacks+mitigations diagram to 18.2 and the runtime-surface diagram to 18.3,
+  and removed the third-party attribution from Figure 18.1. 37 → 38 slides.
+- **r01.3** — Added the closing Supply chain security section. 33 → 37 slides.
+- **r01.2** — Corrected the default non-root user to UID 65532; stable
+  unversioned `.pptx` filename.
+- **r01.1** — Reconciled to GA (May 12, 2026).
 - **r01.0** — Initial deck (not released).
 
 ## Status
