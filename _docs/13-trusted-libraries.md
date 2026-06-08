@@ -25,6 +25,11 @@ every byte of your application — base layer, runtime layer,
 language packages, and your own code — is built and signed by an
 auditable pipeline.
 
+{% include excalidraw.html
+   file="13-trusted-libraries-provenance"
+   alt="The application image contains a hardened base (signed, with SBOM and SLSA provenance) plus your application and its Python dependencies. Those dependencies can come from PyPI (public, unsigned, unaudited — the gap) or from Red Hat Trusted Libraries (rebuilt from source with SLSA Level 3 provenance, signed via Trusted Artifact Signer — verified)."
+   caption="Figure 13.1 — The base image is already trusted; Trusted Libraries extends the same provenance down to your Python dependencies." %}
+
 > **The index is gated.** Because Trusted Libraries is a Tech
 > Preview, the index at `packages.redhat.com/trusted-libraries`
 > requires authentication — you enroll in the preview and

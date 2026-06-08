@@ -14,7 +14,7 @@ const {
 } = H;
 
 const OUT = "../hummingbird-overview.pptx";
-const REV = "r01.6";
+const REV = "r01.7";
 
 const pres = newDeck();
 let pageNum = 0;
@@ -50,7 +50,6 @@ function bsub(items) {
     x: 5.95, y: 2.42, w: 6.95, h: 2.00, fontFace: FONT.title, fontSize: 54, bold: true, color: COLOR.ink, align: "left", valign: "top" });
   s.addText("Minimal, hardened, near-zero-CVE container images — generally available since Red Hat Summit 2026 — and how to work with them at the command line with Podman.",
     { x: 6.00, y: 4.45, w: 6.80, h: 1.25, fontFace: FONT.body, fontSize: 17, italic: true, color: COLOR.caption, align: "left", valign: "top" });
-  s.addText(REV, { x: 11.85, y: 5.85, w: 0.95, h: 0.30, fontFace: FONT.mono, fontSize: 11, color: COLOR.caption, align: "right", valign: "middle" });
   try { s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.10, y: 6.80, w: 1.55, h: 0.37 }); } catch (e) {}
   addNotes(s, "This deck is a walkthrough of Project Hummingbird — Red Hat's catalog of hardened, near-zero-CVE container images, officially Red Hat Hardened Images (RHHI). The bulk of it answers 'what is it and why does it exist'; the back half tours how you actually work with the images, and it closes with a set of live command-line demos. The audience is admins and platform engineers. Everything runs locally on Podman on a laptop — no cluster, no managed cloud required.");
 }
@@ -182,7 +181,7 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
     "What \u201chardened\u201d means concretely",
     "02-introduction-hardening-stack",
     "Figure 2.2 — Four hardening layers, applied to every image in the catalog by default.");
-  addNotes(s, "'Hardened' isn't a vibe — it's four concrete layers, each building on the one below, applied to every image by default. None of the layers is individually novel; the value is applying all four, everywhere, as a release gate. Bottom to top: Source (provenance and CVE tracking), Packages (hardened compiler flags), Images (distroless, non-root, reproducible), and Benchmarks (CIS/STIG/OpenSCAP). The next slide unpacks each.");
+  addNotes(s, `'Hardened' isn't a vibe — it's four concrete layers, applied to every image by default and enforced as a release gate. None of the layers is individually novel; the value is doing all four, everywhere, on every rebuild. Bottom to top: Source (provenance + CVE tracking), Packages (hardened compiler flags), Images (distroless, non-root, reproducible), Benchmarks (compliance scanning). The next slide defines each term — a technical audience will ask what they mean.`);
 }
 
 {
@@ -194,7 +193,20 @@ divider("01", "What is Project Hummingbird?", "The conceptual grounding before a
     { text: "Images — distroless, non-root, reproducible", sub: "Minimal userspace, UID 65532, hermetic builds, signed manifests, attached SBOMs, reproducible across rebuilds." },
     { text: "Benchmarks & scanning — verifiable compliance", sub: "Compliance-related configuration verifiable via OpenSCAP (e.g. CIS, STIG profiles), as part of the release gate. Fail the scan, don't ship." },
   ]), { fontSize: 14 });
-  addNotes(s, "Source: every component is tracked to upstream with continuous remediation, and dependencies come from Red Hat's SLSA 3 build pipeline (Konflux) with signed provenance. The point is a signed attestation, not a claim. Packages: the full RHEL hardening flag set, and crucially they verify the flags are actually present in the binaries with annobin/annocheck — plus weak dependencies are disabled so nothing sneaks in. Images: the distroless, non-root, reproducible, signed assembly. Benchmarks: Red Hat states compliance-related configuration is verifiable via OpenSCAP (which scans against profiles such as CIS and STIG) as part of the release gate. The compounding effect across all four is what makes 'near-zero CVE' defensible at release.");
+  addNotes(s, `This slide is dense and a technical audience will ask what the acronyms are — define them as you go. Bottom to top:
+
+• Source — SLSA 3 provenance, built in Konflux. SLSA (Supply-chain Levels for Software Artifacts) is an OpenSSF framework grading build integrity from 1 to 3; Level 3 means a hardened, isolated build service emits signed, unforgeable provenance. Konflux is Red Hat's Tekton-based build pipeline.
+• Packages — RHEL hardening compiler flags, and crucially verified present in the binary:
+   – PIE (Position-Independent Executable): lets ASLR randomize where the binary loads, so exploits can't rely on fixed addresses.
+   – RELRO (RELocation Read-Only): makes the GOT read-only after startup, blocking GOT-overwrite attacks.
+   – stack protectors (-fstack-protector-strong): canaries that catch stack buffer overflows.
+   – FORTIFY_SOURCE=3: compile- and run-time bounds checks on common libc calls.
+   – annobin/annocheck: annobin records the flags into the ELF; annocheck audits the binary to prove the hardening was actually applied — verification, not a claim.
+   – install_weak_deps=False: skip optional 'recommended' packages so nothing sneaks in.
+• Images — distroless userspace, non-root (UID 65532 where possible), hermetic reproducible builds, signed manifests, attached SBOMs.
+• Benchmarks — compliance config verifiable via OpenSCAP (the open-source scanner for the SCAP standard) against profiles like CIS (Center for Internet Security benchmarks) and STIG (DISA's Security Technical Implementation Guides, used across US government/DoD). Fail the scan, don't ship.
+
+The compounding effect of all four, enforced at release, is what makes 'near-zero CVE' defensible.`);
 }
 
 {
@@ -261,7 +273,16 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
     "The debug-sidecar pattern",
     "03-podman-basics-debug-sidecar",
     "Figure 3.2 — A toolbox container shares the target's PID and network namespaces; the target is untouched.");
-  addNotes(s, "If there's no shell, you don't get into the container — you put a second container beside it. A throwaway UBI toolbox shares the target's PID and network namespaces, so its ps sees the target's processes and its localhost is the target's localhost. The production container never changes, and the toolbox vanishes when you're done. For strace or gdb you add the SYS_PTRACE capability and, on SELinux-enforcing Fedora, relax the label for the debug container only. This is the single most important operational habit to teach.");
+  addNotes(s, `No shell means you don't exec into the container — you stand a second container next to it and share the target's kernel namespaces. The production container never changes, and the toolbox is thrown away after.
+
+Steps to walk through:
+1. Find the target: podman ps — note its name (say 'web').
+2. Launch a toolbox that JOINS the target's namespaces:
+   podman run -it --rm --pid=container:web --network=container:web registry.access.redhat.com/ubi9/toolbox
+3. --pid=container:web shares the PID namespace, so ps/top in the toolbox see the target's processes. --network=container:web shares the network namespace, so curl 127.0.0.1:3000 in the toolbox hits the target's own ports and ss -ltnp lists its sockets.
+4. For strace/gdb, add --cap-add=SYS_PTRACE; on SELinux-enforcing Fedora, relax the label for the debug container only (--security-opt label=disable).
+
+Clarify the mechanism if asked: this is namespace JOINING, not a bind mount — the toolbox enters the same PID and network namespaces the kernel already created for the target, so it sees the same process table and the same loopback. Nothing is copied into the production image. On a cluster, kubectl debug does the identical trick against a pod. This is the single most important operational habit to teach.`);
 }
 
 {
@@ -284,11 +305,50 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
 
 {
   const s = S();
+  addCodeSlide(s, "WORKING WITH IMAGES · MULTI-STAGE BUILDS", "What that buys you, in a Containerfile", "Containerfile",
+    [
+      "# ---- build stage: full toolchain, thrown away ----",
+      "FROM registry.access.redhat.com/hi/go:1.26-builder AS build",
+      "WORKDIR /src",
+      "COPY go.mod go.sum ./",
+      "RUN go mod download",
+      "COPY . .",
+      "RUN CGO_ENABLED=0 go build -o /app ./cmd/server",
+      "",
+      "# ---- runtime stage: distroless — no compiler, no shell ----",
+      "FROM registry.access.redhat.com/hi/go:1.26",
+      "COPY --from=build /app /app",
+      "USER 1001",
+      'ENTRYPOINT ["/app"]',
+    ],
+    "COPY --from copies only the built binary; the compiler, module cache, and source never reach the shipped image.");
+  addNotes(s, `The diagram shows the shape; this makes the payoff concrete. Read it as two images:
+• Build stage (FROM ...-builder): the full toolchain — compiler, dnf, module cache. It does the work, then is discarded.
+• Runtime stage (FROM hi/go:1.26): distroless — no compiler, no package manager, no shell.
+• COPY --from=build copies ONLY the compiled binary across the boundary; the source, module cache, any build secrets, and the toolchain never reach the shipped image.
+
+Why it matters:
+• Attack surface — the production image has almost nothing to exploit: no compiler to build an exploit, no shell to run one.
+• CVEs — the toolchain is where most of a base image's CVEs live; leaving it in the build stage is what keeps the runtime near-zero.
+• Size / pull time — the runtime image is a fraction of the size.
+
+Contrast a single-stage build: it ships the compiler, headers, and source — bigger, more CVEs, more to attack — for zero runtime benefit. Two rules the syntax enforces: only COPY in the runtime stage (no RUN — there's no shell), and in real use pin the base by digest, not a moving tag. CGO_ENABLED=0 makes a static binary, so the runtime needs no libc at all.`);
+}
+
+{
+  const s = S();
   addDiagramSlide(s, "WORKING WITH IMAGES · SBOM & SIGNING",
     "Three artifacts travel with the image",
     "05-sbom-and-signing-artifacts",
     "Figure 5.1 — Signature, SBOM attestation, and SLSA provenance — all on the same manifest, by digest.");
-  addNotes(s, "Three distinct things can hang off an image manifest, all addressed by digest: a signature ('I vouch for these bytes'), an SBOM attestation (a signed bill of materials), and a SLSA provenance attestation (how it was built). Hummingbird images ship Red-Hat-signed versions of these on the signed registry path, verifiable with Cosign and one published key. In the demo we generate an SBOM with Syft, verify Red Hat's signature and SBOM, and then sign an artifact ourselves — the same Cosign either way.");
+  addNotes(s, `Three things hang off the image manifest, all addressed by digest: a signature (who vouches for these exact bytes), an SBOM attestation (a signed bill of materials — what's inside), and a SLSA provenance attestation (how it was built). Hummingbird ships Red-Hat-signed versions on the signed registry path.
+
+Where the SBOM actually lives — likely questions:
+• From the registry (authoritative): the SBOM is attached to the image as a signed attestation. Pull it with cosign download sbom <image>, or verify it signed with cosign verify-attestation --type spdxjson <image>. Every Konflux-built Hummingbird image ships an SBOM plus SLSA provenance.
+• From the image itself: RPM-based images carry their own package inventory inside — the rpm database (under /usr/lib/sysimage/rpm) plus Red Hat 'content manifests'. That's the 'internal DB'. It's present even in distroless images that have no rpm binary, which is exactly how a scanner enumerates packages without a shell.
+• Vendor SBOMs: scanners generate their own SBOM from that inventory — Syft (for Grype), Trivy, and Docker Scout each produce one. So an image can carry the publisher's signed SBOM AND a tool-generated one; for trust decisions, prefer the signed publisher SBOM and verify it.
+
+Red Hat's own SBOM analyzer is Trusted Profile Analyzer (RHTPA). In the demo we generate an SBOM with Syft, verify Red Hat's signature and SBOM, then sign an artifact ourselves — the same cosign either way.`);
 }
 
 {
@@ -300,7 +360,44 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
     "Your own derived image shows what your app adds on top — the base stays clean, so the work shrinks to keeping your direct dependencies patched.",
     { text: "grype <image> --fail-on high gates a CI build automatically.", options: { bullet: false } },
   ], { fontSize: 16 });
-  addNotes(s, "This is where the claim becomes a number you can reproduce. Grype turns the small package list into a CVE count. Two caveats up front: a match is a reported CVE against a present package version, not proof it's reachable; and the database updates daily, so comparisons are only fair against the same DB. The side-by-side — hardened versus general-purpose — is the payoff, and scanning your own derived image reframes the job: the base is clean, so all that's left is keeping your direct dependencies patched. --fail-on high is the CI gate.");
+  addNotes(s, `Where the claim becomes a number you can reproduce. Grype reads the package inventory, matches each entry against a vulnerability database, and reports by severity.
+
+Two caveats to say out loud:
+• A match is a reported CVE against a present package version — not proof the path is reachable. VEX (Vulnerability Exploitability eXchange) statements let a scanner suppress non-exploitable CVEs; Grype and Trivy both accept --vex, and Red Hat publishes VEX/CSAF data.
+• The vuln DB updates daily and Grype refuses a stale one — so side-by-side numbers are only fair against the same DB. Run grype db update first.
+
+We use Grype in the examples, but in production any of these read RHHI images fine — they all consume the in-image rpm inventory plus Red Hat advisories:
+• Grype (Anchore) — CLI, SBOM-first, pairs with Syft. What the demos use.
+• Trivy (Aqua) — the most widely used CLI scanner; images, filesystems, IaC, Kubernetes; uses Red Hat advisories + CPE content sets for accurate RHEL matching.
+• Clair v4 (Red Hat) — service-based; the default scanner in Red Hat Quay / Quay.io and in Harbor.
+• Red Hat Advanced Cluster Security (RHACS) Scanner V4 — the OpenShift-native option; merges the StackRox scanner with Clair v4, and also verifies cosign signatures at admission. The production gate.
+• Commercial: Snyk, Prisma Cloud, Aqua, Docker Scout, Anchore Enterprise.
+
+Accuracy note: RHEL CVE matching relies on per-layer content manifests, so don't flatten or merge layers (e.g. podman export) before scanning, or the CPE mapping breaks and you get false results.`);
+}
+
+{
+  const s = S();
+  addCodeSlide(s, "WORKING WITH IMAGES · CVE SCANNING", "The same claim, from the command line", "zsh",
+    [
+      "# keep the vuln DB fresh — grype refuses a stale one",
+      "grype db status || grype db update",
+      "",
+      "# hardened vs general-purpose, side by side",
+      "grype registry.access.redhat.com/hi/nginx:1",
+      "grype docker.io/library/nginx:latest",
+      "",
+      "# or scan the signed SBOM instead of the image, and gate CI",
+      "cosign download sbom registry.access.redhat.com/hi/nginx:1 > nginx.sbom.json",
+      "grype sbom:nginx.sbom.json --fail-on high   # non-zero exit fails the build",
+    ],
+    "Scan the image directly, or scan its signed SBOM; --fail-on turns either into a CI gate.");
+  addNotes(s, `The reproducible version of the previous slide. Three things to show live:
+• grype db update first — Grype won't scan against a stale database, and a fair comparison needs both images scanned against the same DB.
+• The side-by-side is the moment: the hardened nginx comes back at or near zero; docker.io/library/nginx is typically tens to hundreds.
+• You can scan the image, or scan its signed SBOM — cosign download sbom ... then grype sbom:.... Scanning the SBOM is what CI usually does: it's faster and needs no pull. --fail-on high makes grype exit non-zero, failing the pipeline step.
+
+The same commands work against your own derived image — the base stays clean, so what shows up is what your app added. Tool choice is covered on the previous slide's notes (Trivy, Clair, and RHACS Scanner V4 all read these images too).`);
 }
 
 {
@@ -318,7 +415,14 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
     "zstd:chunked — pull only the bytes that changed",
     "09-zstd-chunked-layer-format",
     "Figure 9.1 — zstd:chunked makes layers seekable, so clients fetch only changed chunks.");
-  addNotes(s, "Two features cover why re-pulls are cheap. zstd:chunked is the modern OCI layer format that makes a layer seekable: the client can fetch just the chunks that changed instead of the whole layer. Combined with Hummingbird's frequent clean rebuilds, this keeps the bandwidth cost of staying current low — which matters when 'rebuild, don't patch' means images change often.");
+  addNotes(s, `Why staying current is cheap — part one. A normal OCI layer is a single gzip blob: change one file and the client re-pulls the whole layer.
+
+• zstd:chunked stores the layer compressed with zstd and keeps a table of content-addressed chunks plus a manifest of which chunk holds which file.
+• On pull, the client compares chunk digests against what it already has and fetches only the chunks that changed; unchanged chunks come from cache.
+• zstd also decompresses much faster than gzip, so even a full pull is quicker.
+• It's a standard OCI/containers-storage feature, not Hummingbird-specific — but it pairs perfectly with 'rebuild, don't patch': a rebuild that touched one package costs roughly that package's bytes, not the whole image.
+
+Good moment to pre-empt 'won't constant rebuilds hammer my bandwidth?' — no, and this is why.`);
 }
 
 {
@@ -327,7 +431,14 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
     "chunkah — content-based layer splitting",
     "10-chunkah-layer-split",
     "Figure 10.1 — Layers grouped by package, so a package update invalidates only its own layer.");
-  addNotes(s, "chunkah is the complementary idea: instead of layering by Containerfile line, group files into layers by the package they belong to. When one package updates, only its layer's digest changes, so everything else stays cached and clients re-pull far less. This is why podman history on a Hummingbird image shows a content-based split rather than a build-step split — and it's a neat thing to point at live in the first demo.");
+  addNotes(s, `Why staying current is cheap — part two, and it composes with zstd:chunked. Normally each Containerfile instruction becomes a layer, so unrelated packages share a layer and any change re-pulls all of them.
+
+• chunkah splits the filesystem into layers by the package each file belongs to, instead of by build step.
+• A one-package security update changes only that package's layer digest; every other layer keeps its digest and stays cached, so clients re-pull just the changed package.
+• It's why podman history on a Hummingbird image shows a content-based split (many small package layers) — and why a hardened image can have MORE layers than a general-purpose one. More layers here is a feature, not bloat.
+• Together: chunkah decides the layer boundaries (per package); zstd:chunked makes each layer's bytes individually fetchable. The cost of staying current tracks what actually changed.
+
+Nice to show live: podman history of a hardened image in demo 1.`);
 }
 
 {
@@ -339,7 +450,27 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
     "Point pip at packages.redhat.com/trusted-libraries, keep PyPI as a fallback, and verify a package's provenance before installing.",
     { text: "Tech Preview (since Feb 2026) and Python-only today, with npm and Java planned; now part of Red Hat Advanced Developer Suite. The upstream community project is Calunga.", options: { bullet: false }, muted: true },
   ], { fontSize: 16 });
-  addNotes(s, "Provenance shouldn't stop at the image. Your application also runs dependencies from PyPI, which is a passthrough that re-signs nothing — a supply-chain gap. Trusted Libraries closes it: a pip-compatible index of Python packages rebuilt from source in Red Hat's Konflux pipeline, carrying SLSA Level 3 provenance and signatures (via Red Hat Trusted Artifact Signer) you can verify before install, from packages.redhat.com/trusted-libraries. Be clear about the current status: it's been Tech Preview since February 2026 and is Python-only, with npm and Java on the roadmap, and it's now part of Red Hat Advanced Developer Suite. The upstream community equivalent is Calunga. The demo verifies image provenance as a rock-solid anchor, then shows the Trusted Libraries flow.");
+  addNotes(s, `Provenance shouldn't stop at the image. Your app still pulls dependencies from PyPI — a public passthrough that re-signs nothing — so the trust you established at the container layer evaporates at the dependency layer. Trusted Libraries closes that gap.
+
+Define the terms (the audience may be new to them):
+• Provenance — a signed, machine-readable record of HOW and from WHAT an artifact was built: source repo + commit, the builder, inputs, parameters. A signature says WHO vouches for the bytes; provenance says WHERE they came from and HOW. You verify both.
+• Konflux — Red Hat's open-source, Tekton-based build pipeline ('software factory') focused on supply-chain security; it builds Hummingbird and emits an SBOM + SLSA provenance for every image.
+• SLSA Level 3 provenance — the build ran on a hardened, isolated, hosted service that produced signed provenance that can't be forged and can be verified as authentic (versus Level 1, which is just unsigned build metadata).
+• Red Hat Trusted Artifact Signer (RHTAS) — Red Hat's enterprise, self-managed deployment of Sigstore (cosign / fulcio / rekor); it's how these packages are signed, and what you'd run in-house to sign your own.
+
+Usage: point pip at packages.redhat.com/trusted-libraries with PyPI as fallback, and verify a package's provenance before installing. Status to state plainly: Tech Preview since Feb 2026, Python-only (npm and Java planned), now part of Red Hat Advanced Developer Suite; the index is authenticated; the upstream community project is Calunga. The next slide is the picture.`);
+}
+
+{
+  const s = S();
+  addDiagramSlide(s, "WORKING WITH IMAGES · TRUSTED LIBRARIES", "Trust, all the way down to your dependencies",
+    "13-trusted-libraries-provenance",
+    "Figure 13.1 — The base image is already trusted; Trusted Libraries extends the same provenance to your Python packages.");
+  addNotes(s, `One picture for the value proposition. The hardened base image is already trusted — signed, with an SBOM and SLSA provenance. Your application sits on top with its Python dependencies, and those have two possible sources:
+• PyPI — the usual index: public, unsigned, unaudited. This is the gap (dashed): you verified the base, then pulled unverified code on top of it.
+• Red Hat Trusted Libraries — the same packages rebuilt from source in Konflux, carrying SLSA Level 3 provenance and signatures (via Trusted Artifact Signer) you can verify before install (solid).
+
+The point to land: it's the exact same verify-before-you-trust habit you already apply to the image, now extended one layer down to the dependencies your app actually runs.`);
 }
 
 {
@@ -359,7 +490,14 @@ divider("02", "Working with the images", "A diagram-led tour of the workflow.",
       "Past ~5 COPYed libraries? Switch to UBI.",
     ]);
   addCaption(s, "None are bugs — each is the absence of something you didn't know you relied on.");
-  addNotes(s, "The gotchas topic is the most practical part, and the closing demo trips each wire on purpose. The framing to land: none of these are defects — they're implicit assumptions from the wider ecosystem becoming visible against a minimal runtime. RUN needs a shell, so do shell work in the builder. Tools want HOME; set it. The bare 'python' alias is gone; use python3. Hummingbird's Postgres uses upstream env names. localhost resolves to IPv6 first, so test against 127.0.0.1. And when your COPYed-library list gets long, that's the signal to use UBI — Hummingbird isn't a moral position, it's a tool for the right workloads.");
+  addNotes(s, `The gotchas are implicit ecosystem assumptions made visible against a minimal runtime — not defects. The closing demo trips each on purpose. Land these:
+• RUN needs a shell → do shell work in the -builder stage, COPY the result into runtime.
+• Build tools want HOME → set it, or caches resolve to / and fail for the non-root user.
+• The bare 'python' alias is gone → use python3 in CMD/ENTRYPOINT.
+• Hummingbird's Postgres uses upstream env names (POSTGRES_PASSWORD), not sclorg (POSTGRESQL_PASSWORD).
+• localhost resolves to IPv6 (::1) first → test against 127.0.0.1, or bind dual-stack.
+
+The biggest real-world gotcha — native-extension stacks: SciPy / NumPy / pandas and most ML inference need shared libraries the distroless runtime omits (libstdc++, libgomp, libgfortran, BLAS/LAPACK, libquadmath…). You can COPY them in one by one, but past a handful you've hand-rebuilt a chunk of UBI's userland — and those hand-copied libraries are NOT in the image's SBOM and NOT CVE-tracked by Red Hat, which quietly undoes the reason you chose a hardened image. The practical rule: hardened runtime for Go static binaries, JVM apps, and light or pure-Python services; reach for UBI when the accommodation list gets long. Mixing per stage is normal — build on UBI, deploy on hardened where it fits. This is Gotcha F in the demo, and it's the most useful 'when NOT to use this' guidance you can give.`);
 }
 
 /* ═══════════════════ SECTION 3 — THE DEMO WALKTHROUGH ═══════════════════ */
@@ -430,7 +568,14 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     "Where the supply chain gets attacked",
     "18-supply-chain-security-the-chain",
     "Figure 18.1 — The container supply chain, and where it gets attacked.");
-  addNotes(s, "Set the stage with the generic picture first — this is the standard container supply-chain threat model, terminology-neutral, before any Hummingbird framing. A container image is assembled from a chain of inputs — source, the build file, a base image, packages — then built, stored, and deployed, and every hand-off is a place to interfere: tamper with source or the Containerfile, a vulnerable base or dependency, build-time tampering or a compromised build host, a swapped image in the registry, an intercepted pull, or a malicious deployment definition. Hold this picture; the next slide overlays the answer.");
+  addNotes(s, `Walk the chain left to right and name the attack at each stage. This is the generic model — no Hummingbird yet.
+1. Source code — tampered source: someone with repo access or stolen credentials changes the app before it's ever built. Defended by branch protection, RBAC, signed commits, review.
+2. Code repo + Containerfile — tampered build file: a malicious RUN line is arbitrary code execution at build time; it can pull malware, read build secrets, or probe the build network. Treat Containerfile edits like privileged code.
+3. CI build — three vectors converge here: a vulnerable or poisoned BASE image (FROM); a vulnerable or confused DEPENDENCY pulled during the build (dependency confusion — a wrong-registry or typo'd package); and BUILD-TIME tampering / a compromised build host that injects a backdoor even from clean source.
+4. Registry — tampered stored image: the image is swapped or modified at rest after it was built.
+5. Pull → Deploy — intercepted pull (image altered in transit) and malicious deployment definition: a one-character change to a registry hostname in the YAML silently runs a different image.
+
+Set up the next slide: most of these are about trusting inputs you didn't build and can't see — exactly what signing, provenance, and a minimal verified base address.`);
 }
 
 {
@@ -439,7 +584,14 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     "The same chain, with the Hummingbird answer",
     "18-supply-chain-security-attack-vectors",
     "Figure 18.2 — Attack vectors and the Hummingbird answer at each stage, on Podman/Konflux/OpenShift.");
-  addNotes(s, "Same chain, reframed for our stack: Buildah/Konflux instead of Docker, the signed registry.access.redhat.com/hi path, OpenShift at deploy. Top row: the classic vectors. Bottom row: the Hummingbird answer. The story to tell — a hardened base turns the three hardest vectors (vulnerable base, vulnerable dependencies, build tampering) from 'trust us' into signed evidence you verify yourself, and the minimalism means there's simply less inside to be vulnerable. Be clear about the left edge: tampered source and a tampered Containerfile are the operator's job — branch protection, signed commits, pin the base by digest. Hummingbird gives you a trustworthy FROM; it can't stop an insecure Containerfile on top of it.");
+  addNotes(s, `Same chain, now the Hummingbird / Red Hat answer at each stage — map them one to one:
+1. Source — still yours, but smaller: branch protection, RBAC, signed commits. Hummingbird doesn't own your repo.
+2. Containerfile — pin the base by digest (not a moving tag) and review every RUN/COPY. Hummingbird gives a trustworthy FROM; it can't fix an insecure Containerfile on top.
+3. Build — the big one: builds run in Konflux, a hardened, isolated pipeline that emits SLSA 3 signed provenance; the base is near-zero-CVE and distroless (fewer dependencies to be vulnerable); and for your own code, Trusted Libraries extends the same provenance to Python packages. Vulnerable-base, vulnerable-deps, and build-tampering all move from 'trust us' to 'here's signed evidence'.
+4. Registry — the image carries a cosign signature + signed SBOM + signed provenance on the signed /hi path. A swapped or modified image fails verification.
+5. Pull/Deploy — verify on pull with podman + cosign; enforce cluster-wide with an OpenShift admission policy (RHACS / sigstore admission) so an unsigned or unverified image won't run — that closes the malicious-YAML vector.
+
+The framing to land: Hummingbird closes the middle of the chain by construction; you still own the two ends — source/Containerfile and deploy/platform.`);
 }
 
 {
@@ -448,7 +600,16 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     "Defense in depth — and where the image helps",
     "18-supply-chain-security-layers",
     "Figure 18.3 — The layered runtime attack surface; the hardened image shrinks the image-and-app cluster, not the platform.");
-  addNotes(s, "The pipeline view was build-and-delivery; this is runtime — defense in depth. The hardened image shrinks the cluster of vectors aimed at the image and the app: a swapped image fails cosign verify; distroless removes the foot-guns (no shell, no package manager, non-root UID 65532); fewer packages mean fewer exploitable paths and very little for an intruder to use if they do land inside. What it does NOT fix sits outside the container — misconfigured host, insecure networking, container escape — and those are platform hardening: rootless Podman, SELinux, seccomp, OpenShift SCCs, network policy. The hardened image is one strong layer, not the whole onion.");
+  addNotes(s, `The pipeline view was build-and-delivery; this is runtime — defense in depth. Walk the layers from outside in and pair each exploit with the Red Hat control that addresses it:
+• Insecure networking (exposed or cleartext services) — OpenShift NetworkPolicy, service mesh / TLS. Hummingbird doesn't change this.
+• Misconfigured host (a weak RHEL host undermines everything above it) — RHEL hardening, SELinux enforcing, OpenSCAP CIS/STIG compliance, a minimal host footprint.
+• Code exploits against the runtime/orchestrator — keep the platform patched; SELinux + seccomp confine what a compromised process can do.
+• Compromised container image (swapped or poisoned) — cosign signature verification at admission (RHACS): fails verification, doesn't run.
+• Poorly configured image — distroless removes the foot-guns (no shell, no package manager, non-root UID 65532), so there's far less to misconfigure.
+• Exposed secrets / code exploits inside the container — a minimal image gives an intruder almost nothing to use (no shell, no curl, no package manager) and fewer packages mean fewer exploitable paths; pair with real secret management (never bake secrets into the image).
+• Container escape — rootless Podman, dropped capabilities, seccomp, SELinux, and OpenShift SCCs constrain the blast radius.
+
+The division to state: the hardened image shrinks the image-and-app cluster in the middle; the RHEL/OpenShift platform handles the host, network, and isolation around it. Defense in depth, not one silver bullet.`);
 }
 
 {
@@ -495,7 +656,6 @@ divider("04", "Supply chain security", "Where a hardened base fits the bigger th
     { text: "github.com/patterncatalyst/hummingbird-tutorial", options: { breakLine: true, color: COLOR.ink } },
     { text: "images.redhat.com  ·  the GA catalog and canonical image names", options: { color: COLOR.caption } },
   ], { x: 6.00, y: 5.05, w: 6.80, h: 0.80, fontFace: FONT.mono, fontSize: 12, align: "left", valign: "top", lineSpacingMultiple: 1.3 });
-  s.addText(REV, { x: 11.85, y: 5.85, w: 0.95, h: 0.30, fontFace: FONT.mono, fontSize: 11, color: COLOR.caption, align: "right", valign: "middle" });
   try { s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.10, y: 6.80, w: 1.55, h: 0.37 }); } catch (e) {}
   addNotes(s, "Close, then open the floor. The single line to leave them with: near-zero CVE isn't a slogan to take on faith — it's one Grype command away from being their own measurement, and the workflow they just saw runs entirely on Podman on a laptop. Point them at the repo for the runnable examples and the eight demos, and at images.redhat.com for the GA catalog and the canonical image names and pull paths.");
 }

@@ -1,31 +1,29 @@
 # Presentations
 
 A Red Hat-branded slide deck introducing Project Hummingbird / Red Hat
-Hardened Images to an audience of admins.
+Hardened Images to a professional, container-literate audience.
 
 ## The deck
 
-**`hummingbird-overview.pptx`** — 40 slides, 16:9, with full speaker notes on
-every slide. Open it in PowerPoint, Keynote, or LibreOffice Impress.
+**`hummingbird-overview.pptx`** — 43 slides, 16:9, with detailed speaker
+notes on every slide. Open it in PowerPoint, Keynote, or LibreOffice Impress.
 
-The filename is intentionally **unversioned** — git history is the source of
-truth for revisions. The current revision is shown on the cover slide (the
-`REV` marker) and recorded in the changelog below.
-
-Structure: cover, an agenda, a "What is Hummingbird" section, a diagram-led
-"Working with the images" tour, a "demo walkthrough" mapping to the eight
-command-line demos, a "Supply chain security" close-out, a recap, and a
-thank-you slide.
+The speaker notes are written to carry a live talk: they define the
+acronyms a technical audience will ask about (SLSA, PIE/RELRO/FORTIFY_SOURCE,
+CIS/STIG/OpenSCAP, provenance, Konflux, Trusted Artifact Signer), walk the
+debug-sidecar and supply-chain diagrams step by step, and name the
+production tooling (Grype, Trivy, Clair, RHACS Scanner V4) rather than only
+the demo tool.
 
 ## Currency — reviewed against GA (May 12, 2026)
 
-Product claims were checked against Red Hat's GA materials
-(redhat.com/en/blog/red-hat-hardened-images, images.redhat.com,
-hummingbird-project.io). Highlights: RHHI is the GA product, Project
-Hummingbird the upstream engine; free on any Linux/Kubernetes/engine with
-optional LTS; 45+ images / 150+ variants; SLSA 3 (Konflux); compliance via
-OpenSCAP; default non-root user UID 65532 (the example Containerfiles pin
-USER 1001 by choice); Trusted Libraries Tech Preview, Python-only.
+Product claims checked against Red Hat's GA materials (images.redhat.com,
+redhat.com, hummingbird-project.io) and developer documentation. RHHI is the
+GA product, Project Hummingbird the upstream engine; free on any
+Linux/Kubernetes/engine with optional LTS; 45+ images / 150+ variants; built
+in Konflux with SLSA 3 signed provenance + SBOM; compliance via OpenSCAP;
+default non-root UID 65532 (example Containerfiles pin USER 1001 by choice);
+Trusted Libraries Tech Preview, Python-only.
 
 ## Rebuilding it
 
@@ -40,27 +38,34 @@ brand `assets/`, and rendered diagram `png/`.
 
 ## Versioning
 
-The `.pptx` filename is stable; revisions live in git history. On each change,
-bump the `REV` constant in `src/deck.js` (it prints on the cover) and add a
-changelog entry here.
+The `.pptx` filename is stable; the revision is no longer printed on the
+slides. Revisions live in git history and in this changelog; bump the `REV`
+constant in `src/deck.js` on each change.
 
 ### Changelog
 
-- **r01.6** — Added an agenda slide (after the cover) and a closing thank-you
-  slide (bookending the cover panel). 38 → 40 slides.
-- **r01.5** — Editorial pass: removed tutorial-companion framing and hedging
-  words ("honestly", "be candid", etc.). No structural or factual changes.
-- **r01.4** — Supply-chain close-out reworked into a problem → answer arc;
-  added the generic stage-setter (Figure 18.1), renumbered the other figures,
-  removed third-party attribution from Figure 18.1. 37 → 38 slides.
-- **r01.3** — Added the closing Supply chain security section. 33 → 37 slides.
-- **r01.2** — Corrected the default non-root user to UID 65532; stable
-  unversioned `.pptx` filename.
+- **r01.7** — Professional-audience pass. Removed the on-slide revision
+  marker and remaining hedging language. Expanded speaker notes throughout
+  with definitions (SLSA, PIE/RELRO/FORTIFY_SOURCE/annobin, CIS/STIG/
+  OpenSCAP, provenance, Konflux, Trusted Artifact Signer, SLSA L3) and
+  step-by-step walkthroughs (debug sidecar; per-stage supply-chain attack
+  and mitigation; runtime exploits and platform controls). Added real-world
+  scanner guidance (Grype/Trivy/Clair/RHACS Scanner V4, VEX) and SBOM
+  retrieval detail (registry attestation vs in-image rpmdb; vendor SBOMs).
+  New slides: a multi-stage Containerfile example, a CVE-scanning CLI
+  example, and a Trusted Libraries value diagram. Rebuilt the compose
+  diagram (fixed overlapping labels) and added the SciPy/libstdc++
+  "when not to use" gotcha. 40 → 43 slides.
+- **r01.6** — Added an agenda slide and a closing thank-you slide.
+- **r01.5** — Removed tutorial-companion framing and hedging words.
+- **r01.4** — Supply-chain close-out reworked into problem → answer; added
+  the generic stage-setter and renumbered the figures.
+- **r01.3** — Added the Supply chain security section.
+- **r01.2** — UID 65532 fix; stable unversioned filename.
 - **r01.1** — Reconciled to GA (May 12, 2026).
-- **r01.0** — Initial deck (not released).
 
 ## Status
 
 **Reviewed.** Builds, eyeballed page-by-page, product claims checked against
-Red Hat GA materials. Confirm image names/tags/paths against `images.redhat.com`
-before an external talk.
+Red Hat GA materials. Confirm image names/tags/paths against
+`images.redhat.com` before an external talk.
