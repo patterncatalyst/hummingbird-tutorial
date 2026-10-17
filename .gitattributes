@@ -1,0 +1,18 @@
+# GitHub Linguist overrides — surface Shell, the real language of this tutorial
+# (podman / podman-compose commands and demo scripts).
+# Jekyll site chrome, generated output, and slide-deck tooling are NOT the source.
+_site/**         linguist-generated
+_layouts/**      linguist-documentation
+_includes/**     linguist-documentation
+_sass/**         linguist-documentation
+_data/**         linguist-documentation
+assets/**        linguist-documentation
+presentations/** linguist-vendored
+presentation/**  linguist-vendored
+*.html           linguist-documentation
+*.css            linguist-detectable=false
+*.js             linguist-detectable=false
+# Re-include examples/ (excluded by default) so its shell counts too.
+examples/** linguist-vendored=false linguist-generated=false linguist-documentation=false
+# The demos and scripts are the point: keep shell detectable.
+*.sh linguist-detectable=true
