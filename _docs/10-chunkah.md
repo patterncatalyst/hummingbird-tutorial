@@ -199,9 +199,3 @@ You should be able to:
 [Real-world examples]({{ "/docs/11-real-world-examples/" | prepend: site.baseurl }})
 walks through five end-to-end scenarios that pull together
 everything from the previous ten sections.
-
-> **Reconciliation note.** This section is the most speculative
-> in the tutorial — the broad architectural idea behind `chunkah`
-> is well-documented, but the exact CLI surface used here needs
-> verification. See the
-> [reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }}).

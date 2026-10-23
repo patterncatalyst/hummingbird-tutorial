@@ -338,8 +338,6 @@ optional follow-ups that go deeper on specific topics:
 - [Pruning Podman images and build cache]({{ "/docs/16-pruning/" | prepend: site.baseurl }}) — reclaim disk on a laptop where bases accumulate.
 - [Distroless gotchas — lessons from the field]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }}) — debugging-and-prevention reference for the rough edges that come up running real workloads on Hummingbird's distroless runtime. Symptom, root cause, fix for everything we hit during tutorial development.
 
-The [reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
-tracks what needs to be verified or expanded. If you spotted
-something in the tutorial that didn't match what your environment
-does, that's the right place to start — open an issue and we'll
+If you spotted something in the tutorial that didn't match what your
+environment does, open an issue and we'll
 pick it up against the plan.

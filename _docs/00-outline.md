@@ -184,9 +184,8 @@ A few things are out of scope on purpose:
 - **Comparisons to other vendors.** This tutorial is about how to
   use Hummingbird, not how it stacks up against alternatives.
 
-The [reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
-records which of these may be added in future iterations and which
-are firmly out of scope.
+Some of these may be added in future iterations; others are firmly out
+of scope.
 
 ## Estimated time
 

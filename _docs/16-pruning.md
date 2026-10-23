@@ -277,9 +277,6 @@ You should be able to:
 ## Where to go next
 
 You've now seen the full tutorial. The
-[reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
-records what's still being verified end-to-end against a live
-Hummingbird catalog. The
 [examples directory]({{ "/examples/" | prepend: site.baseurl }})
 has every Containerfile from the tutorial as a runnable
 companion project.
