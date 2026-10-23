@@ -5,12 +5,30 @@ description: Extend the trust chain from base image to application dependencies.
 duration: 30 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain what trust the base image gives you and where the gap
+  starts (a public, unaudited PyPI index)
+- Configure pip to use the Red Hat Trusted Libraries index with
+  PyPI as a fallback
+- Modify a Hummingbird Python Containerfile to fetch wheels from
+  Trusted Libraries in the builder stage and install them offline
+  in the runtime stage
+- Pull and verify a package's SLSA Level 3 provenance attestation
+  with cosign
+- Merge Trusted Libraries attestations into the §12 custom SBOM
+- Name the Tech Preview limitations: Python-only coverage, partial
+  index coverage, and subscription-gated support
+
+## Why this matters
+
 Hummingbird gets you trust at the **container image layer**: a
 near-zero-CVE base image with a signed SBOM, built reproducibly
 in a hardened pipeline. But your Python application doesn't run on
 the base image alone: it runs on the image *plus* whatever you
 pulled from PyPI. And PyPI is, by design, a public unaudited index.
-
 [Red Hat Trusted Libraries](https://packages.redhat.com/trusted-libraries)
 is the natural complement: a pip-compatible package index of
 curated Python libraries, **built from source** in Red Hat's

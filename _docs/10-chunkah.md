@@ -5,6 +5,19 @@ description: A deeper layer-management tool that complements zstd:chunked. Walk 
 duration: 30 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain the difference between `zstd:chunked` (how layers compress) and `chunkah` (what goes into each layer)
+- Split a container image's layers along chosen file-system boundaries with `chunkah`
+- Separate application code from third-party dependencies into independently cacheable layers
+- Isolate files by extended attribute (xattr) tags rather than directory boundaries
+- Combine `chunkah` splitting with `zstd:chunked` compression for maximum registry-traffic savings
+- Decide when manual layer splitting is worth the added build complexity
+
+## Why this matters
+
 `chunkah` is a tool for splitting container image layers along
 file-system boundaries you choose, rather than along the
 boundaries the build process happens to produce. Where

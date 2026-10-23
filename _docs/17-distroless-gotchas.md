@@ -5,25 +5,44 @@ description: A debugging-and-prevention reference for the rough edges that surfa
 duration: 30 minutes
 ---
 
-This section exists because Hummingbird's
-[distroless]({{ "/docs/02-introduction/#distroless" | prepend: site.baseurl }}) minimalism, the
-property that makes it a great runtime for security-conscious workloads,
-also magnifies every implicit assumption baked into the wider container
-ecosystem. A tool that "just works" on UBI or Alpine because some package
-is incidentally present can fail in surprising ways on a runtime that
-ships only what's strictly needed.
+## Learning objectives
 
-This page collects the issues that came up while writing and testing
-this tutorial against real Hummingbird images, in roughly the order
-you're likely to hit them. Each entry has the symptom you'll see, the
-root cause, and the fix.
+By the end of this chapter you can:
 
-If you're hitting an unfamiliar problem with a Hummingbird build, the
-fastest path is usually: skim this list for the symptom, apply the fix,
-move on. Many of the symptoms (`mvn: command not found`,
-`Connection reset by peer`, `cannot open shared object file`) are
-cryptic on first encounter and quick to diagnose once you've
-seen them once.
+- Fix "`/bin/sh` not found" errors by moving shell-dependent build
+  steps into the builder stage
+- Set `HOME` and tool-specific cache variables so a non-root build
+  user can write its cache files
+- Build a Maven- or Gradle-driven Java project on UBI and deploy
+  the resulting artifact on a Hummingbird runtime
+- Copy the shared libraries (`libstdc++`, `libgomp`, and similar) a
+  native Python extension needs into a distroless runtime
+- Diagnose "Connection reset by peer" caused by an IPv4/IPv6
+  dual-stack mismatch between client and listener
+- Map upstream Postgres environment variable names instead of
+  sclorg conventions in a compose file
+- Decide when a shared-library accommodation list has grown long
+  enough to switch a workload from Hummingbird to UBI
+
+## Why this matters
+
+Hummingbird's [distroless]({{ "/docs/02-introduction/#distroless" | prepend: site.baseurl }})
+minimalism is what makes it a strong runtime for security-conscious
+workloads, and it also surfaces every implicit assumption baked into
+the wider container ecosystem. A tool that works on UBI or Alpine
+because some package happens to be present can fail in unfamiliar
+ways on a runtime that ships only what's strictly needed. This page
+collects the issues that came up while building and testing this
+tutorial against real Hummingbird images, each entry framed as
+symptom, root cause, and fix, so a Hummingbird build picks up the
+design pattern instead of a workaround.
+
+If you hit an unfamiliar problem with a Hummingbird build, the
+fastest path is usually to skim this list for the symptom and apply
+the fix. Symptoms like `mvn: command not found`, `Connection reset
+by peer`, and `cannot open shared object file` look cryptic on
+first encounter and are quick to place once you've seen the
+pattern once.
 
 ## Build-time gotchas
 

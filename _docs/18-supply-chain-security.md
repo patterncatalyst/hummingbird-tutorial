@@ -5,6 +5,23 @@ description: A final chapter that places everything the tutorial built (hardened
 duration: 30 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Sketch the container supply chain and name the attack vector at
+  each stage, in Podman/OpenShift terms
+- Say which vectors a Hummingbird base image closes by
+  construction, and which remain your responsibility
+- Verify both the signature and the attached attestations of a
+  Hummingbird image on pull
+- Explain why an OpenShift admission policy is what closes the
+  malicious-deployment-definition vector
+- Describe the layered runtime attack surface and where the
+  hardened image helps, and where it does not
+
+## Why this matters
+
 Every previous chapter solved one piece of a larger problem. This
 one steps back and names the problem.
 

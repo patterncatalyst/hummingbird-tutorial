@@ -5,6 +5,19 @@ description: Use Hummingbird builder images for the build stage and Hummingbird 
 duration: 45 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Build a two-stage Containerfile using a Hummingbird builder image and a distroless Hummingbird runtime image
+- Apply the two-stage rules consistently: builder first, runtime last, pinned tags, `COPY`-only in the runtime stage
+- Build Quarkus (JVM mode), Python (wheel-build), and Go (static binary) example images end to end
+- Set `HOME` and per-language cache paths in the builder stage to avoid permission errors under UID 1001
+- Swap registry hosts between a public registry and an internal mirror using build args, without editing the Containerfile
+- Recognize language-specific pitfalls: JDK builder/runtime mismatches, Python wheel and version matching, and attaching delve to a Go binary
+
+## Why this matters
+
 This is the canonical Hummingbird workflow. You build your
 application in one stage using a *builder* image (a Hummingbird
 language image with the compiler, package manager, and headers

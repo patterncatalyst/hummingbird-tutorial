@@ -5,6 +5,19 @@ description: A four-layer debugging strategy for images that have no shell, no c
 duration: 25 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Diagnose a running container with Podman's built-in inspect, logs, top, and events commands
+- Add structured logging that surfaces failures without a shell
+- Attach an ephemeral debug sidecar to a running container and reach its network and process namespace
+- Enable stronger introspection (strace, gdb, perf) with `SYS_PTRACE` and the matching SELinux label adjustment
+- Debug a pod in Kubernetes with `kubectl debug`'s ephemeral containers
+- Run an interactive debugger (pdb, jdb, delve) from a Hummingbird builder image with your code mounted in
+
+## Why this matters
+
 This section is the "no shell" promise turned into a habit. The
 moment you build something on Hummingbird and it doesn't behave
 the way you expect, you'll need a debugging workflow that doesn't

@@ -5,15 +5,21 @@ description: Pull, inspect, and run your first Hummingbird image; learn the ephe
 duration: 25 minutes
 ---
 
-This is the section where the design ideas from the introduction
-become tangible. By the end, you'll have:
+## Learning objectives
 
-- pulled a Hummingbird image and inspected its manifest,
-- watched `podman exec ... /bin/sh` fail by design,
-- attached a debug sidecar that shares the running container's
-  PID and network namespaces, and
-- compared the layer count and size against a UBI image so the
-  "minimal runtime" claim has numbers behind it.
+By the end of this chapter you can:
+
+- Pull a Hummingbird image and confirm it in local storage
+- Inspect a Hummingbird image manifest with `podman inspect` and `skopeo inspect`
+- Run a Hummingbird image and verify it is serving traffic
+- Explain why `podman exec` into a Hummingbird container fails, by design
+- Attach an ephemeral debug sidecar that shares a running container's PID and network namespaces
+- Compare layer count and image size against a stock image to quantify the minimal-runtime claim
+
+## Why this matters
+
+This is the section where the design ideas from the introduction
+become tangible.
 
 If you have not finished the prerequisites, do that first: every
 command below assumes the environment variables `HB_REGISTRY` and

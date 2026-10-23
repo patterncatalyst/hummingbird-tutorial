@@ -5,6 +5,19 @@ description: Stand up a small multi-service stack with Hummingbird base images a
 duration: 30 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Build and wire together a three-service stack (web, db, otel) on Hummingbird base images with Podman Compose
+- Write a `compose.yaml` that works under both `podman-compose` and `docker compose`
+- Apply the `:Z` SELinux relabeling suffix correctly on Fedora bind mounts
+- Configure service-name DNS and `OTEL_EXPORTER_OTLP_ENDPOINT` for inter-container traffic
+- Set healthcheck `start_period` values so slow-booting services don't break dependency ordering
+- Bring the stack up, smoke-test it, and tear it down cleanly with `podman-compose`
+
+## Why this matters
+
 This section moves from single images to a multi-service stack:
 a web tier, a database, and an OpenTelemetry collector: all
 running on Hummingbird base images, all managed by Podman

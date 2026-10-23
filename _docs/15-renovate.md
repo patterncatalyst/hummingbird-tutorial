@@ -5,6 +5,23 @@ description: Configure Renovate to watch Hummingbird base image tags on quay.io 
 duration: 20 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain why automated base-image updates matter more for
+  Hummingbird than for typical base images
+- Configure Renovate's `customManagers` regex to match the
+  tutorial's `${HB_REGISTRY}` Containerfile pattern
+- Choose between floating-tag, exact-tag, and digest-pinning
+  strategies for a stated risk profile
+- Combine Renovate auto-merge with a CI-gated grype scan so a bad
+  bump never reaches main
+- Tag and push your own application images with calendar
+  versioning, a digest, and multiple floating tags
+
+## Why this matters more for Hummingbird than for stock images
+
 The whole point of Hummingbird is a base image that ships free of
 known CVEs. The only way to *stay* free of known CVEs as new ones
 are disclosed is to consume new builds promptly and reliably,
@@ -19,8 +36,6 @@ gives you continuous, low-risk base-image updates.
 This section configures Renovate against `quay.io/hummingbird`
 and walks through three tag-pinning strategies; choose the one
 that matches how often you want to ship.
-
-## Why this matters more for Hummingbird than for stock images
 
 A stock `python:3.11` image on a typical public registry gets new
 builds when the maintainers feel like it, sometimes weekly,

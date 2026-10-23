@@ -5,6 +5,18 @@ description: Five end-to-end scenarios that pull together everything from the pr
 duration: 45 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Build and sign a secure Python microservice image with an attached SBOM
+- Compile heavy ML dependencies in a builder stage and ship only the resulting wheels at runtime
+- Harden an edge-application build with pinned digests, `zstd:chunked`, and `chunkah` layering
+- Script a local DevSecOps pipeline that scans, signs, and attests before pushing
+- Explain which layer of the trusted application stack solves which problem
+
+## Why this matters
+
 This section is where everything from sections 1–10 lands in a
 real shape. Each example is a small but realistic scenario you
 can build on your laptop and walk away with a usable artifact.

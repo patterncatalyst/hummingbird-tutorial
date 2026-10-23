@@ -5,6 +5,22 @@ description: Reclaim disk on a laptop where Hummingbird base updates accumulate.
 duration: 15 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Read `podman system df` and identify how much storage is
+  reclaimable
+- Choose between `podman image prune`, `podman image prune -a`,
+  and `podman system prune` for a stated goal
+- Prune images and containers by age using `--filter until=...`
+- Explain when `buildah unshare` is needed to force rootless
+  storage to release freed space
+- Set up a weekly automated prune via systemd (Fedora) or launchd
+  (macOS)
+
+## Why this matters
+
 This section is short, practical, and runs once when you notice
 your laptop's disk is full and never again until it is again.
 Pulling Hummingbird runtimes and builders for several languages,
