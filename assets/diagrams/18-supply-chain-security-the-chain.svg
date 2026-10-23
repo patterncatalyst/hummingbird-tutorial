@@ -24,7 +24,7 @@
 <path d="M455,338 L455,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
 <path d="M680,300 L680,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
 <path d="M877,300 L877,249" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
-<text x="490" y="30" font-size="14" fill="#888" text-anchor="middle" font-weight="700">The container supply chain — and where it gets attacked</text>
+<text x="490" y="30" font-size="14" fill="#888" text-anchor="middle" font-weight="700">The container supply chain: and where it gets attacked</text>
 <text x="100" y="92" font-size="12" fill="#555555" text-anchor="middle">Tamper with source code</text>
 <text x="480" y="55" font-size="12" fill="#555555" text-anchor="middle">Vulnerable base images</text>
 <text x="480" y="78" font-size="12" fill="#555555" text-anchor="middle">Vulnerable dependencies</text>

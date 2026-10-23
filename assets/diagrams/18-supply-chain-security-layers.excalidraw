@@ -1442,13 +1442,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "signed + reproducible, verified by cosign \u2014 so the image is not the weak link",
+   "text": "signed + reproducible, verified by cosign: so the image is not the weak link",
    "fontSize": 12,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "signed + reproducible, verified by cosign \u2014 so the image is not the weak link",
+   "originalText": "signed + reproducible, verified by cosign: so the image is not the weak link",
    "lineHeight": 1.25,
    "baseline": 12
   }
