@@ -14,21 +14,21 @@ layers of that workflow, from cheapest to most invasive.
 The four layers, from least intrusive to most:
 
 1. **Local Podman commands.** `inspect`, `logs`, `top`, `port`,
-   `events` — everything you can do without putting any code into
+   `events`: everything you can do without putting any code into
    the container.
 2. **Log-first diagnostics.** Make the application emit enough
    structured information that you rarely need to reach for a
    shell.
 3. **Ephemeral debug containers.** The sidecar pattern from
    section 3, scaled up to the whole toolkit a Linux engineer
-   normally has — including a stronger variant with
+   normally has, including a stronger variant with
    `SYS_PTRACE` for `strace`/`gdb`/`perf` work.
 4. **Kubernetes ephemeral debug containers.** When the deployment
    target is a cluster, `kubectl debug` does the same thing the
    sidecar pattern does, but with the cluster as the orchestrator.
 
 Plus a complementary fifth technique: **in-image debug with a
-builder image** — for when you're developing the app and want a
+builder image**, for when you're developing the app and want a
 shell with `dnf`, debug-symbol packages, and your code mounted
 in. This pattern works alongside the four layers, not instead of
 them.
@@ -36,9 +36,9 @@ them.
 {% include excalidraw.html
    file="08-debugging-layers"
    alt="Diagram showing the four debugging layers from cheap (logs) to invasive (ephemeral debug container) with appropriate use cases"
-   caption="Figure 8.1 — The four debugging layers and when each one earns its keep" %}
+   caption="Figure 8.1: The four debugging layers, from cheapest to most invasive" %}
 
-## Layer 1 — Local Podman commands
+## Layer 1: Local Podman commands
 
 Before reaching for any new tooling, exhaust what `podman` itself
 will tell you.
@@ -76,7 +76,7 @@ podman events --filter container="$CTR" --since 30m --until now
 If those five commands tell you what's wrong, you don't need
 layer 2. Quite often they do.
 
-## Layer 2 — Log-first diagnostics
+## Layer 2: Log-first diagnostics
 
 The Hummingbird design pushes you toward applications that emit
 useful structured logs by default, because the alternative
@@ -117,11 +117,12 @@ Then on the host:
 podman logs hb-node | jq -r 'select(.level == "error")'
 ```
 
-## Layer 3 — Ephemeral debug containers
+## Layer 3: Ephemeral debug containers
 
-When logs aren't enough — the container is up but not responding,
-or there's network weirdness, or you need to look at file system
-state — attach a sidecar that shares the right namespaces.
+When logs aren't enough, because the container is up but not
+responding, there's network weirdness, or you need to look at
+file system state, attach a sidecar that shares the right
+namespaces.
 
 The shell function below codifies the pattern. Add it to your
 `~/.bashrc` or `~/.zshrc`:
@@ -144,13 +145,13 @@ hb-debug() {
 
 What each flag does:
 
-- `--pid=container:$1` — see the target container's processes.
-- `--network=container:$1` — see its network state and reach its
+- `--pid=container:$1`: see the target container's processes.
+- `--network=container:$1`: see its network state and reach its
   ports via `localhost`.
-- `--volumes-from $1` — see its volume mounts. Be careful with
-  this in production debugging — it gives you write access to
+- `--volumes-from $1`: see its volume mounts. Be careful with
+  this in production debugging: it gives you write access to
   the volumes.
-- The toolbox image — a UBI image with bash, curl, ss, ps,
+- The toolbox image: a UBI image with bash, curl, ss, ps,
   strace, tcpdump, and the rest of a working diagnostic
   toolkit.
 
@@ -177,7 +178,7 @@ ls -la /proc/1/fd
 The sidecar above is enough for poking at network state, file
 descriptors, and process listings. When you need `strace`, `gdb`,
 `perf`, or anything that uses `ptrace(2)`, the basic flags aren't
-sufficient — you need to grant the debug container the
+sufficient: you need to grant the debug container the
 `SYS_PTRACE` capability and (on SELinux-enforcing hosts) relax
 the security label so the debug container can actually attach to
 the target.
@@ -199,20 +200,20 @@ strace -p 1                    # attach to the target's PID 1
 
 Three flags to understand:
 
-- **`--cap-add=SYS_PTRACE`** — without this, `strace -p` and `gdb
+- **`--cap-add=SYS_PTRACE`**: without this, `strace -p` and `gdb
   attach` return *Operation not permitted*.
-- **`--security-opt label=disable`** — bypasses SELinux's
+- **`--security-opt label=disable`**: bypasses SELinux's
   `container_t` isolation for this debug container only. The
   target container's labels are unchanged. On macOS this is a
   no-op; on Fedora it's required to attach.
-- **`--user 0`** — root inside the debug container, so `dnf install`
+- **`--user 0`**: root inside the debug container, so `dnf install`
   works.
 
 Use this variant only when you actually need ptrace. The basic
 sidecar covers the majority of debugging cases without lifting any
 security constraints.
 
-## Layer 4 — Kubernetes ephemeral debug containers
+## Layer 4: Kubernetes ephemeral debug containers
 
 When you're past the laptop and into a cluster, `kubectl debug`
 does the equivalent of the sidecar pattern, but with the
@@ -231,10 +232,10 @@ only the pod's network and volumes, not the target container's
 PID namespace.
 
 This is out of scope for the laptop-focused tutorial, but worth
-mentioning for completeness — the mental model is the same as
+mentioning for completeness: the mental model is the same as
 layer 3.
 
-## Newer technique — in-image debug with a builder image
+## Newer technique: in-image debug with a builder image
 
 The four layers above all assume you have a *running* container
 that needs poking at. There's a complementary pattern for the
@@ -245,7 +246,7 @@ into it, and use the builder's package manager to install
 debug-variant tools.
 
 Why this works: Hummingbird builder images carry `dnf` and the
-language toolchain. The runtime images don't — that's the whole
+language toolchain. The runtime images don't; that's the whole
 point. So the builder is the right place for `dnf install
 python3-debug`, `gdb`, `strace`, and friends, even though you'd
 never ship those into production.
@@ -262,16 +263,16 @@ podman run -it --rm \
 
 Three things to notice:
 
-1. **`--user 0`** — root inside the container. Required so `dnf
+1. **`--user 0`**: root inside the container. Required so `dnf
    install` has permission. The container is ephemeral; this is
    only a risk in the sense that whatever you `dnf install` could
-   come from a compromised mirror — same risk as on any build
+   come from a compromised mirror, the same risk as on any build
    host.
-2. **`-v ./app:/app:Z`** — your local working directory is mounted
+2. **`-v ./app:/app:Z`**: your local working directory is mounted
    into the container. Edits on the host are visible to the
    running process; the `:Z` suffix relabels for SELinux on
    Fedora and is a no-op on macOS.
-3. **`registry.access.redhat.com/hi/...`** — this is the Red Hat
+3. **`registry.access.redhat.com/hi/...`**: this is the Red Hat
    container catalog path for Hummingbird images. The build
    sections of this tutorial use the `quay.io/hummingbird` mirror;
    both should resolve to the same content. If your environment
@@ -279,7 +280,7 @@ Three things to notice:
    at `registry.access.redhat.com` is the canonical Red Hat
    customer path.
 
-### Worked example — Python with pdb
+### Worked example: Python with pdb
 
 ```bash
 # Drop into a Python builder shell with your code mounted.
@@ -298,7 +299,7 @@ breakpoints, step through, and when you've identified the issue,
 fix the host file (the mount makes that a normal edit) and exit
 the container.
 
-### Worked example — Java with jdb
+### Worked example: Java with jdb
 
 ```bash
 # Build with debug info first (host or in-container).
@@ -316,7 +317,7 @@ For attaching to an already-running JVM in JDWP mode, expose the
 JDWP port from the original container and use `jdb -attach
 host:port` from this one.
 
-### Worked example — Go with delve
+### Worked example: Go with delve
 
 ```bash
 podman run -it --rm --user 0 \
@@ -338,10 +339,10 @@ shape. The in-image builder approach is for debugging during
 | Scenario                                                    | Pattern                              |
 |-------------------------------------------------------------|--------------------------------------|
 | Local development, need a debugger or profiler              | In-image builder (this section)      |
-| Reproducing a bug from a running production-shape image     | Layer 3 — basic sidecar              |
-| App crashes on first request, can't catch it under pdb      | Layer 3 — sidecar with `SYS_PTRACE`  |
+| Reproducing a bug from a running production-shape image     | Layer 3: basic sidecar              |
+| App crashes on first request, can't catch it under pdb      | Layer 3: sidecar with `SYS_PTRACE`  |
 | Inspecting dependencies that aren't in the runtime image    | In-image builder                     |
-| Profiling a hot path under realistic load                   | Layer 3 — sidecar with `SYS_PTRACE`  |
+| Profiling a hot path under realistic load                   | Layer 3: sidecar with `SYS_PTRACE`  |
 
 ## When to reach for which layer
 

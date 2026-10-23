@@ -8,7 +8,7 @@ duration: 30 minutes
 Hummingbird gets you trust at the **container image layer**: a
 near-zero-CVE base image with a signed SBOM, built reproducibly
 in a hardened pipeline. But your Python application doesn't run on
-the base image alone — it runs on the image *plus* whatever you
+the base image alone: it runs on the image *plus* whatever you
 pulled from PyPI. And PyPI is, by design, a public unaudited index.
 
 [Red Hat Trusted Libraries](https://packages.redhat.com/trusted-libraries)
@@ -21,18 +21,18 @@ and the rest of that tier) are covered.
 
 This section integrates Trusted Libraries into a Python
 Containerfile alongside a Hummingbird base image. The end result:
-every byte of your application — base layer, runtime layer,
-language packages, and your own code — is built and signed by an
-auditable pipeline.
+every byte of your application, including the base layer, runtime
+layer, language packages, and your own code, is built and signed
+by an auditable pipeline.
 
 {% include excalidraw.html
    file="13-trusted-libraries-provenance"
-   alt="The application image contains a hardened base (signed, with SBOM and SLSA provenance) plus your application and its Python dependencies. Those dependencies can come from PyPI (public, unsigned, unaudited — the gap) or from Red Hat Trusted Libraries (rebuilt from source with SLSA Level 3 provenance, signed via Trusted Artifact Signer — verified)."
-   caption="Figure 13.1 — The base image is already trusted; Trusted Libraries extends the same provenance down to your Python dependencies." %}
+   alt="The application image contains a hardened base (signed, with SBOM and SLSA provenance) plus your application and its Python dependencies. Those dependencies can come from PyPI (public, unsigned, unaudited: the gap) or from Red Hat Trusted Libraries (rebuilt from source with SLSA Level 3 provenance, signed via Trusted Artifact Signer, verified)."
+   caption="Figure 13.1: The base image is already trusted; Trusted Libraries extends the same provenance down to your Python dependencies." %}
 
 > **The index is gated.** Because Trusted Libraries is a Tech
 > Preview, the index at `packages.redhat.com/trusted-libraries`
-> requires authentication — you enroll in the preview and
+> requires authentication: you enroll in the preview and
 > configure pip/curl with your Red Hat credentials. An
 > *unauthenticated* request returns **HTTP 401**. Read that as
 > "not enrolled / not authenticated," **not** "package missing."
@@ -51,8 +51,8 @@ A typical `pip install pandas` does the following:
 
 The wheel was built by whoever uploaded it. PyPI doesn't rebuild
 or re-sign anything; it's a passthrough. If the upload pipeline
-is compromised — supply-chain attack, stolen API key — the wheel
-ships compromised, and PyPI has no way to know.
+is compromised, whether by a supply-chain attack or a stolen API
+key, the wheel ships compromised, and PyPI has no way to know.
 
 Trusted Libraries replaces step 2: the wheel comes from Red Hat's
 build infrastructure, signed by Red Hat, with a SLSA L3
@@ -81,7 +81,7 @@ Two index URLs because Trusted Libraries doesn't yet cover all of
 PyPI. Pip tries Trusted Libraries first; if a package isn't there
 (your obscure data-processing dep, your private fork), it falls
 back to pypi.org. Audit your dependency list to see which fall
-into which bucket (this requires an authenticated session — see
+into which bucket (this requires an authenticated session; see
 the gated-index note above; without credentials every line returns
 401 and prints `✗`, which means "couldn't check," not "not
 covered"):
@@ -143,7 +143,7 @@ EXPOSE 8000
 CMD ["python3", "-m", "src.main"]
 ```
 
-The runtime stage doesn't reach the network — `--no-index
+The runtime stage doesn't reach the network: `--no-index
 --find-links=/tmp/wheels` installs from the wheels the builder
 already fetched. So the trust decision (which index, which
 attestations to require) happens once in the builder.
@@ -152,7 +152,7 @@ attestations to require) happens once in the builder.
 
 Each package on the index ships with an in-toto attestation. Pull
 and verify it before you install (these fetches use the same
-authenticated index session as above — unauthenticated they 401):
+authenticated index session as above; unauthenticated they 401):
 
 ```bash
 # Get the package metadata, including the provenance URL.
@@ -221,7 +221,7 @@ Things to know going in:
   is public; production support and SLAs are part of the Red Hat
   Advanced Developer Suite subscription.
 
-## Calunga — the upstream community version
+## Calunga: the upstream community version
 
 The upstream/community version of Trusted Libraries is the
 **Calunga project**. If you're building images outside the Red

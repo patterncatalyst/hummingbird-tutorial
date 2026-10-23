@@ -6,11 +6,11 @@ duration: 30 minutes
 ---
 
 This section moves from single images to a multi-service stack:
-a web tier, a database, and an OpenTelemetry collector — all
+a web tier, a database, and an OpenTelemetry collector: all
 running on Hummingbird base images, all managed by Podman
 Compose.
 
-The example is deliberately small enough to fit on one page.
+The example is small enough to fit on one page.
 Real production stacks have more services and more configuration,
 but the patterns here scale up cleanly.
 
@@ -19,18 +19,18 @@ but the patterns here scale up cleanly.
 {% include excalidraw.html
    file="07-podman-compose-stack"
    alt="Architecture diagram: an Nginx-fronted web app talking to PostgreSQL, with an OpenTelemetry collector receiving traces from the web app"
-   caption="Figure 7.1 — The compose stack we'll stand up in this section" %}
+   caption="Figure 7.1: The compose stack we'll stand up in this section" %}
 
 Three services:
 
-1. **`web`** — a small Node.js application built on Hummingbird's
+1. **`web`**: a small Node.js application built on Hummingbird's
    Node runtime. It writes a row to PostgreSQL on each request
    and emits a span to the collector.
-2. **`db`** — PostgreSQL on Hummingbird's PostgreSQL image.
-3. **`otel`** — OpenTelemetry Collector, receiving OTLP traces
+2. **`db`**: PostgreSQL on Hummingbird's PostgreSQL image.
+3. **`otel`**: OpenTelemetry Collector, receiving OTLP traces
    from `web`.
 
-## Step 1 — Project skeleton
+## Step 1: Project skeleton
 
 ```bash
 mkdir -p ~/hummingbird-tutorial/examples/compose-stack
@@ -38,7 +38,7 @@ cd ~/hummingbird-tutorial/examples/compose-stack
 mkdir -p web otel
 ```
 
-## Step 2 — The web service
+## Step 2: The web service
 
 ```bash
 cat > web/server.js <<'EOF'
@@ -84,7 +84,7 @@ CMD ["node", "server.js"]
 EOF
 ```
 
-## Step 3 — The OpenTelemetry collector configuration
+## Step 3: The OpenTelemetry collector configuration
 
 ```bash
 cat > otel/config.yaml <<'EOF'
@@ -112,10 +112,10 @@ service:
 EOF
 ```
 
-## Step 4 — The `compose.yaml`
+## Step 4: The `compose.yaml`
 
 This is the file with the most platform-specific content. Pay
-attention to the `:Z` suffix on the volume mounts — that's a
+attention to the `:Z` suffix on the volume mounts: that's a
 Fedora SELinux concern that becomes a no-op on macOS but is
 required on Fedora.
 
@@ -203,7 +203,7 @@ The three things to notice in that file:
    ordering for slower-booting frameworks. Thirty seconds is
    generous but cheap.
 
-## Step 5 — Bring it up
+## Step 5: Bring it up
 
 ```bash
 # Use the env var from the prerequisites for the registry.
@@ -221,7 +221,7 @@ podman-compose logs -f
 # (Ctrl-C to detach from the log stream — the stack keeps running.)
 ```
 
-## Step 6 — Smoke-test the stack
+## Step 6: Smoke-test the stack
 
 ```bash
 # Hit the web service.
@@ -235,7 +235,7 @@ ss -tlnp 2>/dev/null | grep -E "4317|4318" || \
 podman-compose exec db pg_isready -U app -d appdb
 ```
 
-## Step 7 — Tear it down
+## Step 7: Tear it down
 
 ```bash
 podman-compose down

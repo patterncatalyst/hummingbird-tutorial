@@ -7,7 +7,7 @@ duration: 20 minutes
 
 The whole point of Hummingbird is a base image that ships free of
 known CVEs. The only way to *stay* free of known CVEs as new ones
-are disclosed is to consume new builds — promptly, reliably, and
+are disclosed is to consume new builds promptly and reliably,
 without pulling 47 unrelated changes along with the bump.
 
 [Renovate](https://docs.renovatebot.com) is the right tool for
@@ -17,16 +17,16 @@ is available. Combined with your CI's existing test suite, this
 gives you continuous, low-risk base-image updates.
 
 This section configures Renovate against `quay.io/hummingbird`
-and walks through three tag-pinning strategies — choose the one
+and walks through three tag-pinning strategies; choose the one
 that matches how often you want to ship.
 
 ## Why this matters more for Hummingbird than for stock images
 
 A stock `python:3.11` image on a typical public registry gets new
-builds when the maintainers feel like it — sometimes weekly,
+builds when the maintainers feel like it, sometimes weekly,
 sometimes quarterly. Hummingbird rebuilds on every upstream RHEL CVE
 patch. That cadence makes the difference between zero CVEs and zero
-CVEs *for now* — and also means the base image you used last
+CVEs *for now*, and also means the base image you used last
 week may already have a successor.
 
 ## Setting up Renovate
@@ -97,7 +97,7 @@ version. Renovate then queries quay.io for newer tags of
 Pick one of three. They trade off update cadence against
 stability.
 
-### Strategy A — Floating major tag, frequent rebuilds
+### Strategy A: Floating major tag, frequent rebuilds
 
 Use a major-version tag like `:1` or `:latest-1.x`. Renovate
 flags new minor/patch releases. CI rebuilds on every PR merge.
@@ -124,7 +124,7 @@ FROM ${HB_REGISTRY}/python:3.13-builder
 pass, it lands. Combined with a strong test suite, this is the
 fastest CVE response.
 
-### Strategy B — Pinned exact tag, manual review
+### Strategy B: Pinned exact tag, manual review
 
 Use a fully-qualified tag like `:1.2.3-20260201`. Renovate
 flags every change. Each PR requires human review. Slow but
@@ -134,9 +134,9 @@ explicit; appropriate for tightly regulated environments.
 FROM ${HB_REGISTRY}/python:3.13.5-builder-20260201
 ```
 
-No `automerge` rule — the PR sits until a human approves.
+No `automerge` rule: the PR sits until a human approves.
 
-### Strategy C — Digest pinning, audit-grade
+### Strategy C: Digest pinning, audit-grade
 
 Pin by SHA-256 digest. The most precise; impossible to
 silently substitute. Renovate keeps the digest current as new
@@ -182,9 +182,9 @@ FROM ${HB_REGISTRY}/python@sha256:abcdef... AS runtime
 
 ## Tagging your own images
 
-Renovate solves the inbound side. The outbound side — what tag
-you push for your *application* — is just as important. A few
-conventions worth adopting:
+Renovate solves the inbound side. The outbound side, what tag
+you push for your *application*, is just as important. A few
+useful conventions:
 
 - **Calendar versioning for apps that don't have semantic
   releases:** `2026.05.01-1` (date plus daily sequence).
@@ -242,7 +242,7 @@ jobs:
         run: grype test-image --fail-on high
 ```
 
-If `grype --fail-on high` finds a high CVE, the PR fails — even
+If `grype --fail-on high` finds a high CVE, the PR fails, even
 if the build succeeds. That's the safety net that catches a bad
 upstream release. The PR sits open until a clean newer tag
 appears (which it usually does within hours).

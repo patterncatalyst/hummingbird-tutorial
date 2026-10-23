@@ -9,7 +9,7 @@ duration: 25 minutes
 Syft and attaching it as a Cosign attestation. That gets you a
 working chain of custody for the *image*. This section is about
 going further: building an SBOM that captures **what the
-application is**, not only what files happen to be in the image —
+application is**, not only what files happen to be in the image:
 including build-time information that scanning a finished image
 can't recover.
 
@@ -27,7 +27,7 @@ filesystem. That's a strong starting point. It misses:
 - **Pre-build dependencies.** The `pom.xml` declares Maven deps;
   the `requirements.txt` declares Python deps. After build, the
   dependency tree is in the image, but the *intent* is in the
-  source — and the source is what you committed and signed.
+  source; the source is what you committed and signed.
 
 A custom SBOM combines all of these into one signable artifact.
 
@@ -43,7 +43,7 @@ The flow we'll build:
 4. **Sign and attach** the merged SBOM as a Cosign attestation.
 5. **Verify** the attestation against your image at deploy time.
 
-## Step 1 — Generate the base image SBOM
+## Step 1: Generate the base image SBOM
 
 This is the §5 starting point, with one extra flag for the
 schema we'll standardize on:
@@ -61,7 +61,7 @@ syft "$IMAGE" \
 jq '.metadata.component.name, .components | length' sbom-base.cdx.json
 ```
 
-## Step 2 — Augment with build context
+## Step 2: Augment with build context
 
 Your CI run knows things the finished image can't: the commit, the
 build host, the builder image digest, the `SOURCE_DATE_EPOCH` for
@@ -93,11 +93,11 @@ jq --arg commit "$COMMIT" \
 CycloneDX `properties` are an open-by-design extension point;
 Sigstore policy controllers can read them at admission time.
 
-## Step 3 — Merge in source-declared dependencies
+## Step 3: Merge in source-declared dependencies
 
 Syft against the finished image sees what was *installed*. The
 source manifest tells you what was *requested*. They overlap, but
-not perfectly — pinned versions, optional deps, dev-only deps,
+not perfectly: pinned versions, optional deps, dev-only deps,
 and transitive resolution can diverge. Generate a second SBOM
 straight from the source manifest:
 
@@ -134,7 +134,7 @@ cyclonedx merge \
 The `--hierarchical` flag preserves the relationship: image
 contains source-installed packages. A flat merge would lose that.
 
-## Step 4 — Sign and attach to the image
+## Step 4: Sign and attach to the image
 
 Now make the SBOM a **signed attestation** on the image, so anyone
 pulling the image can recover and verify it.
@@ -156,7 +156,7 @@ The image now has three things attached: the original signature
 custom SBOM attestation. They coexist; verifiers can pick which
 predicate type they care about.
 
-## Step 5 — Verify at deploy time
+## Step 5: Verify at deploy time
 
 Whoever consumes the image can pull just the attestation and
 check it without trusting the full image first:
@@ -227,7 +227,7 @@ If your build pulls Python dependencies from
 [Red Hat Trusted Libraries](https://packages.redhat.com/trusted-libraries),
 those packages already ship with SLSA Level 3 provenance and
 their own SBOMs. The `cyclonedx-cli merge` step pulls them into
-your aggregate SBOM automatically — Syft reads the metadata that
+your aggregate SBOM automatically: Syft reads the metadata that
 pip wrote to `site-packages/*.dist-info/METADATA`. The next
 section walks that integration.
 
@@ -245,5 +245,5 @@ You should be able to:
 
 [Hummingbird with Red Hat Trusted Libraries]({{ "/docs/13-trusted-libraries/" | prepend: site.baseurl }})
 extends the trust chain from base image to application
-dependencies — the natural next step once you're signing your
+dependencies, the natural next step once you're signing your
 own SBOMs.

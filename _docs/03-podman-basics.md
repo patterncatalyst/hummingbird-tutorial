@@ -15,7 +15,7 @@ become tangible. By the end, you'll have:
 - compared the layer count and size against a UBI image so the
   "minimal runtime" claim has numbers behind it.
 
-If you have not finished the prerequisites, do that first — every
+If you have not finished the prerequisites, do that first: every
 command below assumes the environment variables `HB_REGISTRY` and
 `RH_REGISTRY` are set.
 
@@ -24,13 +24,13 @@ command below assumes the environment variables `HB_REGISTRY` and
 {% include excalidraw.html
    file="03-podman-basics-pull-flow"
    alt="Sequence diagram of podman pull resolving image layers from quay.io and storing them in local containers-storage"
-   caption="Figure 3.1 — How podman pull resolves a Hummingbird image into local storage" %}
+   caption="Figure 3.1: How podman pull resolves a Hummingbird image into local storage" %}
 
-## Step 1 — Pull a Hummingbird image
+## Step 1: Pull a Hummingbird image
 
 We'll start with Nginx because it is the easiest Hummingbird image
-to demonstrate the "minimal runtime" idea against — Nginx is a
-widely understood reference point and the difference vs. a stock
+to demonstrate the "minimal runtime" idea against. Nginx is a
+widely understood reference point, and the difference vs. a stock
 Nginx image shows up immediately.
 
 ```bash
@@ -57,7 +57,7 @@ podman images "$HB_REGISTRY/nginx"
 Make a mental note of the size column. You'll compare it against a
 non-minimal image in step 5.
 
-## Step 2 — Inspect the manifest
+## Step 2: Inspect the manifest
 
 Skopeo can inspect an image without pulling, but since we just
 pulled, let's use both forms so the syntax is familiar.
@@ -97,7 +97,7 @@ Two things to look at in the output:
    should point back to the Hummingbird build pipeline, and
    `org.opencontainers.image.vendor` will identify Red Hat.
 
-## Step 3 — Run it
+## Step 3: Run it
 
 ```bash
 # Run the image in the background and bind it to a host port.
@@ -115,11 +115,11 @@ podman ps --filter name=hummingbird-nginx
 curl -sI http://localhost:8080
 ```
 
-You should see an HTTP 200 (or 403 — Hummingbird's default
+You should see an HTTP 200 (or 403, since Hummingbird's default
 configuration may not include a default `index.html`). Either is
 fine; we just need to know it's serving.
 
-## Step 4 — Watch the no-shell behaviour
+## Step 4: Watch the no-shell behaviour
 
 This is the moment that surprises people coming from general-purpose
 base images. Try to exec a shell:
@@ -142,7 +142,7 @@ exec: "/bin/sh": stat /bin/sh: no such file or directory
 ```
 
 There is no shell to exec into. The image does not contain `sh`,
-`bash`, or any of the usual diagnostic tools. This is by design —
+`bash`, or any of the usual diagnostic tools. This is by design:
 the entire premise of the minimal runtime is that the post-build
 filesystem contains only the application runtime and its direct
 dependencies.
@@ -152,17 +152,17 @@ dependencies.
 > that habit will not work here. The next step shows the pattern
 > that replaces it.
 
-## Step 5 — The ephemeral debug-sidecar pattern
+## Step 5: The ephemeral debug-sidecar pattern
 
 When you need to look at what's happening inside a Hummingbird
-container — file system, processes, network state — you do it by
-running a *separate* container that shares the relevant
+container, whether file system, processes, or network state, you
+do it by running a *separate* container that shares the relevant
 namespaces. The Hummingbird container itself stays unchanged.
 
 {% include excalidraw.html
    file="03-podman-basics-debug-sidecar"
    alt="Diagram showing a debug sidecar container sharing the PID and network namespace of a Hummingbird container"
-   caption="Figure 3.2 — The debug-sidecar pattern: a second container shares the namespaces of the first" %}
+   caption="Figure 3.2: The debug-sidecar pattern, a second container shares the namespaces of the first" %}
 
 ```bash
 # Attach a UBI toolbox container that shares the Hummingbird
@@ -202,7 +202,7 @@ add `--volumes-from hummingbird-nginx`. That separation is what
 makes this pattern safe to use without contaminating the
 production runtime.
 
-## Step 6 — Compare against a non-minimal image
+## Step 6: Compare against a non-minimal image
 
 To anchor the "minimal" claim with numbers, pull a stock Nginx
 from a non-Hummingbird source and compare side by side.
@@ -229,7 +229,7 @@ The exact numbers will drift over time, but the ratio is the
 durable result: the Hummingbird image is several times smaller and
 carries a fraction of the layers.
 
-## Step 7 — Clean up
+## Step 7: Clean up
 
 ```bash
 # Stop and remove the running Hummingbird container.
@@ -240,7 +240,7 @@ podman rm hummingbird-nginx
 podman rmi docker.io/library/nginx:latest
 ```
 
-Leave the Hummingbird Nginx image in place — section 4 will use
+Leave the Hummingbird Nginx image in place: section 4 will use
 it again as the runtime stage of a multi-stage build.
 
 ## Verify before moving on
@@ -254,7 +254,7 @@ Before you move on to multi-stage builds, confirm:
 - The debug-sidecar in step 5 successfully showed you the Nginx
   process from inside the toolbox container.
 
-If any of those are not yet true, scroll back up — the next
+If any of those are not yet true, scroll back up: the next
 section assumes all three.
 
 ## Where to go next
