@@ -16,7 +16,7 @@ signatures. By the end, you'll have:
 - verified your own signature, and
 - verified the SBOM that ships with a stock Hummingbird image.
 
-## What's actually attached to an image
+## What's attached to an image
 
 Three distinct artifacts can be attached to an OCI image manifest:
 
@@ -28,7 +28,7 @@ Three distinct artifacts can be attached to an OCI image manifest:
    bill of materials (SPDX or CycloneDX). The signature on this
    attestation is what makes the SBOM trustworthy.
 3. **The provenance attestation (SLSA).** A signed envelope
-   describing how the image was built — what source it came from,
+   describing how the image was built: what source it came from,
    what build system produced it, when, and with what inputs.
 
 All three are stored in the registry as separate artifacts on the
@@ -37,9 +37,9 @@ same manifest, addressable by the image digest.
 {% include excalidraw.html
    file="05-sbom-and-signing-artifacts"
    alt="Diagram showing an OCI image manifest with three attached artifacts: signature, SBOM attestation, and provenance attestation"
-   caption="Figure 5.1 — The three artifacts attached to a signed image" %}
+   caption="Figure 5.1: The three artifacts attached to a signed image" %}
 
-## Step 1 — Generate a Cosign key pair
+## Step 1: Generate a Cosign key pair
 
 Cosign supports both keyless OIDC signing (used in CI, where the
 identity comes from a GitHub Actions or GitLab token) and
@@ -58,11 +58,11 @@ cosign generate-key-pair
 
 You now have:
 
-- `cosign.key` — the encrypted private key (do not commit).
-- `cosign.pub` — the public key (safe to share; goes into your
+- `cosign.key`: the encrypted private key (do not commit).
+- `cosign.pub`: the public key (safe to share; goes into your
   policy.json, distributed to verifiers, etc.).
 
-## Step 2 — Sign one of your built images
+## Step 2: Sign one of your built images
 
 Pick whichever of the section 4 images you have handy. The
 Node example is the smallest and fastest to push around:
@@ -86,10 +86,10 @@ cosign sign \
 The `--yes` flag accepts the consent prompt about uploading the
 signature to the public Sigstore transparency log. If you're
 working on something that should not appear in the public log, see
-the Cosign docs on private TUF roots — that's beyond the scope
+the Cosign docs on private TUF roots; that's beyond the scope
 of this tutorial.
 
-## Step 3 — Verify your signature
+## Step 3: Verify your signature
 
 ```bash
 cosign verify \
@@ -100,13 +100,13 @@ cosign verify \
 
 Expected: a JSON object describing the signature, the certificate
 (if any), and the transparency-log entry. If `cosign verify`
-exits non-zero, the image and signature are out of sync —
+exits non-zero, the image and signature are out of sync:
 re-sign and try again.
 
-## Step 4 — Generate an SBOM with Syft
+## Step 4: Generate an SBOM with Syft
 
 Syft can produce SBOMs in several formats. SPDX-JSON is the
-right default — it's the format Cosign expects when attaching
+right default: it's the format Cosign expects when attaching
 an SBOM as an SPDX attestation, and it's the format most
 downstream tools prefer.
 
@@ -126,7 +126,7 @@ jq '.packages[0:5] | .[] | {name, versionInfo, supplier}' \
   /tmp/sbom-node.spdx.json
 ```
 
-## Step 5 — Attach the SBOM as a Cosign attestation
+## Step 5: Attach the SBOM as a Cosign attestation
 
 ```bash
 cosign attest \
@@ -149,10 +149,10 @@ cosign verify-attestation \
   | jq '.payload | @base64d | fromjson | .predicate.packages | length'
 ```
 
-The output should match the package count from step 4 — proof
+The output should match the package count from step 4, proof
 that the SBOM you generated is the SBOM attached to the image.
 
-## Step 6 — Verify the SBOM that ships with a Hummingbird image
+## Step 6: Verify the SBOM that ships with a Hummingbird image
 
 Hummingbird images ship with a Red Hat-signed SBOM by default.
 The verification flow is the same as above, but the key/identity
@@ -178,7 +178,7 @@ cosign verify-attestation \
 ```
 
 > **The exact key and verification flags can change** as the
-> project's signing infrastructure evolves — Red Hat publishes the
+> project's signing infrastructure evolves: Red Hat publishes the
 > canonical command in the Hummingbird catalog docs
 > (`images.redhat.com`) and the "Verifying Reproducibility" guide.
 > The public key above is Red Hat's current image-signing key. If
@@ -196,9 +196,9 @@ cosign download attestation "$HUMMINGBIRD_IMG" \
 
 Note that `cosign verify-attestation --type slsaprovenance` targets
 the v1.0 predicate URI, so it will *not* match the v0.2 attestation
-on these images — enumerating the types as above avoids that trap.
+on these images: enumerating the types as above avoids that trap.
 
-## Step 7 — A `policy.json` that enforces signatures
+## Step 7: A `policy.json` that enforces signatures
 
 Once you've practiced signing and verifying manually, you can
 make Podman / Buildah enforce the same checks automatically by
@@ -229,7 +229,7 @@ cat > ~/.config/containers/policy.json <<EOF
 EOF
 ```
 
-The `keyPath` here is your local public key — useful only for
+The `keyPath` here is your local public key, useful only for
 images you yourself signed. To verify Red Hat-signed Hummingbird
 images, use the Red Hat public key instead. **Test thoroughly**
 before deploying a strict policy: an image that fails the policy

@@ -6,7 +6,7 @@ duration: 30 to 45 minutes
 ---
 
 This page gets your machine ready. Work through it once, in order.
-The rest of the tutorial assumes everything here is in place.
+Later sections assume everything here is in place.
 
 There are two parallel tracks below: **Fedora 44** and **macOS**.
 Pick whichever matches your machine and skip the other one. A small
@@ -15,7 +15,7 @@ platforms; those are flagged inline where they appear.
 
 ## What you'll have when you finish
 
-The exact version numbers will drift over time — match the major
+The exact version numbers will drift over time; match the major
 version, not the patch level.
 
 | Tool             | Purpose                                          | Install via            |
@@ -35,7 +35,7 @@ version, not the patch level.
 {% include excalidraw.html
    file="01-prerequisites-toolchain"
    alt="Diagram showing the relationship between Podman, Buildah, Skopeo, Cosign, Syft, Grype, and the registries they interact with"
-   caption="Figure 1.1 — The local toolchain and the registries it talks to" %}
+   caption="Figure 1.1: The local toolchain and the registries it talks to" %}
 
 ## Track A: Fedora 44
 
@@ -43,7 +43,7 @@ Fedora 44 ships Podman 5.x in the standard repositories, so almost
 everything in this section comes from `dnf`. No third-party repos
 are required for the core toolchain.
 
-### A.1 — System update and core container tools
+### A.1: System update and core container tools
 
 ```bash
 # Refresh metadata and apply updates first. Fedora 44 moves fast and
@@ -74,7 +74,7 @@ podman-compose --version
 
 Expected: Podman reports 5.x or 6.x, Buildah and Skopeo report a
 recent version. If Podman reports 4.x, you are on an older Fedora
-release and some commands later in the tutorial will not match —
+release and some commands later in the tutorial will not match;
 upgrade the host before continuing.
 
 > **A note on Podman 6.** Fedora 44 ships Podman 5.8.x as of release.
@@ -83,10 +83,10 @@ upgrade the host before continuing.
 > for this tutorial are the removal of `slirp4netns` (replaced by
 > `pasta`, which is already the default) and the removal of the
 > BoltDB backend (replaced by SQLite, default since Podman 4.8).
-> Neither change affects any command in this tutorial — we use the
+> Neither change affects any command in this tutorial; we use the
 > defaults throughout.
 
-### A.2 — Rootless Podman configuration
+### A.2: Rootless Podman configuration
 
 Fedora 44 enables cgroups v2 and rootless support out of the box,
 but a few things still need explicit setup the first time you use
@@ -125,13 +125,13 @@ systemctl --user status podman.socket --no-pager | head -5
 ls -la $XDG_RUNTIME_DIR/podman/podman.sock
 ```
 
-### A.3 — Podman Desktop
+### A.3: Podman Desktop
 
 There are two ways to install Podman Desktop on Fedora. The
 recommended path is the upstream tarball, because Flatpak builds
 have historically had trouble loading some extensions cleanly.
 
-**Option A — tarball (recommended):**
+**Option A: tarball (recommended):**
 
 ```bash
 # Discover the latest release tag from the project's GitHub API.
@@ -174,7 +174,7 @@ Categories=Development;
 EOF
 ```
 
-**Option B — Flatpak (if you prefer):**
+**Option B: Flatpak (if you prefer):**
 
 ```bash
 flatpak remote-add --if-not-exists flathub \
@@ -185,10 +185,10 @@ flatpak install -y flathub io.podman_desktop.PodmanDesktop
 If you go this route and find an extension fails to install in
 section 7 or later, switch to Option A.
 
-### A.4 — Supporting security tools (Cosign, Syft, Grype)
+### A.4: Supporting security tools (Cosign, Syft, Grype)
 
 None of Cosign, Syft, or Grype are reliably packaged in Fedora's
-default repositories — Cosign was briefly available in older
+default repositories. Cosign was briefly available in older
 Fedora releases but is no longer in the F44 repos, and Syft and
 Grype have always been upstream-only. We install all three from
 their upstream releases.
@@ -227,9 +227,9 @@ grype db update
 
 > **If you're on aarch64 (rare on Fedora workstations, common on
 > some servers and ARM laptops):** swap `x86_64` for `aarch64` in
-> the cosign URL above — Sigstore publishes RPMs for both.
+> the cosign URL above; Sigstore publishes RPMs for both.
 
-### A.5 — Registry credentials
+### A.5: Registry credentials
 
 Podman, Buildah, and Skopeo all read credentials from the same file:
 `~/.config/containers/auth.json`. Logging in once with `podman login`
@@ -256,14 +256,14 @@ credentials.
 
 ## Track B: macOS
 
-On macOS, Podman runs inside a small virtual machine — a "Podman
-machine" — managed by Podman Desktop or by the `podman machine`
+On macOS, Podman runs inside a small virtual machine, a "Podman
+machine", managed by Podman Desktop or by the `podman machine`
 CLI. The image-building, image-running, and image-pulling commands
 look identical to Fedora; the differences are confined to install
 and to the SELinux mount flag (which is harmless on macOS but
 matters when you copy commands back to Fedora).
 
-### B.1 — Install Homebrew if you don't already have it
+### B.1: Install Homebrew if you don't already have it
 
 ```bash
 # Skip this step if `brew --version` already works in your terminal.
@@ -275,7 +275,7 @@ matters when you copy commands back to Fedora).
 brew --version
 ```
 
-### B.2 — Install Podman Desktop and the CLI tools
+### B.2: Install Podman Desktop and the CLI tools
 
 ```bash
 # Podman Desktop pulls in the Podman CLI, Buildah, and Skopeo as
@@ -300,7 +300,7 @@ syft --version
 grype --version
 ```
 
-### B.3 — Create a Podman machine
+### B.3: Create a Podman machine
 
 The first time you launch Podman Desktop it will offer to create a
 Podman machine for you. You can also do it from the CLI, which is
@@ -325,18 +325,18 @@ podman info | head -20
 ```
 
 > **Why rootless on the VM?** Inside the Podman machine VM,
-> containers always run as a Linux process — the rootless flag here
+> containers always run as a Linux process; the rootless flag here
 > controls whether they run as the VM's `root` user or as a
 > non-root user. We default to non-root so the experience matches
 > what we'll do on Fedora 44.
 
-### B.4 — Update the Grype database
+### B.4: Update the Grype database
 
 ```bash
 grype db update
 ```
 
-### B.5 — Registry credentials
+### B.5: Registry credentials
 
 Same flow as Fedora; the auth file lives in the same place.
 
@@ -356,7 +356,7 @@ Everything from here down applies to both Fedora 44 and macOS.
 ### Environment variables you'll reference repeatedly
 
 Add these to your shell profile (`~/.bashrc` on Fedora or `~/.zshrc`
-on macOS) so the rest of the tutorial can refer to them by name:
+on macOS) so later sections can refer to them by name:
 
 ```bash
 cat >> "$HOME/.${SHELL##*/}rc" <<'EOF'
@@ -382,7 +382,7 @@ exec $SHELL -l
 > **What HB_REGISTRY actually points at.** The Hummingbird image
 > catalog lives at one Quay.io organization:
 > <https://quay.io/organization/hummingbird>. Every image used in
-> this tutorial — **both builder and runtime images** — is pulled
+> this tutorial, **both builder and runtime images**, is pulled
 > from that organization. The shell variable
 > `HB_REGISTRY=quay.io/hummingbird` is the prefix; the rest of the
 > path is the image name and tag.
@@ -391,12 +391,12 @@ exec $SHELL -l
 > `openjdk`, `nodejs`, `postgresql`, `nginx`); the **version is in
 > the tag**, not in the repository name. So:
 >
-> - **Builder pull**: `quay.io/hummingbird/<name>:<ver>-builder` —
+> - **Builder pull**: `quay.io/hummingbird/<name>:<ver>-builder`,
 >   for example `quay.io/hummingbird/python:3.13-builder`.
-> - **Runtime pull**: `quay.io/hummingbird/<name>:<ver>` — for
+> - **Runtime pull**: `quay.io/hummingbird/<name>:<ver>`, for
 >   example `quay.io/hummingbird/python:3.13`.
 >
-> Tags exist at three granularities — major (`:3`), major-minor
+> Tags exist at three granularities: major (`:3`), major-minor
 > (`:3.13`), and full patch (`:3.13.5`). Floating `:latest` and
 > `:latest-builder` aliases also exist. A `-fips` suffix is
 > available on every variant if your environment requires
@@ -409,8 +409,8 @@ exec $SHELL -l
 > JRE-only and meaningfully smaller as a runtime image. Build
 > with `openjdk:21-builder`, deploy on `openjdk:21-runtime`.
 >
-> Red Hat customers can also use `registry.access.redhat.com/hi/<name>:<tag>`
-> — the same images via the Red Hat container catalog. The two
+> Red Hat customers can also use `registry.access.redhat.com/hi/<name>:<tag>`,
+> the same images via the Red Hat container catalog. The two
 > paths should resolve to the same content. The tutorial uses
 > `quay.io/hummingbird` as the default because it works without a
 > Red Hat subscription; if you want the customer path, override
@@ -418,7 +418,7 @@ exec $SHELL -l
 >
 > The source material for this tutorial referenced
 > `quay.io/hummingbird-hatchling` (a pre-GA "hatchling" early-access
-> org). That org is no longer publicly available — use
+> org). That org is no longer publicly available; use
 > `quay.io/hummingbird` (the unsigned mirror of the Red Hat supported
 > images) or the signed `registry.access.redhat.com/hi` instead. Other
 > organizations exist for specific needs: `quay.io/hummingbird-community`

@@ -14,10 +14,10 @@ The final image inherits the small footprint and minimal attack
 surface of Hummingbird, while the build still gets the full
 toolchain it needs.
 
-We'll work through three primary examples — Java (Quarkus, JVM
-mode), Python (FastAPI with the wheel-build pattern), and Go (a
-static binary on the Hummingbird Go runtime) — in roughly the
-order most readers will care about them. A fourth example for
+We'll work through three primary examples, in roughly the order
+most readers will care about them: Java (Quarkus, JVM mode),
+Python (FastAPI with the wheel-build pattern), and Go (a static
+binary on the Hummingbird Go runtime). A fourth example for
 Node.js is in the appendix at the bottom of the section,
 included as a reference for the same multi-stage pattern.
 
@@ -26,7 +26,7 @@ included as a reference for the same multi-stage pattern.
 {% include excalidraw.html
    file="04-multi-stage-builds-pattern"
    alt="Two-stage container build: a Hummingbird builder image compiles the application, then COPY --from copies the artifact into a Hummingbird runtime image"
-   caption="Figure 4.1 — The two-stage build pattern with Hummingbird builder and runtime images" %}
+   caption="Figure 4.1: The two-stage build pattern with Hummingbird builder and runtime images" %}
 
 A few rules apply to every example:
 
@@ -40,7 +40,7 @@ A few rules apply to every example:
   rather than `nodejs:latest`) so a major-version bump never silently
   enters your build.
 - **`COPY` only in the runtime stage; never `RUN`.** Hummingbird
-  runtime images are distroless — no `/bin/sh`, no package
+  runtime images are distroless: no `/bin/sh`, no package
   manager, nothing to interpret a `RUN` line. Buildah will fail
   with `executable file '/bin/sh' not found` if you try. Anything
   that needs to execute (`pip install`, `dnf install`, custom
@@ -65,7 +65,7 @@ mkdir -p ~/hummingbird-tutorial/examples
 cd ~/hummingbird-tutorial/examples
 ```
 
-## Example A — Java (Quarkus, JVM mode)
+## Example A: Java (Quarkus, JVM mode)
 
 Java is the example with the most subtleties. We'll start with
 the straightforward JVM mode here. A native-image variant is in
@@ -157,7 +157,7 @@ The build invocation is the same as the other examples:
 podman build -f Containerfile.jvm -t hummingbird-quarkus-jvm:latest .
 ```
 
-## Example B — Python
+## Example B: Python
 
 Python is the example where the multi-stage pattern earns its
 keep most visibly. The build stage compiles wheels for any C
@@ -253,11 +253,11 @@ curl -s http://localhost:8000 | jq
 podman stop hb-py && podman rm hb-py
 ```
 
-## Example C — Go
+## Example C: Go
 
 Go is the easy example. Compile to a static binary in the builder
 stage, copy the binary into the Hummingbird Go runtime, done. The
-runtime image is essentially just glibc and a non-root user — Go's
+runtime image is essentially just glibc and a non-root user; Go's
 static binaries don't need a language runtime in the deploy stage.
 
 ### Set up
@@ -365,13 +365,13 @@ podman stop hb-go && podman rm hb-go
 
 The Go example is the one where the size win is most dramatic.
 A static Go binary on the Hummingbird Go runtime typically lands
-around 30 MB — orders of magnitude smaller than the equivalent
+around 30 MB, orders of magnitude smaller than the equivalent
 general-purpose image.
 
 ## Cross-cutting: build args for environment switching
 
 All four examples above use the same `HB_REGISTRY` and `RH_REGISTRY`
-build args. That's deliberate — it lets the same Containerfile
+build args. That's deliberate: it lets the same Containerfile
 build against the public registries on a connected machine and
 against an internal mirror on a disconnected one, without
 modifying the Containerfile.
@@ -409,9 +409,9 @@ people in the source material that this tutorial is built from.
 **Match the JDK exactly between builder and runtime.** Hummingbird
 publishes `openjdk:21-builder` and `openjdk:21-runtime` as a
 matched pair. Don't mix `openjdk:21-builder` with
-`openjdk-17-runtime` — the JVM AOT cache and the bytecode-version
+`openjdk-17-runtime`: the JVM AOT cache and the bytecode-version
 floor both depend on identical major versions. Mixing produces
-either runtime errors at first method invocation or — worse —
+either runtime errors at first method invocation or, worse,
 silent slowdowns when the runtime falls back to interpreted mode.
 
 **JVM mode by default; native-image only when you have a reason.**
@@ -419,7 +419,7 @@ GraalVM/Mandrel native compilation cuts cold-start time and
 memory, but it adds 2–4× to build time and not every dependency
 plays well with reflection-heavy native compilation. For most
 production workloads, JVM mode is the right starting point. Move
-to native when there's a measurable need — typically scale-to-zero
+to native when there's a measurable need, typically scale-to-zero
 serverless or memory-constrained edge deployment.
 
 **Use the `target/quarkus-app/` fast-jar layout, not a fat-jar.**
@@ -435,7 +435,7 @@ what you expect. Without the limit set, the JVM sees host memory
 and over-allocates.
 
 **Debugging needs JDWP exposed at runtime.** The Hummingbird
-runtime image lacks `jdb` — that lives in the builder. The §8
+runtime image lacks `jdb`: that lives in the builder. The §8
 in-image-builder pattern is the right approach: build with debug
 info, mount the resulting `target/` into a builder container, run
 `jdb -attach` against the JDWP port your production container
@@ -466,7 +466,7 @@ app makes outbound HTTPS calls or uses `zoneinfo.ZoneInfo`, you
 need to add `ca-certificates` and `tzdata`. The §14 RPM-install
 pattern covers exactly this case.
 
-**Debugging — install `python3-debug` in the builder, not the
+**Debugging: install `python3-debug` in the builder, not the
 runtime.** The §8 in-image-builder pattern: mount your source into
 a `python:3.13-builder` container, `dnf install python3-debug`, run
 `python3-debug -m pdb your-app.py`. Set breakpoints, fix on the
@@ -476,18 +476,18 @@ host, restart. The runtime stays clean.
 
 **Static binary by default; that's the win.** With
 `CGO_ENABLED=0`, the resulting binary has no dynamic-linker
-dependency. You can confirm with `ldd app` — output should be
+dependency. You can confirm with `ldd app`: output should be
 "not a dynamic executable". This is what makes the runtime image
 trivially small.
 
 **The runtime image isn't really a runtime.** Unlike Python or
 Java, a static Go binary doesn't need a language runtime.
 Hummingbird's `go:1.26` runtime image is essentially a minimal
-base — glibc, a non-root user, CA certificates. You're picking it
+base: glibc, a non-root user, CA certificates. You're picking it
 for the user/glibc/certs, not for any "Go runtime".
 
 **`-trimpath` and `-ldflags="-s -w"` aren't optional.** `-trimpath`
-strips local build paths from the binary for reproducible builds —
+strips local build paths from the binary for reproducible builds:
 the same source committed at the same commit produces a
 byte-identical binary regardless of who built it where.
 `-ldflags="-s -w"` strips the symbol table and DWARF debug info.
@@ -498,9 +498,9 @@ build-host fingerprints.
 anything that looks up the running user (`os/user.Current()`,
 certain logging libraries), the runtime image needs `/etc/passwd`
 to have UID 1001. The Hummingbird `go:1.26` runtime ships this by
-default — no extra `COPY` needed.
+default; no extra `COPY` needed.
 
-**Debugging with delve — install in the builder, attach over
+**Debugging with delve: install in the builder, attach over
 network.** `dlv` doesn't exist in the runtime image. The §8
 in-image-builder pattern with `${HB_REGISTRY}/go:1.26-builder`,
 mount your source, `go install
@@ -520,11 +520,11 @@ delve port from the prod container only when actively debugging.
 - **Always two stages.** Mixing build-time tools into the runtime
   is the most common Hummingbird mistake. If you find yourself
   reaching for `RUN apt-get` or `RUN dnf` in the runtime stage,
-  stop and refactor — that work belongs in the builder.
+  stop and refactor: that work belongs in the builder.
 
-## Appendix — Node.js
+## Appendix: Node.js
 
-> The Node example is included as an appendix because the audience this tutorial is aimed at — JVM, Python, and Go backends — sees less Node in production. The two-stage pattern is identical, so if you do ship Node services, the same shape applies. Read it for the pattern; reach for the language-specific examples above for code you will actually copy.
+> The Node example is included as an appendix because the audience this tutorial is aimed at (JVM, Python, and Go backends) sees less Node in production. The two-stage pattern is identical, so if you do ship Node services, the same shape applies. Read it for the pattern; reach for the language-specific examples above for code you will copy directly.
 
 A small Express-style app. Realistic enough that the `npm ci`
 step actually does work, but small enough to read in one screen.
@@ -673,7 +673,7 @@ You should now be able to:
   Containerfile.
 
 If you cleaned up after each example, your system has only the
-three or four built images we tagged above. Leave them in place —
+three or four built images we tagged above. Leave them in place:
 section 5 will sign and SBOM-attest them.
 
 ## Where to go next

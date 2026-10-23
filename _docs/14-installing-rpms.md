@@ -1,7 +1,7 @@
 ---
 title: Installing RPMs into the runtime image
 order: 14
-description: Three patterns for adding OS packages to a Hummingbird runtime image that has no dnf — staged install with --installroot, rpm2cpio extraction, and selective file copy.
+description: Three patterns for adding OS packages to a Hummingbird runtime image that has no dnf, staged install with --installroot, rpm2cpio extraction, and selective file copy.
 duration: 25 minutes
 ---
 
@@ -9,7 +9,7 @@ The Hummingbird design takes the package manager out of the
 runtime image. That's the whole point: smaller attack surface, no
 runtime upgrades, an image as fixed as your application is. But
 sometimes you need an OS-level package the runtime doesn't ship
-with — `tzdata` for time-zone handling, `ca-certificates` updates,
+with: `tzdata` for time-zone handling, `ca-certificates` updates,
 a specific shared library your app dlopen()s, a curl binary for
 container-internal health checks.
 
@@ -29,7 +29,7 @@ each suited to a different situation.
 | The package has scriptlets that must run | **--installroot, then COPY rootfs** |
 | You're not sure | **--installroot** is the safe default |
 
-## Pattern 1 — Staged install with `dnf --installroot`
+## Pattern 1: Staged install with `dnf --installroot`
 
 `dnf install --installroot=/some/path` installs into a directory
 as if that directory were `/`. You can then `COPY` that
@@ -79,22 +79,22 @@ CMD ["python3", "-m", "src.main"]
 
 Three flags worth understanding:
 
-- **`--setopt=install_weak_deps=False`** — skips "recommended"
+- **`--setopt=install_weak_deps=False`**: skips "recommended"
   packages. Without it, you can pick up a hundred MB of indirect
   deps you didn't ask for.
-- **`--nodocs`** — skips `/usr/share/doc` and friends. Saves
+- **`--nodocs`**: skips `/usr/share/doc` and friends. Saves
   several MB on a typical install.
-- **`--releasever=9`** — pins the RPM repo metadata to RHEL/UBI 9.
+- **`--releasever=9`**: pins the RPM repo metadata to RHEL/UBI 9.
   Without it, dnf may guess wrong inside the builder.
 
 After the `rm -rf` cleanup, a `tzdata + ca-certificates` install
-adds maybe 5–8 MB to the runtime image — which is the irreducible
+adds maybe 5–8 MB to the runtime image: the irreducible
 content of the package, not packaging overhead.
 
-## Pattern 2 — `rpm2cpio` extract
+## Pattern 2: `rpm2cpio` extract
 
-When you need exactly one file from one package — a single
-shared library, a single binary — and you don't want
+When you need exactly one file from one package, a single
+shared library or a single binary, and you don't want
 dependency resolution at all, extract the RPM directly without
 using dnf:
 
@@ -140,13 +140,13 @@ Caveats:
 - **Useful for curl-minimal, jq, ca-certificates** and similar
   "just give me the binary" packages.
 
-## Pattern 3 — Download RPMs, install at runtime (avoid)
+## Pattern 3: Download RPMs, install at runtime (avoid)
 
 You'll see this in some legacy material: download `.rpm` files in
 the builder, COPY them into the runtime, install them on first
 boot. It looks tempting because it defers the install to runtime.
 **Avoid it.** The runtime image won't have `rpm` or `dnf`, so
-you'd have to ship those too — which defeats the entire reason
+you'd have to ship those too, which defeats the entire reason
 you chose Hummingbird.
 
 If you find yourself reaching for this pattern, the underlying
@@ -212,9 +212,9 @@ CMD ["python3", "-m", "src.main"]
 
 What this image now has that a stock `python:3.13` doesn't:
 
-- `/etc/ssl/certs/ca-bundle.crt` — Python's `ssl` module finds it
+- `/etc/ssl/certs/ca-bundle.crt`: Python's `ssl` module finds it
   automatically; HTTPS requests to public URLs work.
-- `/usr/share/zoneinfo/...` — `zoneinfo.ZoneInfo("Europe/London")`
+- `/usr/share/zoneinfo/...`: `zoneinfo.ZoneInfo("Europe/London")`
   works without falling back to UTC.
 
 What it still doesn't have (which is the point):
@@ -236,7 +236,7 @@ podman run --rm --entrypoint sh hb-py-app:latest -c \
   2>/dev/null || echo "expected: no shell in runtime; use a sidecar to inspect"
 ```
 
-Last command will fail because the runtime has no `sh` — exactly
+Last command will fail because the runtime has no `sh`: that's
 the design. Use the §8 sidecar pattern to inspect:
 
 ```bash

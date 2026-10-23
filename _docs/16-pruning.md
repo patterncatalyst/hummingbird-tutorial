@@ -7,11 +7,10 @@ duration: 15 minutes
 
 This section is short, practical, and runs once when you notice
 your laptop's disk is full and never again until it is again.
-Working through the rest of the tutorial — pulling Hummingbird
-runtimes and builders for several languages, building three or
-four examples, running CVE scans that pull more layers — racks
-up dozens of gigabytes of containers-storage. Most of it is
-recoverable.
+Pulling Hummingbird runtimes and builders for several languages,
+building three or four examples, and running CVE scans that pull
+more layers racks up dozens of gigabytes of containers-storage.
+Most of it is recoverable.
 
 ## See where the space went
 
@@ -38,16 +37,16 @@ Local Volumes   3      1       180 MB   140 MB (77%)
 Build Cache     0      0       0 B      0 B
 ```
 
-That `RECLAIMABLE` column is the one to watch — 9.8 GB sitting
+That `RECLAIMABLE` column is the one to watch: 9.8 GB sitting
 unused.
 
 ## Three pruning verbs
 
 Pick one based on how aggressive you want to be:
 
-### `podman image prune` — dangling only
+### `podman image prune`: dangling only
 
-Removes images that no tag points at — typically intermediate
+Removes images that no tag points at: typically intermediate
 build layers and replaced bases. Safe to run; won't touch any
 image you've explicitly pulled or built.
 
@@ -56,7 +55,7 @@ podman image prune
 # Will be prompted: "Are you sure...?". Add -f to skip.
 ```
 
-### `podman image prune -a` — everything unused
+### `podman image prune -a`: everything unused
 
 Removes any image with no running container. This includes
 images you pulled but haven't run lately. Aggressive but
@@ -71,9 +70,9 @@ After this, `podman images` is much shorter, and `podman build`
 on your existing Containerfiles will repopulate exactly what
 those Containerfiles reference.
 
-### `podman system prune` — everything unused, full sweep
+### `podman system prune`: everything unused, full sweep
 
-Images, containers, networks, build cache — all of the above,
+Images, containers, networks, build cache: all of the above,
 in one command. The "I want a clean slate" option:
 
 ```bash
@@ -84,7 +83,7 @@ podman system prune -af --volumes
 it, volumes are preserved, which is usually what you want
 (databases, persistent state).
 
-## Pruning by age — keep recent, remove old
+## Pruning by age: keep recent, remove old
 
 The blunt prunes above don't distinguish "pulled yesterday"
 from "pulled three months ago". You can keep the recent stuff:
@@ -97,7 +96,7 @@ podman image prune -af --filter "until=720h"
 podman container prune -f --filter "until=168h"
 ```
 
-`until` takes a Go duration string — `168h` is a week, `720h`
+`until` takes a Go duration string: `168h` is a week, `720h`
 is 30 days, `2160h` is 90 days. There's no `30d` shorthand.
 
 For finer control, prune by image label:
@@ -162,7 +161,7 @@ If you live on this laptop, set up a weekly prune so it never
 gets bad. A systemd user timer is the right shape on Fedora; on
 macOS a `launchd` plist or a `cron` entry works.
 
-### Fedora — systemd user units
+### Fedora: systemd user units
 
 ```bash
 mkdir -p ~/.config/systemd/user
@@ -200,7 +199,7 @@ anything older than two weeks gets pruned. `Persistent=true`
 means a missed run (laptop was asleep) catches up next time
 the timer activates.
 
-### macOS — launchd
+### macOS: launchd
 
 ```bash
 cat > ~/Library/LaunchAgents/com.user.podman-prune.plist <<'EOF'
@@ -232,7 +231,7 @@ launchctl load ~/Library/LaunchAgents/com.user.podman-prune.plist
 ```
 
 The path may be `/opt/homebrew/bin/podman` (Apple Silicon) or
-`/usr/local/bin/podman` (Intel) — adjust based on `which podman`.
+`/usr/local/bin/podman` (Intel), adjust based on `which podman`.
 
 ## Verifying the freed space
 
@@ -243,7 +242,7 @@ podman system df
 ```
 
 The `RECLAIMABLE` column should be near zero. If it isn't, you
-likely have running containers holding references — `podman
+likely have running containers holding references: `podman
 ps -a` will show them.
 
 A practical pattern after a tutorial-running session:

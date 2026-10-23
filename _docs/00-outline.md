@@ -14,7 +14,7 @@ links back here from the prev/next bar at the bottom of the page.
 The tutorial is divided into eleven core numbered sections plus
 five optional follow-up sections, each of which lives in its own
 document under `docs/`. The core sections are designed to
-be **read and executed in order** — each one builds on the state your
+be **read and executed in order**: each one builds on the state your
 machine is in when you finish the previous one. The follow-up
 sections (12 through 16) can be read in any order after the core,
 based on what you actually need. There is no separate
@@ -23,16 +23,16 @@ lab from start to finish.
 
 Within a section, the structure is consistent:
 
-1. **Why this section exists** — what you should be able to do after.
-2. **What you'll learn** — a one-paragraph summary in plain language.
-3. **The diagram** — an Excalidraw figure showing the moving parts.
-4. **Step-by-step commands** — every command is meant to be copied
+1. **Why this section exists**: what you should be able to do after.
+2. **What you'll learn**: a one-paragraph summary in plain language.
+3. **The diagram**: an Excalidraw figure showing the moving parts.
+4. **Step-by-step commands**: every command is meant to be copied
    and pasted. Where the command differs between Fedora 44 and
    macOS, both variants are shown side by side under collapsible
    headings.
-5. **What to verify** — a short checklist so you can confirm the
+5. **What to verify**: a short checklist so you can confirm the
    section worked before moving on.
-6. **Where to go next** — a pointer to the next section, plus
+6. **Where to go next**: a pointer to the next section, plus
    optional side trips.
 
 ## The eleven core sections
@@ -57,8 +57,8 @@ means in practice.
 Pull a Hummingbird image, inspect its manifest, run it, and
 discover for yourself why exec'ing into it doesn't work. Learn the
 ephemeral debug-sidecar pattern that replaces interactive shells.
-This is the section where the rest of the tutorial starts to make
-sense viscerally rather than abstractly.
+This is the section where the no-shell container model starts to
+make sense viscerally rather than abstractly.
 
 ### 4. [Multi-stage builds]({{ "/docs/04-multi-stage-builds/" | prepend: site.baseurl }})
 
@@ -83,8 +83,8 @@ Wire scanning into a pre-commit hook for local development.
 
 ### 7. [Multi-container apps with Podman Compose]({{ "/docs/07-podman-compose/" | prepend: site.baseurl }})
 
-Stand up a small multi-service application — a web tier, a
-database, and an OpenTelemetry collector — entirely with
+Stand up a small multi-service application built from a web tier,
+a database, and an OpenTelemetry collector, entirely with
 Hummingbird base images. Cover the gotchas that come up on
 Fedora's SELinux-enforcing storage and the healthcheck timing
 that catches people coming from Docker.
@@ -155,7 +155,7 @@ Reclaim laptop disk as Hummingbird base updates accumulate.
 `podman image prune`, `podman system prune`, age-based filters,
 and a scheduled-cleanup recipe via systemd or launchd.
 
-### 17. [Distroless gotchas — lessons from the field]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
+### 17. [Distroless gotchas: lessons from the field]({{ "/docs/17-distroless-gotchas/" | prepend: site.baseurl }})
 
 A debugging-and-prevention reference for the rough edges that
 surface running real workloads on Hummingbird's distroless runtime.
@@ -167,9 +167,9 @@ to support NumPy, IPv4/IPv6 binding caveats that surface as
 Hummingbird isn't the right runtime for your workload. Each
 gotcha is documented as symptom → root cause → fix.
 
-## What this tutorial deliberately does not cover
+## What this tutorial does not cover
 
-A few things are out of scope on purpose:
+A few things fall outside this tutorial's scope:
 
 - **OpenShift deployment.** Hummingbird is just as useful in a plain
   Kubernetes cluster, on a single VM with `podman-compose`, or on a

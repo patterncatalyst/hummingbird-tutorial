@@ -18,7 +18,7 @@ resulting layers efficient to pull incrementally.
 ## Why split layers manually
 
 When you build a Hummingbird-based image, the layers come out
-of the build process in a fixed order — base image, your `COPY`
+of the build process in a fixed order: base image, your `COPY`
 instructions, and so on. If your application code is in the same
 layer as your application's third-party dependencies, every
 application change invalidates the dependency layer, even though
@@ -34,14 +34,14 @@ the dependencies didn't change.
 
 Combined with `zstd:chunked` push, this means an application
 update only re-uploads (and clients only re-download) the small
-top layer — not the dependency layer below it.
+top layer, not the dependency layer below it.
 
 {% include excalidraw.html
    file="10-chunkah-layer-split"
    alt="Diagram showing an image with one combined layer being split by chunkah into three layers: base/runtime, dependencies, and application code"
-   caption="Figure 10.1 — chunkah re-partitioning a Hummingbird-based image into three independently cacheable layers" %}
+   caption="Figure 10.1: chunkah re-partitioning a Hummingbird-based image into three independently cacheable layers" %}
 
-## Setup — what you need
+## Setup: what you need
 
 `chunkah` is distributed as a small CLI. As of this writing it
 is not in the Fedora default repos and not in Homebrew, so it's
@@ -62,7 +62,7 @@ echo "chunkah version: ${CHUNKAH_VERSION:-not-detected}"
 > below are correct in spirit; the precise commands will need
 > validation.
 
-## Example 1 — Split a Hummingbird base image and inspect
+## Example 1: Split a Hummingbird base image and inspect
 
 The simplest possible invocation: take a Hummingbird image and
 re-emit it with the layers split along defined boundaries.
@@ -91,7 +91,7 @@ this directory, start a new layer." The result is an image
 that's logically equivalent to the original but partitioned into
 more granular layers.
 
-## Example 2 — App code on top, dependencies underneath
+## Example 2: App code on top, dependencies underneath
 
 The most operationally useful pattern: keep your application
 code in its own layer, separate from your dependencies.
@@ -116,7 +116,7 @@ layer's digest stays identical. A registry pull on a node that
 already has a previous version of the image only needs the
 `app` layer.
 
-## Example 3 — xattr-based isolation
+## Example 3: xattr-based isolation
 
 A more advanced pattern: tag files with extended attributes
 during the build, and have `chunkah` use those tags as the
@@ -137,7 +137,7 @@ chunkah split \
 A `RUN setfattr -n user.layer -v app /app/server.js` during the
 build would tag that file as belonging to the `app` layer.
 
-## Example 4 — chunkah + zstd:chunked together
+## Example 4: chunkah + zstd:chunked together
 
 The combined effect is the maximum win on registry traffic.
 `chunkah` decides what goes into each layer; `zstd:chunked`
@@ -164,8 +164,8 @@ An application update on this image now re-pushes:
 - A fresh manifest pointing at the new `app` layer plus the
   unchanged `deps` and base layers.
 
-A pulling node only fetches the new `app` layer — typically a
-few hundred KB — instead of the entire image.
+A pulling node only fetches the new `app` layer (typically a
+few hundred KB) instead of the entire image.
 
 ## When this matters and when it doesn't
 

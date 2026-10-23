@@ -1,13 +1,13 @@
 ---
-title: Distroless gotchas — lessons from the field
+title: "Distroless gotchas: lessons from the field"
 order: 17
 description: A debugging-and-prevention reference for the rough edges that surface when running real workloads on Hummingbird's distroless runtime images. Documents symptoms, root causes, and fixes for the issues that came up during tutorial development and testing.
 duration: 30 minutes
 ---
 
 This section exists because Hummingbird's
-[distroless]({{ "/docs/02-introduction/#distroless" | prepend: site.baseurl }}) minimalism — the
-property that makes it a great runtime for security-conscious workloads —
+[distroless]({{ "/docs/02-introduction/#distroless" | prepend: site.baseurl }}) minimalism, the
+property that makes it a great runtime for security-conscious workloads,
 also magnifies every implicit assumption baked into the wider container
 ecosystem. A tool that "just works" on UBI or Alpine because some package
 is incidentally present can fail in surprising ways on a runtime that
@@ -22,7 +22,7 @@ If you're hitting an unfamiliar problem with a Hummingbird build, the
 fastest path is usually: skim this list for the symptom, apply the fix,
 move on. Many of the symptoms (`mvn: command not found`,
 `Connection reset by peer`, `cannot open shared object file`) are
-genuinely cryptic on first encounter and quick to diagnose once you've
+cryptic on first encounter and quick to diagnose once you've
 seen them once.
 
 ## Build-time gotchas
@@ -38,13 +38,13 @@ error running container: from /usr/bin/crun creating container for [/bin/sh -c .
 executable file `/bin/sh` not found: No such file or directory
 ```
 
-**Root cause:** Most Hummingbird runtime images are distroless —
+**Root cause:** Most Hummingbird runtime images are distroless:
 no `/bin/sh`, no shell of any kind. Buildah's `RUN` instruction
 defaults to `/bin/sh -c <command>`, which fails the moment you try
 to use `RUN` in a runtime stage that has no shell.
 
 A few specific images do ship with a shell (Golang, Core Runtime,
-full OpenJDK — see [§2's image variants section]({{ "/docs/02-introduction/#image-variants-default-builder-fips" | prepend: site.baseurl }})),
+full OpenJDK; see [§2's image variants section]({{ "/docs/02-introduction/#image-variants-default-builder-fips" | prepend: site.baseurl }})),
 but the safe assumption is that runtime stages are shell-free.
 Treating the rule as universal makes Containerfiles portable
 across the catalog without having to track which images are
@@ -145,7 +145,7 @@ search path. Same for `bin/` scripts.
 
 **Root cause:** The Hummingbird `openjdk:21-builder` image ships the JDK
 and `javac` but does not pre-install Maven. Hummingbird keeps builder
-images minimal — build tools that not every user needs (Maven, Gradle,
+images minimal: build tools that not every user needs (Maven, Gradle,
 Ant) aren't included. For a `javac`-driven Java project, the Hummingbird
 builder is sufficient. For a Maven- or Gradle-driven project, it isn't.
 
@@ -173,7 +173,7 @@ CMD ["java", "-jar", "quarkus-run.jar"]
 ```
 
 The CVE surface that ships in production is the runtime image, not the
-builder — the larger UBI builder doesn't reach the deployed artifact.
+builder: the larger UBI builder doesn't reach the deployed artifact.
 
 ## Runtime gotchas
 
@@ -212,7 +212,7 @@ ModuleNotFoundError: No module named 'fastapi'
 ```
 
 **Root cause:** RHEL-based distributions split Python's `site-packages`
-across two directories — pure-Python code lands in
+across two directories: pure-Python code lands in
 `/usr/local/lib/python3.13/site-packages/`, compiled C-extension code
 lands in `/usr/local/lib64/python3.13/site-packages/`. The runtime
 image's default `sys.path` may not include the `lib64` variant. Packages
@@ -239,7 +239,7 @@ ImportError: libstdc++.so.6: cannot open shared object file: No such file or dir
 ```
 
 **Root cause:** Hummingbird's distroless `python:3.13` runtime ships
-only what bare CPython needs — the C++ standard library isn't included
+only what bare CPython needs: the C++ standard library isn't included
 because vanilla Python doesn't use it. NumPy's compiled extensions are
 written in C++ and need `libstdc++` at runtime; same for many other
 scientific-Python packages.
@@ -257,9 +257,9 @@ COPY --from=builder /usr/lib64/libgomp.so.1*   /usr/lib64/
 
 The three above cover most of the NumPy stack:
 
-- `libstdc++` — C++ symbols required at import time.
-- `libgcc_s` — GCC support runtime, required for stack unwinding.
-- `libgomp` — OpenMP runtime, used by NumPy's bundled OpenBLAS for
+- `libstdc++`: C++ symbols required at import time.
+- `libgcc_s`: GCC support runtime, required for stack unwinding.
+- `libgomp`: OpenMP runtime, used by NumPy's bundled OpenBLAS for
   parallel matrix operations. Often delay-loaded: the import succeeds
   without it, but the first actual compute (`np.eye(3).sum()`) triggers
   a load that fails. Failure manifests as a silent SIGSEGV killing the
@@ -279,7 +279,7 @@ Common candidates for additions:
 | lxml | `libxml2.so.2`, `libxslt.so.1` |
 | Pillow | `libjpeg.so.62`, `libpng16.so.16` |
 | psycopg2-binary | `libpq.so.5` (or use psycopg2 wheel that bundles it) |
-| cryptography | normally fine — wheel is statically linked |
+| cryptography | normally fine: wheel is statically linked |
 
 If your COPY list is starting to look like a hand-rolled mini-distro,
 that's the signal to consider switching the runtime to UBI Python.
@@ -287,7 +287,7 @@ See "When Hummingbird isn't the right runtime" below.
 
 ## Network gotchas
 
-These surface only when you're testing your container — fine in
+These surface only when you're testing your container: fine in
 production, confusing in development.
 
 ### "Connection reset by peer" against a working container
@@ -302,13 +302,13 @@ curl: (56) Recv failure: Connection reset by peer
 **Root cause:** Modern resolvers prefer IPv6. `curl http://localhost`
 resolves `localhost` to `::1` first and connects there. If your
 application binds with Python's `socket.bind(("0.0.0.0", port))`, that's
-IPv4-only — your listener isn't on `::1`. Podman's port forwarder
+IPv4-only: your listener isn't on `::1`. Podman's port forwarder
 accepts the connection on the IPv6 side, can't deliver it to a listener
 that doesn't exist, and resets back to curl. The container is fine; the
 test harness is hitting the wrong address family.
 
-This is not Hummingbird-specific — it would behave identically against
-any distro — but it surfaces more often in distroless environments
+This is not Hummingbird-specific; it would behave identically against
+any distro, but it surfaces more often in distroless environments
 because they tend to have leaner network configurations and less
 ambient dual-stack helper machinery.
 
@@ -333,8 +333,8 @@ uvicorn.run(app, host="::", port=8000)
 
 Languages where the standard library binds dual-stack by default:
 
-- Go (`http.ListenAndServe(":8080", ...)` — both stacks)
-- Java (most servers — both stacks)
+- Go (`http.ListenAndServe(":8080", ...)`, both stacks)
+- Java (most servers, both stacks)
 
 Languages where you have to opt in:
 
@@ -386,7 +386,7 @@ services:
 
 Once the data directory has been initialized, the env vars are only
 consulted by the entrypoint to create roles and databases on first
-boot — subsequent boots ignore them. So if you swap names on a
+boot; subsequent boots ignore them. So if you swap names on a
 container that already initialized with the old names, you'll get
 "database does not exist" errors instead. Easiest recovery is to
 delete the volume (`podman-compose down -v`) and start fresh.
@@ -418,17 +418,17 @@ healthcheck:
   start_period: 30s
 ```
 
-Same idea for other runtimes — use the language interpreter that's
+Same idea for other runtimes: use the language interpreter that's
 guaranteed to be in the image, not a coreutils binary.
 
 For databases, the database's own client is usually there. PostgreSQL
 ships `pg_isready` in most distributions including (presumably)
-Hummingbird's `postgresql:18` — that's worth verifying as part of your
+Hummingbird's `postgresql:18`: that's worth verifying as part of your
 testing matrix rather than assuming.
 
 ## When Hummingbird isn't the right runtime
 
-The patterns above will get you a long way — most workloads can run on
+The patterns above will get you a long way: most workloads can run on
 Hummingbird with a small accommodation list. But there's a point where
 the accommodation list itself becomes the problem.
 
@@ -457,7 +457,7 @@ Hummingbird is undermined: you're shipping all those libraries; they
 have CVEs; nothing's auditing the set you assembled. UBI ships the
 same set with version coordination and CVE tracking from Red Hat.
 
-The honest engineering answer is to match the runtime to the workload:
+The practical answer is to match the runtime to the workload:
 
 - **Use Hummingbird** when your image is Python with a few dependencies,
   or a Go static binary, or a Java JVM app. The CVE-minimization
@@ -471,13 +471,14 @@ The honest engineering answer is to match the runtime to the workload:
   `openjdk-21` for the builder (because Hummingbird's builder doesn't
   ship Maven) and Hummingbird's `openjdk:21-runtime` for the deploy
   image (because that's what reaches production and CVE surface
-  matters there). That pattern — UBI where breadth helps, Hummingbird
-  where minimalism helps — is the most common shape in practice.
+  matters there). That pattern, UBI where breadth helps and
+  Hummingbird where minimalism helps, is the most common shape in
+  practice.
 
-There's no shame in the call to use UBI for an ML workload. Hummingbird
-isn't a moral position; it's a tool that's exceptional for some
-workloads and a poor fit for others. Knowing the line is more
-valuable than picking a side.
+Choosing UBI for an ML workload is a reasonable call. Hummingbird is
+a tool, not a moral position: exceptional for some workloads, a poor
+fit for others. Knowing the line is more valuable than picking a
+side.
 
 ## A complete reference Containerfile
 
@@ -543,5 +544,5 @@ inline, so future readers can find the explanation at the point of
 need rather than having to come back to this page.
 
 If you have an additional gotcha worth adding, the format is intended
-to be straightforward — symptom, root cause, fix — and the source for
+to be straightforward: symptom, root cause, fix. The source for
 this page is in [`_docs/17-distroless-gotchas.md`](https://github.com/patterncatalyst/hummingbird-tutorial/blob/main/_docs/17-distroless-gotchas.md).

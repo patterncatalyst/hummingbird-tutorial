@@ -5,7 +5,7 @@ description: Build images that pull faster on subsequent updates by using the zs
 duration: 25 minutes
 ---
 
-This section covers `zstd:chunked` — a compression format for
+This section covers `zstd:chunked`, a compression format for
 container image layers that lets clients pull only the *changed*
 parts of a layer when an image is updated, rather than re-pulling
 the entire layer. It pairs particularly well with Hummingbird
@@ -25,21 +25,21 @@ The win is most visible when:
 {% include excalidraw.html
    file="09-zstd-chunked-layer-format"
    alt="Diagram comparing a gzip-compressed layer (must be re-pulled in full when changed) with a zstd:chunked layer (only changed chunks need to be re-pulled)"
-   caption="Figure 9.1 — Why zstd:chunked enables partial layer pulls" %}
+   caption="Figure 9.1: Why zstd:chunked enables partial layer pulls" %}
 
 In the standard gzip layer format, a layer is a single
 gzip-compressed tar archive. If a single byte changes, the
-entire compressed blob changes — the client has to re-pull the
+entire compressed blob changes, and the client has to re-pull the
 whole layer.
 
 In `zstd:chunked`, the layer is divided into chunks aligned to
 file boundaries inside the tar archive. Each chunk has its own
 checksum, recorded in a manifest at the end of the layer. When
 an update changes one chunk, the rest are byte-identical to the
-previous version — and the client can fetch only the changed
+previous version, and the client can fetch only the changed
 chunks from the registry.
 
-## Step 1 — Confirm your Podman version supports zstd:chunked
+## Step 1: Confirm your Podman version supports zstd:chunked
 
 `zstd:chunked` is supported by Podman 4.5 and newer. Section 1's
 prerequisites already cover Podman 5.x, so this should be a
@@ -50,7 +50,7 @@ podman --version
 # Expected: podman version 5.x.x or later
 ```
 
-## Step 2 — Enable zstd:chunked at build time
+## Step 2: Enable zstd:chunked at build time
 
 There are two places `zstd:chunked` shows up: when *building*
 an image, and when *pushing* it to a registry. We'll cover both.
@@ -70,11 +70,11 @@ podman build \
 
 The flags:
 
-- `--layers` — keep intermediate build stages cached as
+- `--layers`: keep intermediate build stages cached as
   separate layers, which is what you want here. Without it,
   Podman may collapse stages.
-- `--compression-format zstd:chunked` — the headline flag.
-- `--compression-level 3` — a reasonable default. Higher
+- `--compression-format zstd:chunked`: the headline flag.
+- `--compression-level 3`: a reasonable default. Higher
   values (up to 22) give smaller layers at the cost of build
   time; lower values are faster.
 
@@ -86,10 +86,10 @@ skopeo inspect --raw containers-storage:hb-node-zstd:latest \
 ```
 
 The `mediaType` field should include
-`application/vnd.oci.image.layer.v1.tar+zstd` — that's the
+`application/vnd.oci.image.layer.v1.tar+zstd`: that's the
 indicator that the layer is `zstd`-compressed (chunked or not).
 
-## Step 3 — Push with zstd:chunked
+## Step 3: Push with zstd:chunked
 
 ```bash
 TARGET="quay.io/${USER}/hb-node-zstd:latest"
@@ -104,9 +104,9 @@ podman push \
 If the registry doesn't support OCI artifacts with
 `tar+zstd` media types yet, you'll get an error. Quay supports
 it; some self-hosted registries may not. Falling back to gzip
-is just a matter of dropping the flag — the image still pushes.
+is just a matter of dropping the flag: the image still pushes.
 
-## Step 4 — Dual-format push for compatibility
+## Step 4: Dual-format push for compatibility
 
 In a heterogeneous environment where some nodes have a Podman
 that supports `zstd:chunked` and some don't, push the image in
@@ -129,7 +129,7 @@ references both formats under the same tag, so clients
 auto-select. That's covered in the Podman documentation for
 `podman manifest` and is beyond the scope of this tutorial.
 
-## Step 5 — Verify partial-pull savings
+## Step 5: Verify partial-pull savings
 
 To see the benefit, build a second version of the image with a
 small change and watch what happens on a fresh node when it
@@ -175,7 +175,7 @@ output if you run with `--log-level=debug`.
 
 `zstd:chunked` is most valuable for images that are updated
 frequently with small changes. Hummingbird's "rebuild on
-upstream fix" cadence produces exactly that pattern — a typical
+upstream fix" cadence produces exactly that pattern: a typical
 update changes one or two packages out of a small total. The
 chunked format means a fleet of nodes can pull those updates
 incrementally rather than re-pulling the whole image.
@@ -193,6 +193,6 @@ You should be able to:
 ## Where to go next
 
 [Splitting layers with chunkah]({{ "/docs/10-chunkah/" | prepend: site.baseurl }})
-is the natural follow-on — `chunkah` is a tool for *deciding*
+is the natural follow-on: `chunkah` is a tool for *deciding*
 how to split image content into layers in the first place, which
 multiplies the benefit `zstd:chunked` provides.
