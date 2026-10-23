@@ -41,5 +41,5 @@
 <text x="130" y="240" font-size="12.5" fill="#555555" text-anchor="end">Code exploits</text>
 <text x="160" y="432" font-size="12.5" fill="#555555" text-anchor="end">Misconfigured host</text>
 <text x="500" y="574" font-size="12" fill="#b8650a" text-anchor="middle">Near-zero CVE · distroless (no shell / no package manager) · non-root UID 65532</text>
-<text x="500" y="596" font-size="12" fill="#b8650a" text-anchor="middle">signed + reproducible, verified by cosign — so the image is not the weak link</text>
+<text x="500" y="596" font-size="12" fill="#b8650a" text-anchor="middle">signed + reproducible, verified by cosign: so the image is not the weak link</text>
 </svg>

@@ -29,11 +29,11 @@
       "locked": false,
       "fontSize": 28,
       "fontFamily": 1,
-      "text": "Figure 10.1 \u2014 chunkah layer split",
+      "text": "Figure 10.1: chunkah layer split",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Figure 10.1 \u2014 chunkah layer split",
+      "originalText": "Figure 10.1: chunkah layer split",
       "lineHeight": 1.25,
       "baseline": 22
     },
@@ -63,11 +63,11 @@
       "locked": false,
       "fontSize": 16,
       "fontFamily": 1,
-      "text": "Two side-by-side boxes.\n\nLeft (\"Before \u2014 natural build layers\"):\n  A single muted block: \"everything in one layer\n  (base + deps + app code mingled)\"\n  Caption: any app change invalidates the deps too \u2014 full re-pull.\n\nRight (\"After chunkah split\", red-accent):\n  Three stacked layers:\n    1. Hummingbird base (stable)\n    2. dependencies (slow-changing)\n    3. application code (fast-changing, accent)\n  Caption: app-only updates re-push/re-pull layer 3 only.\n\nRed arrow labeled \"split\" between the two.\nBottom note: pairs naturally with zstd:chunked.\n",
+      "text": "Two side-by-side boxes.\n\nLeft (\"Before: natural build layers\"):\n  A single muted block: \"everything in one layer\n  (base + deps + app code mingled)\"\n  Caption: any app change invalidates the deps too: full re-pull.\n\nRight (\"After chunkah split\", red-accent):\n  Three stacked layers:\n    1. Hummingbird base (stable)\n    2. dependencies (slow-changing)\n    3. application code (fast-changing, accent)\n  Caption: app-only updates re-push/re-pull layer 3 only.\n\nRed arrow labeled \"split\" between the two.\nBottom note: pairs naturally with zstd:chunked.\n",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Two side-by-side boxes.\n\nLeft (\"Before \u2014 natural build layers\"):\n  A single muted block: \"everything in one layer\n  (base + deps + app code mingled)\"\n  Caption: any app change invalidates the deps too \u2014 full re-pull.\n\nRight (\"After chunkah split\", red-accent):\n  Three stacked layers:\n    1. Hummingbird base (stable)\n    2. dependencies (slow-changing)\n    3. application code (fast-changing, accent)\n  Caption: app-only updates re-push/re-pull layer 3 only.\n\nRed arrow labeled \"split\" between the two.\nBottom note: pairs naturally with zstd:chunked.\n",
+      "originalText": "Two side-by-side boxes.\n\nLeft (\"Before: natural build layers\"):\n  A single muted block: \"everything in one layer\n  (base + deps + app code mingled)\"\n  Caption: any app change invalidates the deps too: full re-pull.\n\nRight (\"After chunkah split\", red-accent):\n  Three stacked layers:\n    1. Hummingbird base (stable)\n    2. dependencies (slow-changing)\n    3. application code (fast-changing, accent)\n  Caption: app-only updates re-push/re-pull layer 3 only.\n\nRed arrow labeled \"split\" between the two.\nBottom note: pairs naturally with zstd:chunked.\n",
       "lineHeight": 1.3,
       "baseline": 14
     }

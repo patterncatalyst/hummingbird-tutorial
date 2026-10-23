@@ -29,11 +29,11 @@
       "locked": false,
       "fontSize": 28,
       "fontFamily": 1,
-      "text": "Figure 1.1 \u2014 Local toolchain and registries",
+      "text": "Figure 1.1: Local toolchain and registries",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Figure 1.1 \u2014 Local toolchain and registries",
+      "originalText": "Figure 1.1: Local toolchain and registries",
       "lineHeight": 1.25,
       "baseline": 22
     },

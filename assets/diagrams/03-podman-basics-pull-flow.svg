@@ -69,5 +69,5 @@
 
   <!-- Footer notes -->
   <text x="440" y="425" class="footer" text-anchor="middle">Step 3 repeats for each layer in the manifest; layers already in local storage are skipped.</text>
-  <text x="440" y="445" class="footer" text-anchor="middle">Step 4 streams concurrently with step 3 — fetch and write happen as bytes arrive.</text>
+  <text x="440" y="445" class="footer" text-anchor="middle">Step 4 streams concurrently with step 3: fetch and write happen as bytes arrive.</text>
 </svg>

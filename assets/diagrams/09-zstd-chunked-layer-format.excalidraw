@@ -29,11 +29,11 @@
       "locked": false,
       "fontSize": 28,
       "fontFamily": 1,
-      "text": "Figure 9.1 \u2014 gzip vs zstd:chunked",
+      "text": "Figure 9.1: gzip vs zstd:chunked",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Figure 9.1 \u2014 gzip vs zstd:chunked",
+      "originalText": "Figure 9.1: gzip vs zstd:chunked",
       "lineHeight": 1.25,
       "baseline": 22
     },

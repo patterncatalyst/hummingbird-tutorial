@@ -22,22 +22,22 @@
   </defs>
   <text x="410.0" y="32" class="title" text-anchor="middle">Four debugging layers, cheap to invasive</text>
   <rect x="80" y="70" width="580" height="80" rx="6" class="box"/>
-  <text x="370.0" y="106.0" text-anchor="middle" class="label">Layer 1 — podman commands</text>
+  <text x="370.0" y="106.0" text-anchor="middle" class="label">Layer 1: podman commands</text>
   <text x="370.0" y="124.0" text-anchor="middle" class="small">inspect, logs, top, stats, events</text>
   <rect x="680" y="95" width="100" height="30" rx="4" class="box-muted"/>
   <text x="730" y="115" text-anchor="middle" class="small">cheapest</text>
   <rect x="80" y="165" width="580" height="80" rx="6" class="box"/>
-  <text x="370.0" y="201.0" text-anchor="middle" class="label">Layer 2 — structured logs</text>
+  <text x="370.0" y="201.0" text-anchor="middle" class="label">Layer 2: structured logs</text>
   <text x="370.0" y="219.0" text-anchor="middle" class="small">JSON to stdout, trace IDs, ready signals</text>
   <rect x="680" y="190" width="100" height="30" rx="4" class="box-muted"/>
   <text x="730" y="210" text-anchor="middle" class="small">cheap</text>
   <rect x="80" y="260" width="580" height="80" rx="6" class="box-accent"/>
-  <text x="370.0" y="296.0" text-anchor="middle" class="label">Layer 3 — debug sidecar</text>
+  <text x="370.0" y="296.0" text-anchor="middle" class="label">Layer 3: debug sidecar</text>
   <text x="370.0" y="314.0" text-anchor="middle" class="small">ubi9/toolbox + shared namespaces</text>
   <rect x="680" y="285" width="100" height="30" rx="4" class="box-muted"/>
   <text x="730" y="305" text-anchor="middle" class="small">moderate</text>
   <rect x="80" y="355" width="580" height="80" rx="6" class="box"/>
-  <text x="370.0" y="391.0" text-anchor="middle" class="label">Layer 4 — kubectl debug</text>
+  <text x="370.0" y="391.0" text-anchor="middle" class="label">Layer 4: kubectl debug</text>
   <text x="370.0" y="409.0" text-anchor="middle" class="small">cluster-side ephemeral debug pod</text>
   <rect x="680" y="380" width="100" height="30" rx="4" class="box-muted"/>
   <text x="730" y="400" text-anchor="middle" class="small">most invasive</text>

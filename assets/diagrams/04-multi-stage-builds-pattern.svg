@@ -47,5 +47,5 @@
   <text x="670.0" y="329.0" text-anchor="middle" class="small">non-root by default</text>
   <line x1="400" y1="295" x2="490" y2="245" class="conn-red" marker-end="url(#arrow-red)"/>
   <text x="445" y="270" class="small" text-anchor="middle">COPY --from=builder</text>
-  <text x="440.0" y="430" class="small" text-anchor="middle">The runtime image carries no build tooling — only what runs</text>
+  <text x="440.0" y="430" class="small" text-anchor="middle">The runtime image carries no build tooling: only what runs</text>
 </svg>
