@@ -535,11 +535,8 @@ CMD ["python3", "-m", "uvicorn", "app.main:app", \
 
 ## Where to go next
 
-If you're hitting an issue not on this list, the
-[reconciliation plan](../../plans/reconciliation-plan/) tracks every
-verified fact and outstanding question about the tutorial's contents.
-The plan's testing matrix in §G is also a record of what's been built
-and run end-to-end versus what's still on faith.
+If you're hitting an issue not on this list, open an issue on the
+repository.
 
 Each gotcha here is also annotated in the relevant Containerfile
 inline, so future readers can find the explanation at the point of

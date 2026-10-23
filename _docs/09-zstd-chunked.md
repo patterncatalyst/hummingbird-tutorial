@@ -196,12 +196,3 @@ You should be able to:
 is the natural follow-on — `chunkah` is a tool for *deciding*
 how to split image content into layers in the first place, which
 multiplies the benefit `zstd:chunked` provides.
-
-> **Reconciliation note.** This section needs verification
-> against current Hummingbird image availability and current
-> Podman default behaviour. The mechanics described here are
-> stable, but the exact flags and media-type strings should be
-> confirmed against a live build before this tutorial is
-> declared complete. See the
-> [reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
-> for the working list.

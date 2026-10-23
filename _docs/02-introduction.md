@@ -346,10 +346,7 @@ availability, or `dnf install` at runtime. Hummingbird is the
 right choice when you want the smallest, hardest-to-attack
 runtime — typically the deploy stage of a multi-stage build.
 Section 17 of this tutorial expands on the decision criteria with
-specific failure modes; the
-[reconciliation plan]({{ "/plans/reconciliation-plan/" | prepend: site.baseurl }})
-records every place in the tutorial where one or the other is
-the deliberate choice.
+specific failure modes.
 
 ## Why this tutorial focuses on Podman
 
