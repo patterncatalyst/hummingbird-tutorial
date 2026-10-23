@@ -5,6 +5,26 @@ description: Three patterns for adding OS packages to a Hummingbird runtime imag
 duration: 25 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain why dnf and the package manager are removed from
+  Hummingbird runtime images
+- Choose between a `--installroot` staged install, an `rpm2cpio`
+  extraction, and avoid the download-and-install-at-boot
+  anti-pattern
+- Write a multi-stage Containerfile that installs `tzdata` and
+  `ca-certificates` into a staged root and copies it into a
+  distroless runtime
+- Find and copy the shared-library dependencies of an extracted
+  binary with `ldd`
+- Clean a staged rootfs of package-manager metadata, locale data,
+  and docs before copying it into the runtime
+- Inspect a shell-less runtime image with the sidecar pattern
+
+## Why this matters
+
 The Hummingbird design takes the package manager out of the
 runtime image. That's the whole point: smaller attack surface, no
 runtime upgrades, an image as fixed as your application is. But
@@ -13,12 +33,10 @@ with: `tzdata` for time-zone handling, `ca-certificates` updates,
 a specific shared library your app dlopen()s, a curl binary for
 container-internal health checks.
 
-You can't `dnf install` it at runtime. You can't `RUN apt-get` in
-the runtime stage. There's no `/usr/bin/dnf` to call.
-
-You can do it from the **builder** stage, where dnf does exist,
-and copy the result into the runtime. There are three patterns,
-each suited to a different situation.
+You can't `dnf install` it at runtime, and there's no
+`/usr/bin/dnf` to call. You can do it from the **builder** stage,
+where dnf does exist, and copy the result into the runtime. There
+are three patterns, each suited to a different situation.
 
 ## Pattern decision matrix
 

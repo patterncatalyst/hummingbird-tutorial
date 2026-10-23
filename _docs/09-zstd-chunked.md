@@ -5,6 +5,19 @@ description: Build images that pull faster on subsequent updates by using the zs
 duration: 25 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Confirm Podman's `zstd:chunked` support and enable it at build time
+- Recognize the `tar+zstd` media type on built layers
+- Push images to a registry using `zstd:chunked` compression
+- Push dual-format images for fleets with mixed Podman versions
+- Measure partial-pull savings when only a few chunks change
+- Explain why `zstd:chunked` and Hummingbird's rebuild cadence reinforce each other
+
+## Why this matters
+
 This section covers `zstd:chunked`, a compression format for
 container image layers that lets clients pull only the *changed*
 parts of a layer when an image is updated, rather than re-pulling

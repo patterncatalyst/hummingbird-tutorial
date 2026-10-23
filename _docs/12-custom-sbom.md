@@ -5,6 +5,19 @@ description: Generate richer, application-specific SBOMs that capture build cont
 duration: 25 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Generate a CycloneDX SBOM from a finished image with Syft and inspect it with `jq`
+- Augment an SBOM with build-time context such as commit, builder image, and source date epoch
+- Merge image-derived and source-declared SBOMs with `cyclonedx merge`
+- Sign and attach a custom SBOM as a Cosign attestation
+- Verify an attached attestation and recover its build properties at deploy time
+- Wire the generate, augment, merge, sign, and verify flow into a CI pipeline script
+
+## Why this matters
+
 §5 introduced SBOMs by generating one from your finished image with
 Syft and attaching it as a Cosign attestation. That gets you a
 working chain of custody for the *image*. This section is about

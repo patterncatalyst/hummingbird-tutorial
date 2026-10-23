@@ -5,16 +5,23 @@ description: Generate SBOMs with Syft, sign images with Cosign, and verify the a
 duration: 30 minutes
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Generate an SBOM for an image built in the previous chapter
+- Sign an image with a local Cosign key pair
+- Attach an SBOM to an image as a Cosign attestation
+- Verify your own signature against the matching public key
+- Verify the SBOM that ships with a stock Hummingbird image
+- Configure a `policy.json` that enforces Sigstore signatures on pull
+
+## Why this matters
+
 This section is about the artifacts that travel alongside an image
 without being part of its filesystem: software bills of materials
 (SBOMs), build provenance attestations, and Sigstore-style
-signatures. By the end, you'll have:
-
-- generated an SBOM for one of the images you built in section 4,
-- signed that image with a local Cosign key pair,
-- attached the SBOM as a Cosign attestation,
-- verified your own signature, and
-- verified the SBOM that ships with a stock Hummingbird image.
+signatures.
 
 ## What's attached to an image
 
