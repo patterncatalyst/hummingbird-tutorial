@@ -5,7 +5,7 @@ Hardened Images to a professional, container-literate audience.
 
 ## The deck
 
-**`hummingbird-overview.pptx`** — 43 slides, 16:9, with detailed speaker
+**`hummingbird-overview.pptx`**: 43 slides, 16:9, with detailed speaker
 notes on every slide. Open it in PowerPoint, Keynote, or LibreOffice Impress.
 
 The speaker notes are written to carry a live talk: they define the
@@ -15,7 +15,7 @@ debug-sidecar and supply-chain diagrams step by step, and name the
 production tooling (Grype, Trivy, Clair, RHACS Scanner V4) rather than only
 the demo tool.
 
-## Currency — reviewed against GA (May 12, 2026)
+## Currency: reviewed against GA (May 12, 2026)
 
 Product claims checked against Red Hat's GA materials (images.redhat.com,
 redhat.com, hummingbird-project.io) and developer documentation. RHHI is the
@@ -44,7 +44,7 @@ constant in `src/deck.js` on each change.
 
 ### Changelog
 
-- **r01.7** — Professional-audience pass. Removed the on-slide revision
+- **r01.7**: Professional-audience pass. Removed the on-slide revision
   marker and remaining hedging language. Expanded speaker notes throughout
   with definitions (SLSA, PIE/RELRO/FORTIFY_SOURCE/annobin, CIS/STIG/
   OpenSCAP, provenance, Konflux, Trusted Artifact Signer, SLSA L3) and
@@ -56,13 +56,13 @@ constant in `src/deck.js` on each change.
   example, and a Trusted Libraries value diagram. Rebuilt the compose
   diagram (fixed overlapping labels) and added the SciPy/libstdc++
   "when not to use" gotcha. 40 → 43 slides.
-- **r01.6** — Added an agenda slide and a closing thank-you slide.
-- **r01.5** — Removed tutorial-companion framing and hedging words.
-- **r01.4** — Supply-chain close-out reworked into problem → answer; added
+- **r01.6**: Added an agenda slide and a closing thank-you slide.
+- **r01.5**: Removed tutorial-companion framing and hedging words.
+- **r01.4**: Supply-chain close-out reworked into problem → answer; added
   the generic stage-setter and renumbered the figures.
-- **r01.3** — Added the Supply chain security section.
-- **r01.2** — UID 65532 fix; stable unversioned filename.
-- **r01.1** — Reconciled to GA (May 12, 2026).
+- **r01.3**: Added the Supply chain security section.
+- **r01.2**: UID 65532 fix; stable unversioned filename.
+- **r01.1**: Reconciled to GA (May 12, 2026).
 
 ## Status
 

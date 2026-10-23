@@ -25,3 +25,8 @@ sbom-*.spdx.json
 # Local Cosign keys — never commit these
 cosign.key
 *.cosign.key
+
+# deck build deps (pptxgenjs installed locally for rebuild)
+presentations/src/node_modules/
+presentations/src/package-lock.json
+presentations/src/package.json
