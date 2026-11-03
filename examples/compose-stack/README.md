@@ -1,9 +1,9 @@
 # compose-stack
 
 Three-service multi-container example: a Node web app, a PostgreSQL
-database, and an OpenTelemetry collector — all on Hummingbird base
+database, and an OpenTelemetry collector, all on Hummingbird base
 images, orchestrated with Podman Compose. Walked through in detail
-in [§7 — Multi-container apps](../../_docs/07-podman-compose.md).
+in [§7: Multi-container apps](../../_docs/07-podman-compose.md).
 
 ## Bring it up
 
@@ -50,8 +50,7 @@ podman-compose down
    healthcheck would mark the container unhealthy *during* normal
    boot, breaking the dependency chain.
 
-These three things are documented in §7 and reflect the findings
-from the infrastructure environment notes (`FINDINGS.md`).
+These three things are documented in §7.
 
 ## Layout
 
@@ -69,5 +68,5 @@ compose-stack/
 ## Image-name caveat
 
 Assumes `nodejs:20-builder`, `nodejs:20`, and `postgresql:18` are all
-published in the Hummingbird org. See the
-[reconciliation plan](../../plans/reconciliation-plan.md) §A.
+published in the Hummingbird org; confirm these against the catalog
+you have access to.

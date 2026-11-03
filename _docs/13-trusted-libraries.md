@@ -227,9 +227,9 @@ Three signatures, one chain.
 
 Things to know going in:
 
-- **Python only.** No Java/Go/Node equivalents yet. The user-facing
-  product page acknowledges Python-first; broader language coverage
-  is on the roadmap.
+- **Python only.** No Java/Go/Node equivalents yet. The product
+  page lists Python-first support; other languages aren't available
+  yet.
 - **Not every package is mirrored.** Long-tail packages won't be
   there. The fallback to pypi.org keeps builds working but means
   not every dependency in your tree carries a Red Hat attestation.

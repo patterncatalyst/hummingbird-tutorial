@@ -20,11 +20,10 @@ By the end of this chapter you can:
 
 §5 introduced SBOMs by generating one from your finished image with
 Syft and attaching it as a Cosign attestation. That gets you a
-working chain of custody for the *image*. This section is about
-going further: building an SBOM that captures **what the
-application is**, not only what files happen to be in the image:
-including build-time information that scanning a finished image
-can't recover.
+working chain of custody for the *image*. Going further means
+building an SBOM that captures **what the application is**, not
+only what files happen to be in the image, including build-time
+information that scanning a finished image can't recover.
 
 ## Why a richer SBOM is worth the effort
 

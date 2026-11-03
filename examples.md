@@ -14,12 +14,12 @@ directory, or clone the repo and work straight from the example.
 
 | Example | What it shows | Tutorial section |
 |---|---|---|
-| [`node-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/node-example) | Multi-stage build on a hardened base, Node | [Ch4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
-| [`python-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/python-example) | Multi-stage build on a hardened base, Python | [Ch4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
-| [`go-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/go-example) | Multi-stage build on a hardened base, Go | [Ch4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
-| [`quarkus-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/quarkus-example) | A Quarkus service on a hardened base | [Ch4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
-| [`compose-stack`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/compose-stack) | A multi-container app wired with Podman Compose | [Ch7]({{ '/docs/07-podman-compose/' | relative_url }}) |
-| [`ml-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/ml-example) | A real-world scenario: ML inference on a hardened image | [Ch11]({{ '/docs/11-real-world-examples/' | relative_url }}) |
+| [`node-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/node-example) | Multi-stage build on a hardened base, Node | [§4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
+| [`python-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/python-example) | Multi-stage build on a hardened base, Python | [§4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
+| [`go-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/go-example) | Multi-stage build on a hardened base, Go | [§4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
+| [`quarkus-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/quarkus-example) | A Quarkus service on a hardened base | [§4]({{ '/docs/04-multi-stage-builds/' | relative_url }}) |
+| [`compose-stack`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/compose-stack) | A multi-container app wired with Podman Compose | [§7]({{ '/docs/07-podman-compose/' | relative_url }}) |
+| [`ml-example`](https://github.com/{{ site.github_username }}/hummingbird-tutorial/tree/main/examples/ml-example) | A real-world scenario: ML inference on a hardened image | [§11]({{ '/docs/11-real-world-examples/' | relative_url }}) |
 
 ## Running an example
 

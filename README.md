@@ -1,14 +1,14 @@
 # Hummingbird Tutorial
 
-A follow-along, cut-and-paste tutorial for Project Hummingbird — Red Hat's
-catalog of minimal, hardened, near-zero-CVE container images — using
+A follow-along, cut-and-paste tutorial for Project Hummingbird, Red Hat's
+catalog of minimal, hardened, near-zero-CVE container images, using
 Podman, Podman Compose, and Podman Desktop.
 
 The tutorial is published as a Jekyll site under `docs/` and is intended
 to be read in order, top to bottom. Every command shown is meant to be
 copied directly into a terminal on a Fedora 44 workstation or a macOS
 machine with iTerm2 / Terminal. There is no separate "lab environment"
-to provision — your laptop is the lab.
+to provision; your laptop is the lab.
 
 ## Who this is for
 
@@ -19,8 +19,8 @@ to provision — your laptop is the lab.
 
 ## What you'll need
 
-The full prerequisite list — packages, tools, registry accounts, and
-configuration — lives in [`docs/01-prerequisites.md`](docs/01-prerequisites.md).
+The full prerequisite list (packages, tools, registry accounts, and
+configuration) lives in [`docs/01-prerequisites.md`](docs/01-prerequisites.md).
 At a glance:
 
 - Fedora 44 (bash or zsh) **or** macOS (Terminal or iTerm2)
@@ -45,12 +45,9 @@ bundle exec jekyll serve
 
 The site will be available at `http://localhost:4000/hummingbird-tutorial/`.
 
-## Status and reconciliation
+## Status
 
-This repository is under active development. The
-[reconciliation plan](plans/reconciliation-plan.md) tracks what is
-written, what is in flight, and what remains to be verified against
-running Fedora 44 and macOS environments. If you find a command that
+This repository is under active development. If you find a command that
 doesn't behave as documented, please open an issue and reference the
 relevant section number.
 
@@ -58,12 +55,12 @@ relevant section number.
 
 This project is dual-licensed to separate the code from the writing:
 
-- **Code** — everything under `examples/`, plus build and helper scripts and
-  inline code snippets — is licensed under the **Apache License 2.0**
+- **Code**: everything under `examples/`, plus build and helper scripts and
+  inline code snippets, is licensed under the **Apache License 2.0**
   ([`LICENSE`](LICENSE)).
-- **Content** — the tutorial and book prose (chapters under `_docs/`),
+- **Content**: the tutorial and book prose (chapters under `_docs/`),
   diagrams and images under `assets/`, and the slide decks under
-  `presentation/` — is licensed under **Creative Commons Attribution 4.0
+  `presentations/`, is licensed under **Creative Commons Attribution 4.0
   International (CC BY 4.0)** ([`LICENSE-docs.md`](LICENSE-docs.md)).
 
 Copyright 2026 PatternCatalyst (Robert Sedor).

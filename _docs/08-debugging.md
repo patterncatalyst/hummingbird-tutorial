@@ -387,8 +387,8 @@ You should be able to:
   `--security-opt label=disable` matter on the sidecar,
 - run an interactive Python or Go debugger by mounting your code
   into a Hummingbird builder image, and
-- explain why `--volumes-from` is a powerful flag to use with
-  care in production debugging.
+- explain why `--volumes-from` needs care in production
+  debugging.
 
 ## Where to go next
 
