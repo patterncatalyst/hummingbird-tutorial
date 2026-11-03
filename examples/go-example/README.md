@@ -2,9 +2,9 @@
 
 Static Go HTTP server compiled with the Hummingbird Go builder
 and deployed onto the Hummingbird Go runtime. Walked through in
-[§4 — Multi-stage builds, Example C](../../_docs/04-multi-stage-builds.md).
+[§4: Multi-stage builds, Example C](../../_docs/04-multi-stage-builds.md).
 
-This is the smallest of the §4 examples — typically around 30 MB
+This is the smallest of the §4 examples, typically around 30 MB
 total, almost all of which is the binary itself.
 
 ## Build and run
@@ -34,16 +34,16 @@ the Hummingbird image typically lands an order of magnitude smaller.
 
 ## Why the Hummingbird Go runtime
 
-A static Go binary built with `CGO_ENABLED=0` is self-contained —
+A static Go binary built with `CGO_ENABLED=0` is self-contained;
 it doesn't need a Go toolchain at runtime. So the runtime image
 just needs to provide:
 
-- **glibc** — even a "static" Go binary still calls into glibc
+- **glibc**: even a "static" Go binary still calls into glibc
   for some syscalls and DNS resolution.
-- **A non-root user (UID 1001)** — Hummingbird images default to
+- **A non-root user (UID 1001)**: Hummingbird images default to
   running as 1001; the runtime ships an `/etc/passwd` entry so
   any Go code that calls `os/user.Current()` works.
-- **CA certificates** — for outbound HTTPS calls.
+- **CA certificates**: for outbound HTTPS calls.
 
 The Hummingbird `go:1.26` runtime image gives you exactly that
 and not much else. It's the right default for any Go service.
@@ -60,7 +60,5 @@ and not much else. It's the right default for any Go service.
 
 This Containerfile assumes that `go:1.26-builder` and `go:1.26`
 both exist in the Hummingbird catalog at `quay.io/hummingbird/`.
-The builder is well-precedented (matches the Python and Java
-patterns); the runtime is parallel to `python:3.13` and
-`openjdk:21`. Verification status is tracked in the
-[reconciliation plan](../../plans/reconciliation-plan.md) §A.
+If the names differ in the catalog you have access to, edit the two
+`FROM` lines or set `--build-arg HB_REGISTRY=…`.

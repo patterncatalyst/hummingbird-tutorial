@@ -1,9 +1,9 @@
 // Trivial HTTP server used by the §4 multi-stage build example.
 // See _docs/04-multi-stage-builds.md for the walkthrough.
 //
-// Uses pino for structured logging — gives the multi-stage build a
-// real dependency to flow from the builder stage into the runtime
-// stage. A pure-stdlib example wouldn't actually demonstrate the
+// Uses pino for structured logging, giving the multi-stage build an
+// external dependency to flow from the builder stage into the runtime
+// stage. A pure-stdlib example wouldn't demonstrate the
 // dependency-flow pattern that's the point of the multi-stage build.
 
 const http = require('http');

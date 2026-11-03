@@ -1,4 +1,4 @@
-// deck-helpers.js — design system & helpers for the REST deck
+// deck-helpers.js: design system and helpers for the REST deck
 // Carries the visual conventions from the existing Python deck:
 //   - 13.333 x 7.5 LAYOUT_WIDE
 //   - Eyebrow 12pt bold red EE0000, charSpacing 4
@@ -76,7 +76,7 @@ function addFooter(slide, pageNum) {
     fontFace: FONT.body, fontSize: 10, color: COLOR.pageNum,
     align: "left", valign: "middle",
   });
-  // Red Hat color logo, bottom-right — present on every content slide
+  // Red Hat color logo, bottom-right, present on every content slide
   // (the cover and section dividers carry their own logo separately).
   try {
     slide.addImage({
@@ -133,7 +133,7 @@ function addBullets(slide, lines, opts = {}) {
   });
 }
 
-// Two-column bullets — matches the reference deck's agenda layout.
+// Two-column bullets: matches the reference deck's agenda layout.
 // `left` and `right` are arrays of strings (or {text, options} objects).
 // `muted` indicates items to render in muted italic style (e.g. appendices).
 function addTwoColBullets(slide, left, right, opts = {}) {
@@ -174,7 +174,7 @@ function addTwoColBullets(slide, left, right, opts = {}) {
   });
 }
 
-// Status-code table: 3-column layout — code | name | purpose
+// Status-code table: 3-column layout, code | name | purpose
 // Designed for the 2xx/4xx/5xx slides so the bullets-as-prose pattern can be retired.
 function addStatusTable(slide, rows, opts = {}) {
   const y = opts.y ?? 1.85;
@@ -230,7 +230,7 @@ function addCaption(slide, text, y) {
 }
 
 function addPerfCallout(slide, text, opts = {}) {
-  // Distinctive "perf" sidebar — amber tint, left bar, eyebrow "⚡ PERFORMANCE"
+  // Distinctive "perf" sidebar: amber tint, left bar, eyebrow "⚡ PERFORMANCE"
   const x = opts.x ?? 0.62;
   const y = opts.y ?? 5.65;
   const w = opts.w ?? 12.09;
@@ -301,7 +301,7 @@ function addCodeSlide(slide, eyebrow, title, lang, codeLines, caption, opts = {}
     fill: { color: COLOR.codeBg },
     line: { color: COLOR.codeBg, width: 0 },
   });
-  // code text — render each line with simple syntax coloring (comments green)
+  // code text: render each line with simple syntax coloring (comments green)
   const items = codeLines.map((ln) => {
     const trimmed = ln.replace(/^\s+/, "");
     const isComment = trimmed.startsWith("#") || trimmed.startsWith("//");
@@ -331,7 +331,7 @@ function addCodeSlide(slide, eyebrow, title, lang, codeLines, caption, opts = {}
 }
 
 function addSectionDivider(slide, code, title, subtitle) {
-  // background — solid red, matches Python deck
+  // background: solid red, matches Python deck
   slide.background = { color: COLOR.redDark };
   // section-panel.png covers full slide (textured red)
   try {

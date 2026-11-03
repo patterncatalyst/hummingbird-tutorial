@@ -17,16 +17,16 @@ containers cleanly even on failure, and exit non-zero on any problem.
 | `test-node.sh`            | examples/node-example              | 18083 |
 | `test-ml.sh`              | examples/ml-example                | 18084 |
 | `test-compose-stack.sh`   | examples/compose-stack             | 3000  |
-| `test-all-examples.sh`    | All of the above, in sequence      | —     |
+| `test-all-examples.sh`    | All of the above, in sequence      | varies |
 
-Run any of them from anywhere — they auto-detect the repo root:
+Run any of them from anywhere; they auto-detect the repo root:
 
 ```bash
 bash scripts/test-go.sh                # one example
 bash scripts/test-all-examples.sh      # all of them
 ```
 
-The aggregator does **not** fail fast — every test runs regardless of
+The aggregator does **not** fail fast; every test runs regardless of
 earlier results, then a final summary tallies pass/fail. Useful when
 you want to see all problems at once after a refactor rather than
 fixing them one re-run at a time.
@@ -38,7 +38,7 @@ directly.
 ## Workflow scripts
 
 `secure-build.sh` is the local DevSecOps pipeline from
-[§11 Real-world examples](../_docs/11-real-world-examples.md), Scenario 4
-— builds, scans, signs, and pushes a Hummingbird-based image with a
+[§11 Real-world examples](../_docs/11-real-world-examples.md), Scenario 4.
+It builds, scans, signs, and pushes a Hummingbird-based image, with a
 hard fail if any high-severity CVE is found. See the §11 walkthrough
 for usage.

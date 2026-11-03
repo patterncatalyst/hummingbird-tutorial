@@ -1,8 +1,8 @@
 # python-example
 
 Trivial FastAPI app demonstrating the wheel-build multi-stage pattern.
-Walked through in detail in [§4 — Multi-stage builds, Example B](../../_docs/04-multi-stage-builds.md)
-and reused in [§11 — Real-world examples (Scenario 1)](../../_docs/11-real-world-examples.md).
+Walked through in detail in [§4: Multi-stage builds, Example B](../../_docs/04-multi-stage-builds.md)
+and reused in [§11: Real-world examples (Scenario 1)](../../_docs/11-real-world-examples.md).
 
 ## Build and run
 
@@ -51,5 +51,5 @@ podman build \
 
 ## Image-name caveat
 
-Assumes `python:3.13-builder` and `python:3.13`. See the
-[reconciliation plan](../../plans/reconciliation-plan.md) §A.
+Assumes `python:3.13-builder` and `python:3.13`; confirm these
+against the catalog you have access to.

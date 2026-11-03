@@ -2,9 +2,9 @@
 
 Trivial Quarkus app demonstrating the two-stage JVM-mode build pattern
 on Hummingbird OpenJDK images. Walked through in
-[§4 — Multi-stage builds, Example A](../../_docs/04-multi-stage-builds.md).
+[§4: Multi-stage builds, Example A](../../_docs/04-multi-stage-builds.md).
 
-JVM mode rather than native — building a native image needs a different
+JVM mode rather than native. Building a native image needs a different
 builder image and roughly doubles build time. JVM mode is what most
 teams ship; native is conceptual ground covered in the tutorial body.
 
@@ -33,7 +33,7 @@ podman stop hb-q && podman rm hb-q
 
 ## Why JVM mode is the realistic default
 
-The Quarkus marketing pitch is around native image builds — fast cold
+The Quarkus marketing pitch is around native image builds: fast cold
 start, low memory. Both real. But native builds:
 
 - Need a separate Mandrel/GraalVM builder image.
@@ -41,24 +41,24 @@ start, low memory. Both real. But native builds:
 - Don't always succeed without tuning, especially with reflection-heavy
   libraries.
 
-For most production workloads JVM mode is the right starting point —
+For most production workloads JVM mode is the right starting point:
 predictable, fast to build, well-understood. Move to native when you
-have a measurable reason. This example deliberately shows the JVM
-path so the build is fast enough to fit in a tutorial.
+have a measurable reason. This example shows the JVM path so the
+build is fast enough to fit in a tutorial.
 
 ## Why UBI for the builder, Hummingbird for the runtime
 
 The build stage uses `registry.access.redhat.com/ubi9/openjdk-21`,
-not Hummingbird. That's a deliberate choice and worth understanding.
+not Hummingbird.
 
 The Hummingbird `openjdk:21-builder` image ships the JDK and `javac`,
 but **does not ship Maven**. Hummingbird's design philosophy is
-"minimal: only what's actually used, only what's been audited" —
+"minimal: only what's actually used, only what's been audited",
 which means the builder images don't pre-install build tools that
 not every user needs. For a `javac`-driven Java project, the
 Hummingbird builder is the right choice. For a Maven- or
 Gradle-driven project (most real-world Java apps, including this
-Quarkus example), it isn't — there's no `mvn` on PATH.
+Quarkus example), it isn't; there's no `mvn` on PATH.
 
 UBI's `openjdk-21` image is the dual: purpose-built for Java
 builds, with Maven and Gradle pre-installed and ready to use.
@@ -68,7 +68,7 @@ across the multi-stage boundary into Hummingbird's
 
 **The CVE surface that ships in the deployed artifact is the
 runtime image, not the builder.** A larger UBI builder doesn't
-hurt the deployed app — it never reaches production. The
+hurt the deployed app; it never reaches production. The
 near-zero-CVE properties Hummingbird is known for are properties
 of the runtime image, and we keep that.
 
@@ -76,12 +76,12 @@ of the runtime image, and we keep that.
 
 Hummingbird publishes both a full JDK runtime (`openjdk:21`) and a
 JRE-only runtime (`openjdk:21-runtime`). For an application that
-only runs bytecode at runtime — no `javac`, no Maven invocations
-inside the container — the JRE-only image is meaningfully smaller
+only runs bytecode at runtime, with no `javac` or Maven invocations
+inside the container, the JRE-only image is meaningfully smaller
 and removes attack surface that wouldn't be exercised anyway.
 That's what we use here.
 
-If you needed to compile inside the container at runtime (rare —
+If you needed to compile inside the container at runtime (rare:
 think hot-reloading scripts, or a JShell-driven service), use
 `openjdk:21` instead.
 
@@ -117,11 +117,9 @@ podman build \
 ## Why not native here
 
 If you do want to try native, the conceptual change is one extra
-build stage. The Mandrel builder image's exact name in the
-Hummingbird catalog isn't yet verified — see the
-[reconciliation plan](../../plans/reconciliation-plan.md) for the
-in-flight question. Treat the snippet below as illustrative until
-the catalog is checked:
+build stage. Confirm the Mandrel builder image name against the
+current Hummingbird catalog, and treat the snippet below as
+illustrative:
 
 ```dockerfile
 # Native build stage — adds 2-4 minutes to build time.

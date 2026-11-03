@@ -47,7 +47,7 @@ rehearse without stopping, set `DEMO_NO_PAUSE=1`.
 
 The same tools the tutorial uses: `podman`, `skopeo`, `jq`, `syft`,
 `grype`, `cosign`, and `curl`. Run `./demos/run.sh check` to see what's on
-your `PATH` and what's missing — see `_docs/01-prerequisites.md` for
+your `PATH` and what's missing. See `_docs/01-prerequisites.md` for
 install notes (including the cosign-on-Fedora-44 caveat).
 
 **Before a talk, pre-pull the images** so nothing stalls on conference
@@ -76,7 +76,7 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
 
 - **Nothing aborts on stage.** A failed pull, an unreachable registry, or a
   signing-infra hiccup degrades to a short explanation and the demo keeps
-  going. Steps that touch the network are deliberately allowed to fail soft.
+  going. Steps that touch the network fail soft by design.
 - **Self-cleaning.** Each demo removes the containers, images, and temp
   files it created when it exits, so re-runs are idempotent and your machine
   stays tidy.
@@ -84,18 +84,18 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
   (default max age 5 days). Run `grype db update` in your preflight; demo 6
   also runs it automatically if the DB is invalid.
 - **Layer count is not a size signal.** Hardened images have *more* layers
-  than the stock image — that's chunkah (content-based splitting for cheap
+  than the stock image; that's chunkah (content-based splitting for cheap
   re-pulls), not bloat. Demo 3 says this; size, contents, package count
   (demo 5), and CVE count (demo 6) are the real signals.
 - **Signatures and SBOM attestations verify with the public key.** On the
   Red Hat catalog path (`registry.access.redhat.com/hi/`), the published key
   (`security.access.redhat.com/data/63405576.txt`) verifies the image
   signature and the SBOM attestation. The `quay.io/hummingbird/` mirror is
-  the *unsigned* copy — verify against `hi/`. SLSA provenance backs the
+  the *unsigned* copy; verify against `hi/`. SLSA provenance backs the
   reproducible-build guarantee; the exact verify/rebuild recipe lives in
   hummingbird-project.io "Verifying Reproducibility" (it changes, so follow
   the source rather than hard-coding a predicate type). Demo 7, Step 3 just
-  enumerates the predicate types actually attached.
+  enumerates the predicate types attached.
 - **cosign v3.** Demo 5's offline self-signing uses the v3 flags
   (`--use-signing-config=false --tlog-upload=false` + `--bundle` on both
   sign and verify). On cosign v2, drop `--use-signing-config=false`.
@@ -105,33 +105,33 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
 
 ## Changelog
 
-- **r01.6** — Version bump only, to give the demo 7 fixes a fresh,
+- **r01.6**: Version bump only, to give the demo 7 fixes a fresh,
   unambiguous filename (the `r01.5` label had been reused). No code change
   since r01.5. Demo 8 confirmed correct as-is: Gotcha A's `RUN` build is an
-  intentional `run_fail` — the `/bin/sh not found` error is the lesson, and
+  intentional `run_fail`; the `/bin/sh not found` error is the lesson, and
   the "✓ …failed exactly as expected" line confirms it.
-- **r01.5** — Demo 7 polish: fixed a mangled closing line ("full SLSA"
+- **r01.5**: Demo 7 polish: fixed a mangled closing line ("full SLSA"
   fragment) and aligned Step 2's forward-reference with Step 3's enumerate.
   Confirmed on a live run that Step 3 lists both predicate types
-  (`https://slsa.dev/provenance/v0.2` and `https://spdx.dev/Document`) — the
+  (`https://slsa.dev/provenance/v0.2` and `https://spdx.dev/Document`); the
   provenance is v0.2, which is why the older `--type slsaprovenance` (v1.0)
   alias never matched.
-- **r01.4** — Demo 7, Step 3: on this catalog image, cosign surfaces only
+- **r01.4**: Demo 7, Step 3: on this catalog image, cosign surfaces only
   SBOM-family predicates for `--type slsaprovenance`, so the step now
   enumerates the attached predicate types via `cosign download attestation`
   and frames SLSA provenance/reproducibility by pointing at the source docs,
   rather than running a `--type slsaprovenance` query that errors on stage.
-- **r01.3** — Grype severity summary fix (`value` not `count`); dropped the
+- **r01.3**: Grype severity summary fix (`value` not `count`); dropped the
   unreachable `hummingbird-hatchling` provenance path and stale override
   examples.
-- **r01.1** — Fixes from a live dry run: demo 3 reframes layer count as
+- **r01.1**: Fixes from a live dry run: demo 3 reframes layer count as
   chunkah (hardened has *more* layers, by design); demo 5's SBOM contrast is
   now apples-to-apples (hardened nginx vs stock nginx) and the offline
   cosign sign/verify uses the v3 `--bundle` flags; demo 6 refreshes a stale
   Grype DB and builds the Go example itself if demo 4's image isn't present;
   demo 7 treats the Trusted Libraries 401 as auth-required rather than
   absence. Network curls gained timeouts.
-- **r01.0** — Initial eight demos + runner.
+- **r01.0**: Initial eight demos + runner.
 
 ## Verification status
 
@@ -139,6 +139,6 @@ HB_REGISTRY=registry.access.redhat.com/hi ./demos/run.sh all
 exercised through a dry run; the r01.1 changes came from a real run on
 Fedora 44. Still confirm image names/tags and the signed paths against
 `images.redhat.com` (and the upstream GitLab key for provenance) before an
-audience — run `./demos/run.sh check`, pre-pull, `grype db update`, then a
+audience: run `./demos/run.sh check`, pre-pull, `grype db update`, then a
 full `./demos/run.sh all` rehearsal.
 

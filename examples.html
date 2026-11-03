@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Example projects
-description: Runnable companion projects for the tutorial sections — Quarkus, Python, Go, multi-container compose, ML inference, Node.
+description: "Runnable companion projects for the tutorial sections: Quarkus, Python, Go, multi-container compose, ML inference, Node."
 ---
 
 <section class="hero hero--compact">
@@ -69,7 +69,7 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <h3 class="card__title">Go on Hummingbird Go runtime</h3>
         <p class="card__desc">
           The smallest of the bunch. <code>CGO_ENABLED=0</code> static
-          binary on the Hummingbird <code>go:1.26</code> runtime —
+          binary on the Hummingbird <code>go:1.26</code> runtime,
           typically around 30 MB total.
         </p>
         <div class="card__meta">
@@ -103,7 +103,7 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
           Same wheel-build pattern as the Python example, but with a
           NumPy dependency that compiles native code. Demonstrates the
           shared-library COPY pattern (libstdc++, libgcc_s, libgomp)
-          for distroless runtimes — the technique scales to
+          for distroless runtimes; the technique scales to
           <code>transformers</code> + <code>torch</code> when ready.
         </p>
         <div class="card__meta">
@@ -118,7 +118,7 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
         <div class="card__eyebrow">Compose · <strong>3 services</strong></div>
         <h3 class="card__title">Multi-container stack</h3>
         <p class="card__desc">
-          Web app, PostgreSQL, OpenTelemetry collector — all on
+          Web app, PostgreSQL, and an OpenTelemetry collector, all on
           Hummingbird base images. Demonstrates the SELinux <code>:Z</code>
           flag, healthcheck timing, and service-name DNS in one file.
         </p>
@@ -148,10 +148,9 @@ description: Runnable companion projects for the tutorial sections — Quarkus, 
     <h2 class="section-heading">If a build fails on <code>manifest unknown</code></h2>
     <p>
       Image names and the existence of specific Hummingbird builder
-      images vary across the early-access and post-GA windows. The
-      <a href="{{ '/plans/reconciliation-plan/' | relative_url }}">reconciliation plan, section A</a>
-      tracks every unverified image reference. If a build fails, that's
-      the first place to check.
+      images vary across the early-access and post-GA windows. If a build
+      fails on <code>manifest unknown</code>, confirm the image reference
+      against the current Hummingbird catalog on Quay.
     </p>
   </div>
 </section>

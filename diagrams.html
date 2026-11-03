@@ -11,7 +11,7 @@ description: Architecture and flow diagrams for the tutorial. Each diagram is sh
     <p class="hero__lead">
       Ten diagrams covering the tutorial's architectures and flows.
       Click any diagram to open it fullscreen. Each is also available as
-      <code>.excalidraw</code> source — open it on excalidraw.com to edit.
+      <code>.excalidraw</code> source; open it on excalidraw.com to edit.
     </p>
   </div>
 </section>
@@ -43,7 +43,7 @@ description: Architecture and flow diagrams for the tutorial. Each diagram is sh
          file="03-podman-basics-debug-sidecar"
          section="§3"
          title="Debug sidecar pattern"
-         caption="A second container shares PID and network namespaces with the running Hummingbird container — replaces shell-into-container." %}
+         caption="A second container shares PID and network namespaces with the running Hummingbird container, replacing shell-into-container." %}
 
       {% include diagram-card.html
          file="04-multi-stage-builds-pattern"
@@ -73,7 +73,7 @@ description: Architecture and flow diagrams for the tutorial. Each diagram is sh
          file="09-zstd-chunked-layer-format"
          section="§9"
          title="zstd:chunked layer format"
-         caption="How chunked compression enables partial pulls — only changed chunks travel on the wire." %}
+         caption="How chunked compression enables partial pulls: only changed chunks travel on the wire." %}
 
       {% include diagram-card.html
          file="10-chunkah-layer-split"
@@ -87,7 +87,7 @@ description: Architecture and flow diagrams for the tutorial. Each diagram is sh
 </section>
 
 {%- comment -%}
-  Fullscreen modal — populated by JS when a card is clicked.
+  Fullscreen modal, populated by JS when a card is clicked.
 {%- endcomment -%}
 <div id="diagram-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <button class="modal__close" type="button" aria-label="Close fullscreen">×</button>

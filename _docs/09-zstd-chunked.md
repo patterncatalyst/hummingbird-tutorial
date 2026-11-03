@@ -18,10 +18,9 @@ By the end of this chapter you can:
 
 ## Why this matters
 
-This section covers `zstd:chunked`, a compression format for
-container image layers that lets clients pull only the *changed*
-parts of a layer when an image is updated, rather than re-pulling
-the entire layer. It pairs particularly well with Hummingbird
+`zstd:chunked` is a compression format for container image layers
+that lets clients pull only the *changed* parts of a layer when an
+image is updated, rather than re-pulling the entire layer. It pairs particularly well with Hummingbird
 images, where the small dependency graph means a typical update
 changes only a few packages.
 

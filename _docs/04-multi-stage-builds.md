@@ -268,7 +268,7 @@ podman stop hb-py && podman rm hb-py
 
 ## Example C: Go
 
-Go is the easy example. Compile to a static binary in the builder
+Go is the simplest example. Compile to a static binary in the builder
 stage, copy the binary into the Hummingbird Go runtime, done. The
 runtime image is essentially just glibc and a non-root user; Go's
 static binaries don't need a language runtime in the deploy stage.

@@ -18,10 +18,9 @@ By the end of this chapter you can:
 
 ## Why this matters
 
-This section is about the artifacts that travel alongside an image
-without being part of its filesystem: software bills of materials
-(SBOMs), build provenance attestations, and Sigstore-style
-signatures.
+Some artifacts travel alongside an image without being part of its
+filesystem: software bills of materials (SBOMs), build provenance
+attestations, and Sigstore-style signatures.
 
 ## What's attached to an image
 
@@ -201,9 +200,9 @@ cosign download attestation "$HUMMINGBIRD_IMG" \
   | sort -u
 ```
 
-Note that `cosign verify-attestation --type slsaprovenance` targets
-the v1.0 predicate URI, so it will *not* match the v0.2 attestation
-on these images: enumerating the types as above avoids that trap.
+`cosign verify-attestation --type slsaprovenance` targets the v1.0
+predicate URI, so it will *not* match the v0.2 attestation on these
+images: enumerating the types as above avoids that trap.
 
 ## Step 7: A `policy.json` that enforces signatures
 
