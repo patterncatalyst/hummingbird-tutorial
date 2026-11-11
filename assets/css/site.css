@@ -980,3 +980,9 @@ pre code {
   .modal__viewer { padding: var(--space-4); }
   .modal__actions { padding: var(--space-3) var(--space-4); }
 }
+
+/* Bibliography: explicit column widths (colgroup) keep long titles and focus text readable */
+table.bib { table-layout: fixed; width: 100%; }
+table.bib td small { display: block; margin-top: .5rem; color: var(--ink-muted, #6a6e73); line-height: 1.45; }
+table.bib--books td:last-child { white-space: nowrap; }
+table.bib :is(th, td) code { white-space: normal; overflow-wrap: anywhere; }
