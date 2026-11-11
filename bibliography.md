@@ -10,9 +10,13 @@ and distroless runtimes draws on one reference book and the primary
 documentation for the tools it uses. These are reference works, not sources: no
 text or code from any of them is reproduced here.
 
-| Title | Author(s) | Publisher | Year | Focus |
-|---|---|---|---|---|
-| [*Container Security*, 2nd ed.](https://www.oreilly.com/library/view/container-security-2nd/9781098168988/) | Liz Rice | O'Reilly | 2025 | Container isolation, image supply chain, and runtime security |
+<table class="bib bib--books">
+  <colgroup><col style="width:62%"><col style="width:24%"><col style="width:14%"></colgroup>
+  <thead><tr><th>Title</th><th>Author(s)</th><th>Year</th></tr></thead>
+  <tbody>
+    <tr><td><a href="https://www.oreilly.com/library/view/container-security-2nd/9781098168988/" rel="noopener"><em>Container Security</em>, 2nd ed.</a><br><small>O'Reilly. Container isolation, image supply chain, and runtime security</small></td><td>Liz Rice</td><td>2025</td></tr>
+  </tbody>
+</table>
 
 ## Primary references
 
